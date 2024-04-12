@@ -1,0 +1,4 @@
+mypy
+Flask
+SQLAlchemy
+types-Flask-SQLAlchemy
