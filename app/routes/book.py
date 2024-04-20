@@ -12,8 +12,8 @@ def products() -> str:
 # /book/add?name=...&author=...
 @app.route("/book/add")
 def add() -> str:
-    name = request.args.get("name")
-    author = request.args.get("author")
+    name = request.args.get("name") or "..."
+    author = request.args.get("author") or "..."
 
     book = Book(name = name, author = author)
 
