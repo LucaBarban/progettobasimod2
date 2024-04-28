@@ -1,0 +1,75 @@
+.navbar,
+.navbar__box,
+.search-bar {
+    background: var(--navbar-background);
+}
+
+.navbar {
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    grid-template-rows: 1;
+    align-items: center;
+    padding: 30px 10%;
+}
+
+.navbar__box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar__button {
+    position: relative;
+    font-size: var(--font-size);
+    font-weight: 500;
+    background: var(--accent-color);
+    overflow: hidden;
+    border-radius: 5px;
+    border: none;
+    padding: 8px 10px;
+    margin: 5px;
+}
+
+/* SEARCH BAR */
+
+.search-bar__input::placeholder,
+.search-bar__icon {
+    color: var(--input-foreground);
+    color: rgba(0, 0, 0, 0.25);
+}
+
+.search-bar__box:focus-within {
+    filter: brightness(95%);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.75);
+}
+
+.search-bar__box {
+    --padding: 10px;
+
+    width: max-content;
+    align-items: center;
+    display: flex;
+    border-radius: 28px;
+    padding: var(--padding);
+    background: var(--input-background);
+    width: 600px;
+    transition: background 1s;
+}
+
+.search-bar__input {
+    border: none;
+    font-family: var(--font);
+    color: #fff;
+    margin-left: var(--padding);
+    outline: none;
+    border: none;
+    font-size: var(--font-size);
+    background: transparent;
+    flex: 1;
+}
+
+.search-bar__icon {
+    background: var(--input-background);
+    margin-left: var(--padding);
+}
+
