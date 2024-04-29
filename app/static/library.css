@@ -1,0 +1,62 @@
+html {
+    background: #242424;
+    color: #ffffff;
+}
+
+.lib__container {
+    display: flex;
+    justify-content: center;
+}
+
+.lib__item {
+    display: flex;
+    flex-direction: column;
+    min-width: 50%;
+}
+
+.lib__library {
+    border: 10px solid #8B4513;
+    padding: 20px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.own__item {
+    text-align: center;
+    flex: 0 1 auto;
+}
+
+.own__details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
+}
+
+.lib__btn {
+    border-radius: 10px;
+    padding: 5px 10px;
+    margin: 5px;
+    color: white;
+    background: #c061cb;
+    text-decoration: none;
+
+}
+
+.own__separator {
+    border: 2px solid #6F4E37;
+}
+
+.lib__pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.lib__title {
+    text-align: center;
+}
+
