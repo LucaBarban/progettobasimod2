@@ -1,8 +1,7 @@
-from datetime import date
+from datetime import date, datetime
 from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 from typing import Optional
-import datetime
 
 # TODO: aggiungere colonna token (nullable + indice) e logingdate (not null) al db
 
@@ -14,12 +13,12 @@ class User(Base):
     last_name: Mapped[str]
     password: Mapped[str]
     created_at: Mapped[date]
-    last_logged_in_at: Mapped[datetime.datetime]
+    last_logged_in_at: Mapped[datetime]
     balance: Mapped[int]
     seller: Mapped[bool]
     token: Mapped[Optional[str]]
 
-    def __init__(self, username: str, first_name: str, last_name: str, password: str, created_at: datetime.datetime, last_logged_in_at:datetime.datetime, balance:int, seller:bool, token:str):
+    def __init__(self, username: str, first_name: str, last_name: str, password: str, created_at: datetime, last_logged_in_at:datetime, balance:int, seller:bool, token:str):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
