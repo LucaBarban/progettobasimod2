@@ -1,0 +1,21 @@
+<div class="lib__pagination">
+    {% if pages[0] != 1 %}
+        <a href="1" class="lib__btn">1</a>
+    {% endif %}
+
+    {% if pages[0] > 2 %}
+        <span> ... </span>
+    {% endif %}
+
+    {% for page in pages %}
+    <a href="{{ page }}" class="lib__btn"> {{ page }} </a>
+    {% endfor %}
+
+    {% if pages[-1] < last_page - 1 %}
+        <span> ... </span>
+    {% endif %}
+
+    {% if pages[-1] != last_page %}
+        <a href="{{ last_page }}" class="lib__btn"> {{ last_page }} </a>
+    {% endif %}
+</div>

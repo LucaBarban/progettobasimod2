@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block pagestyles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+{% endblock pagestyles %}
+
+{% block content %}
+
+{% include 'components/navbar.html' %}
+
+<div class="lib__container">
+    <div class="lib__item">
+        <h1 class="lib__title"> {{ username }}'s library </h1>
+        <div class="lib__library">
+            {% for own in owns %}
+                <div class="own__item">
+                    {% with book = own.book %}
+                        <h2> {{ book.title }} </h1>
+                        <img
+                            width=200
+                            src="{{ url_for('static', filename='image/' ~ book.id) }}"
+                            onerror="this.src='{{ url_for('static', filename='404.png') }}'"
+                        />
+                        <hr class="own__separator"/>
+                    {% endwith %}
+
+                    <div class="own__details">
+                        {{ own.state }}
+                        <span> x{{ own.quantity }} </span>
+                    </div>
+
+                    {% if own.on_sale %}
+                        <a class="lib__btn" href="/insertion/remove/{{own.fk_book}}">remove insertion</a>
+                    {% elif own.user.seller %}
+                        <a class="lib__btn" href="/insertion/add/{{own.fk_book}}">create insertion</a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% include "components/pagination.html" %}
+    </div>
+</div>
+
+{% endblock content %}

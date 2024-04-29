@@ -1,0 +1,64 @@
+html {
+    background: var(--page-background);
+    color: var(--main-foreground);
+    --library-border: #8B4513;
+    --library-separator: #6F4E37;
+}
+
+.lib__container {
+    display: flex;
+    justify-content: center;
+}
+
+.lib__item {
+    display: flex;
+    flex-direction: column;
+    min-width: 50%;
+}
+
+.lib__library {
+    border: 10px solid var(--library-border);
+    padding: 20px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.own__item {
+    text-align: center;
+    flex: 0 1 auto;
+}
+
+.own__details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
+}
+
+.lib__btn {
+    border-radius: 10px;
+    padding: 5px 10px;
+    margin: 5px;
+    color: #000;
+    background: var(--accent-color);
+    text-decoration: none;
+
+}
+
+.own__separator {
+    border: 2px solid var(--library-separator);
+}
+
+.lib__pagination {
+    display: flex;
+    justify-content: center;
+}
+
+.lib__title {
+    text-align: center;
+}
+
