@@ -1,6 +1,8 @@
 html {
-    background: #242424;
-    color: #ffffff;
+    background: var(--page-background);
+    color: var(--main-foreground);
+    --library-border: #8B4513;
+    --library-separator: #6F4E37;
 }
 
 .lib__container {
@@ -15,7 +17,7 @@ html {
 }
 
 .lib__library {
-    border: 10px solid #8B4513;
+    border: 10px solid var(--library-border);
     padding: 20px;
     border-radius: 30px;
     display: flex;
@@ -41,14 +43,14 @@ html {
     border-radius: 10px;
     padding: 5px 10px;
     margin: 5px;
-    color: white;
-    background: #c061cb;
+    color: #000;
+    background: var(--accent-color);
     text-decoration: none;
 
 }
 
 .own__separator {
-    border: 2px solid #6F4E37;
+    border: 2px solid var(--library-separator);
 }
 
 .lib__pagination {
