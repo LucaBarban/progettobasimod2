@@ -5,7 +5,7 @@ from .safety import bcrypt, csrf
 def create_app() -> Flask:
     app = Flask(__name__)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://user-name:strong-password@localhost/progetto"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///library.db"
     app.config["WTF_CSRF_CHECK_DEFAULT"] = False
     app.secret_key = b'test' # TODO: spostare la chiave in un luogo decente (e renderla più sicura di così)
 
