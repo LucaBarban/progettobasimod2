@@ -17,7 +17,7 @@ def page_list(current: int, last: int, offset: int = 2) -> List[int]:
 def library(page: int = 1) -> str:
     username = "user_B"
 
-    limit = 10
+    limit = 2
 
     count = db.session.query(Own).filter(Own.fk_username == username).count()
 
@@ -34,6 +34,13 @@ def library(page: int = 1) -> str:
         .offset((page - 1) * limit)
     ).all()
 
+    print(pages, last_page)
+
     return render_template(
-        "library.html", username=username, owns=owns, pages=pages, last_page=last_page
+        "library.html",
+        username=username,
+        owns=owns,
+        page=page,
+        pages=pages,
+        last_page=last_page,
     )
