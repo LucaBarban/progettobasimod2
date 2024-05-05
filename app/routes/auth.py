@@ -11,12 +11,6 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length
 from ..safety import bcrypt, csrf
 
-# from app.routes.auth import checkLoggedIn# type: ignore
-# if checkLoggedIn():
-#     return render_template("index.html")
-# else:
-#     return render_template("login.html", error="")
-
 minPwdLen: int = 8
 bcryptRounds: int = 10
 tokenSize: int = 32
@@ -132,7 +126,21 @@ def getNewToken() -> str:
     return '{' + secrets.token_hex(tokenSize) + '}'
 
 def checkLoggedIn() -> bool:
-    '''Return True if the user is logged in with a valid session, False otherwise'''
+    """
+    Check is the user has logged in properly (has correct and valid session)
+
+    Returns::
+        bool: True if the user is logged in with a valid session, False otherwise
+
+    Example::
+
+        from app.routes.auth import checkLoggedIn #type: ignore
+        if checkLoggedIn():
+            return render_template("index.html")
+        else:
+            return render_template("login.html", error="")
+
+    """
     if not session.get('token'): #if a token already exists
         return False
     users = db.session.scalars(sq.select(User).filter_by(token=session['token'])).fetchall()
