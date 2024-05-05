@@ -136,7 +136,7 @@ def checkLoggedIn() -> bool:
 
         from app.routes.auth import checkLoggedIn #type: ignore
         from werkzeug.wrappers.response import Response
-        if checkLoggedIn() -> str | Response:
+        if checkLoggedIn():
             return render_template("index.html")
         else:
             return redirect("/login/")
