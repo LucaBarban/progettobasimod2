@@ -135,10 +135,11 @@ def checkLoggedIn() -> bool:
     Example::
 
         from app.routes.auth import checkLoggedIn #type: ignore
-        if checkLoggedIn():
+        from werkzeug.wrappers.response import Response
+        if checkLoggedIn() -> str | Response:
             return render_template("index.html")
         else:
-            return render_template("login.html", error="")
+            return redirect("/login/")
 
     """
     if not session.get('token'): #if a token already exists
