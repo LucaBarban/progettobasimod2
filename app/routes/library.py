@@ -35,5 +35,10 @@ def library(page: int = 1) -> str:
     ).all()
 
     return render_template(
-        "library.html", username=username, owns=owns, pages=pages, last_page=last_page
+        "library.html",
+        username=username,
+        owns=owns,
+        page=page,
+        pages=pages,
+        last_page=last_page,
     )

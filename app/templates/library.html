@@ -31,12 +31,18 @@
                     </div>
 
                     {% if own.on_sale %}
-                        <a class="lib__btn" href="/insertion/remove/{{own.fk_book}}">remove insertion</a>
+                        <a class="lib__btn" href="/insertion/{{own.fk_book}}"> edit </a>
+                        <a class="lib__btn" href="/insertion/remove/{{own.fk_book}}"> remove </a>
                     {% elif own.user.seller %}
-                        <a class="lib__btn" href="/insertion/add/{{own.fk_book}}">create insertion</a>
+                        <a class="lib__btn" href="/insertion/add/{{own.fk_book}}"> create </a>
                     {% endif %}
                 </div>
             {% endfor %}
+            {% if page == last_page %}
+                <div class="lib__add">
+                    <a href="/book/add" class="add__btn"> + </a>
+                </div>
+            {% endif %}
         </div>
         {% include "components/pagination.html" %}
     </div>

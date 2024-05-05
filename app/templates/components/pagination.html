@@ -1,3 +1,4 @@
+{% if pages|length != 1 %}
 <div class="lib__pagination">
     {% if pages[0] != 1 %}
         <a href="1" class="lib__btn">1</a>
@@ -7,8 +8,12 @@
         <span> ... </span>
     {% endif %}
 
-    {% for page in pages %}
-    <a href="{{ page }}" class="lib__btn"> {{ page }} </a>
+    {% for p in pages %}
+        {% if page == p %}
+            <a href="{{ p }}" class="lib__btn lib__disabled"> {{ p }} </a>
+        {% else %}
+            <a href="{{ p }}" class="lib__btn"> {{ p }} </a>
+        {% endif %}
     {% endfor %}
 
     {% if pages[-1] < last_page - 1 %}
@@ -19,3 +24,4 @@
         <a href="{{ last_page }}" class="lib__btn"> {{ last_page }} </a>
     {% endif %}
 </div>
+{% endif %}
