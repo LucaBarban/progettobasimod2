@@ -46,7 +46,13 @@ html {
     color: #000;
     background: var(--accent-color);
     text-decoration: none;
+}
 
+.lib__disabled {
+    color: var(--accent-color);
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    text-decoration: none;
 }
 
 .own__separator {
@@ -62,3 +68,18 @@ html {
     text-align: center;
 }
 
+.lib__add {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.add__btn {
+    text-decoration: none;
+    font-weight: bold;
+    color: var(--main-foreground);
+    font-size: 50px;
+    padding: 0px 20px;
+    border: 5px solid var(--library-separator);
+    border-radius: 1000px;
+}
