@@ -89,6 +89,11 @@ def register() -> str | Response:
     if pwd != checkpwd:
         return render_template("register.html", error="Passwords must be the same")
 
+    dbUsers = db.session.scalars(sq.select(User).where(User.username==usr)).fetchall()
+    if len(dbUsers) != 0:
+        return render_template("register.html", error="Username already taken")
+
+    newUsersToken:str = getNewToken()
     db.session.add(User(usr,
                         frname,
                         lsname,
@@ -97,7 +102,8 @@ def register() -> str | Response:
                         datetime.now(),
                         0,
                         False,
-                        getNewToken()))
+                        newUsersToken))
+    session['token'] = newUsersToken
     db.session.commit()
 
     flash('You have successfully registered')
@@ -127,7 +133,7 @@ def getNewToken() -> str:
 
 def checkLoggedIn() -> bool:
     """
-    Check is the user has logged in properly (has correct and valid session)
+    Check if the user has logged in properly (has correct and valid session)
 
     Returns::
         bool: True if the user is logged in with a valid session, False otherwise
@@ -136,11 +142,10 @@ def checkLoggedIn() -> bool:
 
         from app.routes.auth import checkLoggedIn #type: ignore
         from werkzeug.wrappers.response import Response
-        if checkLoggedIn():
-            return render_template("index.html")
-        else:
+        if not checkLoggedIn():
             return redirect("/login/")
-
+        else:
+            return render_template("index.html")
     """
     if not session.get('token'): #if a token already exists
         return False
@@ -149,3 +154,27 @@ def checkLoggedIn() -> bool:
         return False
     return True
 
+def getLoggedInUser() -> str | None:
+    """
+    Get the username of the currently logged in user
+
+    Returns::
+        str: username of the logged in user if the session is valid, None otherwise
+
+    Example::
+
+        from app.routes.auth import getLoggedInUser #type: ignore
+        from werkzeug.wrappers.response import Response
+        usr: str|None = getLoggedInUser()
+        if usr is None:
+            return redirect("/login/")
+        else:
+            return render_template("index.html")
+
+    """
+    if not session.get('token'): #if a token already exists
+        return None
+    users = db.session.scalars(sq.select(User).filter_by(token=session['token'])).fetchall()
+    if len(users) != 1 or (datetime.combine(users[0].last_logged_in_at, datetime.min.time()) - datetime.now()).days >= 1:
+        return None
+    return users[0].username
