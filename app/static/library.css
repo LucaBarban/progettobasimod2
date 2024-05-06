@@ -55,6 +55,10 @@ html {
     text-decoration: none;
 }
 
+.own__title {
+    margin: 10px;
+}
+
 .own__separator {
     border: 2px solid var(--library-separator);
 }
