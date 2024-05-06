@@ -146,8 +146,6 @@ def checkLoggedIn() -> bool:
             return redirect("/login/")
         else:
             return render_template("index.html")
-
-
     """
     if not session.get('token'): #if a token already exists
         return False
