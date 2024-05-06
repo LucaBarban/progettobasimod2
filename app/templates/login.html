@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1> LoginPage! </h1>
+
+<h2>Login Form</h2>
+<form action="/login/" method="POST">
+    <label for="usr">Username:</label>
+    <input type="text" id="usr" name="usr"><br>
+    <label for="pwd">Password:</label>
+    <input type="password" id="pwd" name="pwd"><br>
+    <input type="submit" value="Login">
+</form>
+
+{{ error }}
+
+{% endblock content %}
