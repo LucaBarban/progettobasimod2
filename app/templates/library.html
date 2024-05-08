@@ -11,12 +11,12 @@
 
 <div class="lib__container">
     <div class="lib__item">
-        <h1 class="lib__title"> {{ username }}'s library </h1>
+        <h1 class="lib__title"> {{ user.username }}'s library </h1>
         <div class="lib__library">
             {% for own in owns %}
                 <div class="own__item">
                     {% with book = own.book %}
-                        <h2> {{ book.title }} </h1>
+                        <h2 class="own__title"> {{ book.title }} </h1>
                         <img
                             width=200
                             src="{{ url_for('static', filename='image/' ~ book.id) }}"

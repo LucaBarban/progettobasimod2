@@ -6,7 +6,12 @@
         {% include 'components/searchbar.html' %}
     </div>
     <div class="navbar__box">
-        <button class="navbar__button">SignIn</button>
-        <button class="navbar__button">SignUp</button>
+        {% if user is not none %}
+            <span class="navbar__user">hi {{ user.username }}</span>
+            <a href="/logout" class="navbar__button">Logout</a>
+        {% else %}
+            <a href="/login" class="navbar__button">SignIn</a>
+            <a href="/register" class="navbar__button">SignUp</a>
+        {% endif %}
     </div>
 </header>

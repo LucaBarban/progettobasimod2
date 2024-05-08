@@ -1,6 +1,13 @@
 {% extends "layout.html" %}
 
+{% block pagestyles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+{% endblock pagestyles %}
+
 {% block content %}
+
+{% include 'components/navbar.html' %}
 
 {% with messages = get_flashed_messages() %}
     {% if messages %}
