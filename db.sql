@@ -53,8 +53,8 @@ CREATE TABLE owns(
     fk_book INTEGER,
     quantity INTEGER NOT NULl CONSTRAINT quantity_gt CHECK (quantity > 0),
     state state NOT NULL,
-    on_sale BOOLEAN NOT NULL,
-    PRIMARY KEY (fk_username, fk_book, state, on_sale),
+    price INTEGER,
+    PRIMARY KEY (fk_username, fk_book, state, price),
     FOREIGN KEY (fk_username) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
@@ -64,11 +64,11 @@ CREATE TABLE carts(
     fk_seller VARCHAR(100),
     fk_book INTEGER,
     fk_state state,
-    fk_sale BOOLEAN,
+    fk_price INTEGER,
     quantity INTEGER NOT NULL,
     PRIMARY KEY (fk_buyer, fk_seller, fk_book),
     FOREIGN KEY (fk_buyer) REFERENCES users(username),
-    FOREIGN KEY(fk_seller, fk_book, fk_state, fk_sale) REFERENCES owns(fk_username, fk_book, state, on_sale)
+    FOREIGN KEY(fk_seller, fk_book, fk_state, fk_price) REFERENCES owns(fk_username, fk_book, state, price)
 );
 
 
@@ -76,6 +76,7 @@ CREATE TABLE history(
     date DATE PRIMARY KEY,
     quantity INTEGER NOT NULL,
     status status NOT NULL,
+    price INTEGER NOT NULL,
     recensione TEXT,
     fk_buyer VARCHAR(100),
     fk_seller VARCHAR(100),

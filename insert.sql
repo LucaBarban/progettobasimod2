@@ -131,111 +131,111 @@ INSERT INTO users (username, first_name, last_name, password, created_at, balanc
 
 
 -- User: alice123
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('alice123', 1, 5, 'new', true),
-    ('alice123', 2, 4, 'as new', false),
-    ('alice123', 3, 3, 'used', true),
-    ('alice123', 4, 6, 'new', false),
-    ('alice123', 5, 7, 'as new', true),
-    ('alice123', 6, 5, 'used', false),
-    ('alice123', 7, 4, 'new', true),
-    ('alice123', 8, 3, 'as new', false),
-    ('alice123', 9, 2, 'used', true),
-    ('alice123', 10, 7, 'new', false),
-    ('alice123', 11, 6, 'as new', true),
-    ('alice123', 12, 5, 'used', false),
-    ('alice123', 13, 4, 'new', true),
-    ('alice123', 14, 3, 'as new', false),
-    ('alice123', 15, 2, 'used', true);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('alice123', 1, 5, 'new', 2000),
+    ('alice123', 2, 4, 'as new', -1),
+    ('alice123', 3, 3, 'used', 1000),
+    ('alice123', 4, 6, 'new', -1),
+    ('alice123', 5, 7, 'as new', 1500),
+    ('alice123', 6, 5, 'used', -1),
+    ('alice123', 7, 4, 'new', 1750),
+    ('alice123', 8, 3, 'as new', -1),
+    ('alice123', 9, 2, 'used', 800),
+    ('alice123', 10, 7, 'new', -1),
+    ('alice123', 11, 6, 'as new', 700),
+    ('alice123', 12, 5, 'used', -1),
+    ('alice123', 13, 4, 'new', 2500),
+    ('alice123', 14, 3, 'as new', -1),
+    ('alice123', 15, 2, 'used', 1050);
 -- User: bob_smith
 
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('bob_smith', 16, 5, 'new', false),
-    ('bob_smith', 17, 4, 'as new', false),
-    ('bob_smith', 18, 3, 'used', false),
-    ('bob_smith', 19, 6, 'new', false),
-    ('bob_smith', 20, 7, 'as new', false);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('bob_smith', 16, 5, 'new', -1),
+    ('bob_smith', 17, 4, 'as new', -1),
+    ('bob_smith', 18, 3, 'used', -1),
+    ('bob_smith', 19, 6, 'new', -1),
+    ('bob_smith', 20, 7, 'as new', -1);
 
 -- User: jane_doe
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('jane_doe', 21, 5, 'used', false),
-    ('jane_doe', 22, 4, 'new', false),
-    ('jane_doe', 23, 3, 'as new', false),
-    ('jane_doe', 24, 6, 'used', false),
-    ('jane_doe', 25, 7, 'new', false);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('jane_doe', 21, 5, 'used', -1),
+    ('jane_doe', 22, 4, 'new', -1),
+    ('jane_doe', 23, 3, 'as new', -1),
+    ('jane_doe', 24, 6, 'used', -1),
+    ('jane_doe', 25, 7, 'new', -1);
 
 -- User: mike87
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('mike87', 26, 5, 'as new', false),
-    ('mike87', 27, 4, 'used', true),
-    ('mike87', 28, 3, 'new', true),
-    ('mike87', 29, 6, 'as new', true),
-    ('mike87', 30, 7, 'used', true);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('mike87', 26, 5, 'as new', -1),
+    ('mike87', 27, 4, 'used', 1200),
+    ('mike87', 28, 3, 'new', 3500),
+    ('mike87', 29, 6, 'as new', 1599),
+    ('mike87', 30, 7, 'used', 999);
 
 -- Insert owned books for user 'sara_miller'
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('sara_miller', 1, 3, 'new', false),
-    ('sara_miller', 2, 4, 'as new', false),
-    ('sara_miller', 3, 2, 'used', false);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('sara_miller', 1, 3, 'new', -1),
+    ('sara_miller', 2, 4, 'as new', -1),
+    ('sara_miller', 3, 2, 'used', -1);
 
 -- Insert owned books for user 'max_king'
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('max_king', 4, 5, 'new', true),
-    ('max_king', 5, 3, 'as new', true),
-    ('max_king', 6, 4, 'used', false),
-    ('max_king', 7, 2, 'new', false);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('max_king', 4, 5, 'new', 2050),
+    ('max_king', 5, 3, 'as new', 1499),
+    ('max_king', 6, 4, 'used', -1),
+    ('max_king', 7, 2, 'new', -1);
 
 -- Insert owned books for user 'emily_green'
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('emily_green', 8, 4, 'as new', false),
-    ('emily_green', 9, 3, 'used', false),
-    ('emily_green', 10, 2, 'new', false);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('emily_green', 8, 4, 'as new', -1),
+    ('emily_green', 9, 3, 'used', -1),
+    ('emily_green', 10, 2, 'new', -1);
 
 -- Insert owned books for user 'chris99'
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('chris99', 11, 3, 'as new', false),
-    ('chris99', 12, 4, 'used', false),
-    ('chris99', 13, 2, 'new', true),
-    ('chris99', 14, 5, 'as new', true);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('chris99', 11, 3, 'as new', -1),
+    ('chris99', 12, 4, 'used', -1),
+    ('chris99', 13, 2, 'new', 1399),
+    ('chris99', 14, 5, 'as new', 1200);
 
 -- Insert owned books for user 'lisa_wang'
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('lisa_wang', 15, 4, 'used', false),
-    ('lisa_wang', 16, 3, 'new', false),
-    ('lisa_wang', 17, 2, 'as new', false);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('lisa_wang', 15, 4, 'used', -1),
+    ('lisa_wang', 16, 3, 'new', -1),
+    ('lisa_wang', 17, 2, 'as new', -1);
 
 -- Insert owned books for user 'alex23'
-INSERT INTO owns (fk_username, fk_book, quantity, state, on_sale) VALUES
-    ('alex23', 18, 3, 'used', true),
-    ('alex23', 19, 4, 'new', true),
-    ('alex23', 20, 2, 'as new', true),
-    ('alex23', 21, 5, 'used', false),
-    ('alex23', 22, 3, 'new', false);
+INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
+    ('alex23', 18, 3, 'used', 899),
+    ('alex23', 19, 4, 'new', 1550),
+    ('alex23', 20, 2, 'as new', 1399),
+    ('alex23', 21, 5, 'used', -1),
+    ('alex23', 22, 3, 'new', -1);
 
 -- Add cart entries
 -- Cart entry 1: Buyer 'alice123' purchasing from seller 'mike87'
-INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_sale, quantity) VALUES
-    ('alice123', 'mike87', 28, 'new', true, 2);
+INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_price, quantity) VALUES
+    ('alice123', 'mike87', 28, 'new', 3500, 2);
 
 -- Cart entry 2: Buyer 'bob_smith' purchasing from seller 'max_king'
-INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_sale, quantity) VALUES
-    ('bob_smith', 'max_king', 4, 'new', true, 1);
+INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_price, quantity) VALUES
+    ('bob_smith', 'max_king', 4, 'new', 2050, 1);
 
 -- Cart entry 3: Buyer 'jane_doe' purchasing from seller 'chris99'
-INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_sale, quantity) VALUES
-    ('jane_doe', 'chris99', 14, 'as new', true, 2);
+INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_price, quantity) VALUES
+    ('jane_doe', 'chris99', 14, 'as new', 1200, 2);
 
 
 -- Add historical records to the 'history' table
-INSERT INTO history (date, quantity, status, recensione, fk_buyer, fk_seller, fk_book, state) VALUES
-    ('2023-01-20', 2, 'delivered', 'Great transaction!', 'alice123', 'mike87', 1, 'new'),
-    ('2023-02-25', 3, 'shipped', NULL, 'bob_smith', 'max_king', 4, 'as new'),
-    ('2023-03-12', 4, 'on delivery', NULL, 'jane_doe', 'chris99', 11, 'new'),
-    ('2023-04-05', 1, 'delivered', 'Smooth transaction.', 'sara_miller', 'alice123', 2, 'used'),
-    ('2023-05-10', 2, 'delivered', 'Excellent service!', 'max_king', 'mike87', 3,'new'),
-    ('2023-06-18', 3, 'shipped', NULL, 'emily_green', 'max_king', 5, 'as new'),
-    ('2023-07-01', 4, 'on delivery', NULL, 'chris99', 'mike87', 6, 'used'),
-    ('2023-08-14', 2, 'delivered', 'Book arrived in perfect condition.', 'lisa_wang', 'chris99', 7, 'used'),
-    ('2023-09-22', 3, 'delivered', 'Fast shipping!', 'alex23', 'chris99', 8, 'as new'),
-    ('2023-10-05', 1, 'delivered', 'Happy with the purchase.', 'alice123', 'chris99', 9, 'used');
+INSERT INTO history (date, quantity, status, price, recensione, fk_buyer, fk_seller, fk_book, state) VALUES
+    ('2023-01-20', 2, 'delivered', 1000, 'Great transaction!', 'alice123', 'mike87', 1, 'new'),
+    ('2023-02-25', 3, 'shipped', 1000,  NULL, 'bob_smith', 'max_king', 4, 'as new'),
+    ('2023-03-12', 4, 'on delivery', 1000, NULL, 'jane_doe', 'chris99', 11, 'new'),
+    ('2023-04-05', 1, 'delivered', 1000, 'Smooth transaction.', 'sara_miller', 'alice123', 2, 'used'),
+    ('2023-05-10', 2, 'delivered', 1000, 'Excellent service!', 'max_king', 'mike87', 3,'new'),
+    ('2023-06-18', 3, 'shipped', 1000, NULL, 'emily_green', 'max_king', 5, 'as new'),
+    ('2023-07-01', 4, 'on delivery', 1000, NULL, 'chris99', 'mike87', 6, 'used'),
+    ('2023-08-14', 2, 'delivered', 1000, 'Book arrived in perfect condition.', 'lisa_wang', 'chris99', 7, 'used'),
+    ('2023-09-22', 3, 'delivered', 1000, 'Fast shipping!', 'alex23', 'chris99', 8, 'as new'),
+    ('2023-10-05', 1, 'delivered', 1000, 'Happy with the purchase.', 'alice123', 'chris99', 9, 'used');
 
