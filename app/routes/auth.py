@@ -154,7 +154,7 @@ def checkLoggedIn() -> bool:
         return False
     return True
 
-def getLoggedInUser() -> str | None:
+def getLoggedInUser() -> User | None:
     """
     Get the username of the currently logged in user
 
@@ -177,4 +177,4 @@ def getLoggedInUser() -> str | None:
     users = db.session.scalars(sq.select(User).filter_by(token=session['token'])).fetchall()
     if len(users) != 1 or (datetime.combine(users[0].last_logged_in_at, datetime.min.time()) - datetime.now()).days >= 1:
         return None
-    return users[0].username
+    return users[0]

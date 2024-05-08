@@ -18,11 +18,18 @@
     align-items: center;
 }
 
+.navbar__user {
+    margin: 10px;
+    color: var(--main-foreground);
+}
+
 .navbar__button {
     position: relative;
     font-size: var(--font-size);
     font-weight: 500;
     background: var(--accent-color);
+    color: #000;
+    text-decoration: none;
     overflow: hidden;
     border-radius: 5px;
     border: none;

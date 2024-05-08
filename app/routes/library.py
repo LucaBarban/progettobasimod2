@@ -1,7 +1,8 @@
 from typing import List
 
+from app.routes.auth import getLoggedInUser
 import sqlalchemy as sq
-from flask import current_app as app
+from flask import current_app as app, redirect
 from flask import render_template
 
 from app.database import db
@@ -15,11 +16,13 @@ def page_list(current: int, last: int, offset: int = 2) -> List[int]:
 @app.route("/library/")
 @app.route("/library/<int:page>")
 def library(page: int = 1) -> str:
-    username = "user_B"
+    user = getLoggedInUser()
+    if user is None:
+        return redirect('/login')
 
     limit = 10
 
-    count = db.session.query(Own).filter(Own.fk_username == username).count()
+    count = db.session.query(Own).filter(Own.fk_username == user.username).count()
 
     last_page = count // limit + 1
     if (page - 1) * limit > count:
@@ -29,14 +32,14 @@ def library(page: int = 1) -> str:
 
     owns = db.session.scalars(
         sq.select(Own)
-        .filter(Own.fk_username == username)
+        .filter(Own.fk_username == user.username)
         .limit(limit)
         .offset((page - 1) * limit)
     ).all()
 
     return render_template(
         "library.html",
-        username=username,
+        user=user,
         owns=owns,
         page=page,
         pages=pages,
