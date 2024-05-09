@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block pagestyles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+{% endblock pagestyles %}
+
+{% block content %}
+
+{% include 'components/navbar.html' %}
+
+<h1> CART! </h1>
+
+{% for item in missing %}
+{{ item }}
+{% endfor %}
+
+<form action="/cart" method="post">
+
+    {% for item in items %}
+        <div>
+            <img
+                width=200
+                src="{{ url_for('static', filename='covers/' ~ item.own.book.id ~ ".png") }}"
+                onerror="this.src='{{ url_for('static', filename='404.png') }}'"
+            />
+            Title: {{ item.own.book.title }}
+            Seller: {{ item.own.user.username }}
+            Price: {{ item.own.price / 100 }}
+            Quantity: {{ item.quantity }}
+            Total Price: {{ '%0.2f'|format(item.own.price * item.quantity / 100) }}
+        </div>
+
+        <!-- HACK (?) -->
+        <!-- <input type="hidden" name="item[{{ loop.index }}]user" value="{{ item.own.user.username }}"/>
+        <input type="hidden" name="item[{{ loop.index }}]book" value="{{ item.own.book.id }}"/>
+        <input type="hidden" name="item[{{ loop.index }}]state" value="{{ item.own.state }}"/>
+        <input type="hidden" name="item[{{ loop.index }}]price" value="{{ item.own.price }}"/> -->
+
+        <!-- HACK (?) -->
+        <input type="hidden" name="user" value="{{ item.own.user.username }}"/>
+        <input type="hidden" name="book" value="{{ item.own.book.id }}"/>
+        <input type="hidden" name="state" value="{{ item.own.state }}"/>
+        <input type="hidden" name="price" value="{{ item.own.price }}"/>
+        <input type="hidden" name="quantity" value="{{ item.quantity }}"/>
+    {% endfor %}
+
+    Total: {{ '%0.2f'|format(total / 100) }}
+
+    <input type="submit" value="Buy"/>
+</form>
+
+{% endblock content %}

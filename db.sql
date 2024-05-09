@@ -66,7 +66,7 @@ CREATE TABLE carts(
     fk_state state,
     fk_price INTEGER,
     quantity INTEGER NOT NULL,
-    PRIMARY KEY (fk_buyer, fk_seller, fk_book),
+    PRIMARY KEY (fk_buyer, fk_seller, fk_book, fk_state, fk_price),
     FOREIGN KEY (fk_buyer) REFERENCES users(username),
     FOREIGN KEY(fk_seller, fk_book, fk_state, fk_price) REFERENCES owns(fk_username, fk_book, state, price)
 );

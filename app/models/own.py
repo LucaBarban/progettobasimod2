@@ -15,10 +15,10 @@ class Own(Base):
     fk_book: Mapped[str] = mapped_column(ForeignKey(Book.id), primary_key=True)
     quantity: Mapped[int]
     state: Mapped[str] = mapped_column(primary_key=True)
-    on_sale: Mapped[bool]
+    price: Mapped[int] = mapped_column(primary_key=True)
 
     user: Mapped[User] = relationship(User)
     book: Mapped[Book] = relationship(Book)
 
     def __repr__(self) -> str:
-        return f"Own {{ {self.fk_username}, {self.fk_book}, {self.quantity}, {self.state}, {self.on_sale} }}"
+        return f"Own {{ {self.fk_username}, {self.fk_book}, {self.quantity}, {self.state}, {self.price} }}"

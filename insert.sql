@@ -118,7 +118,7 @@ INSERT INTO booksgenres (fk_idB, fk_genre) VALUES
     (30, 'Sci-Fi');
 
 INSERT INTO users (username, first_name, last_name, password, created_at, balance, seller, last_logged_in_at, token) VALUES
-    ('alice123', 'Alice', 'Johnson', '$2b$10$Oy7A3rGnu9X8BXZ40oazEeg72SXO3KBb8lAhjgjKwGL3Msk4BPE/q', '2023-01-15', 500, true, NOW(), '{}'),
+    ('alice123', 'Alice', 'Johnson', '$2b$10$Oy7A3rGnu9X8BXZ40oazEeg72SXO3KBb8lAhjgjKwGL3Msk4BPE/q', '2023-01-15', 15000, true, NOW(), '{}'),
     ('bob_smith', 'Bob', 'Smith', '$2b$10$Oy7A3rGnu9X8BXZ40oazEeg72SXO3KBb8lAhjgjKwGL3Msk4BPE/q', '2023-02-20', 750, false, NOW(), '{}'),
     ('jane_doe', 'Jane', 'Doe', '$2b$10$Oy7A3rGnu9X8BXZ40oazEeg72SXO3KBb8lAhjgjKwGL3Msk4BPE/q', '2023-03-10', 300, false, NOW(), '{}'),
     ('mike87', 'Mike', 'Johnson', '$2b$10$Oy7A3rGnu9X8BXZ40oazEeg72SXO3KBb8lAhjgjKwGL3Msk4BPE/q', '2023-04-05', 1000, true, NOW(), '{}'),
@@ -215,7 +215,10 @@ INSERT INTO owns (fk_username, fk_book, quantity, state, price) VALUES
 -- Add cart entries
 -- Cart entry 1: Buyer 'alice123' purchasing from seller 'mike87'
 INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_price, quantity) VALUES
-    ('alice123', 'mike87', 28, 'new', 3500, 2);
+    ('alice123', 'mike87', 28, 'new', 3500, 2),
+    ('alice123', 'max_king', 4, 'new', 2050, 1),
+    ('alice123', 'alex23', 20, 'as new', 1399, 1),
+    ('alice123', 'chris99', 14, 'as new', 1200, 3);
 
 -- Cart entry 2: Buyer 'bob_smith' purchasing from seller 'max_king'
 INSERT INTO carts (fk_buyer, fk_seller, fk_book, fk_state, fk_price, quantity) VALUES
