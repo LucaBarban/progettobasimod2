@@ -17,8 +17,5 @@ class Own(Base):
     state: Mapped[str] = mapped_column(primary_key=True)
     on_sale: Mapped[bool]
 
-    user: Mapped[User] = relationship(User)
-    book: Mapped[Book] = relationship(Book)
-
     def __repr__(self) -> str:
         return f"Own {{ {self.fk_username}, {self.fk_book}, {self.quantity}, {self.state}, {self.on_sale} }}"
