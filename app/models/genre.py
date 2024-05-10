@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 
-class Book(Base):
+class Genre(Base):
     __tablename__ = "genres"
 
     name: Mapped[str] = mapped_column(primary_key=True)

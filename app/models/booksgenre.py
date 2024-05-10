@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
 
 
-class Book(Base):
+class Booksenre(Base):
     __tablename__ = "booksgenres"
 
     fk_idB: Mapped[int] = mapped_column(ForeignKey("books.id"), primary_key=True,)
