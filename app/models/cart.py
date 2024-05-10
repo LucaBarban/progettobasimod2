@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, and_
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -16,4 +16,4 @@ class Cart(Base):
     own = relationship(Own)
 
     def __repr__(self) -> str:
-        return f"Cart {{{self.fk_buyer}, {self.fk_seller}, {self.fk_book}, {self.fk_state}, {self.fk_price}, {self.quantity}}}"
+        return f"Cart {{{self.fk_buyer}, {self.own}, {self.quantity}}}"
