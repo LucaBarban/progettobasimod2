@@ -24,30 +24,25 @@ def cart_get(user: User) -> str:
 
 
 def cart_post(user: User) -> str:
-    users = request.form.getlist("user")
-    books = request.form.getlist("book")
-    states = request.form.getlist("state")
-    prices = request.form.getlist("price")
+    own_ids = request.form.getlist("own")
     quantities = request.form.getlist("quantity")
     quantities = [int(q) for q in quantities]
 
-    owns_str = list(zip(users, books, states, prices))
-    price_total = sum(
-        [int(own[3]) * quantity for (own, quantity) in zip(owns_str, quantities)]
-    )
+    price_total = 0
 
     try:
-        user.balance -= price_total
-
-        for i, own_str in enumerate(owns_str):
-            own = db.session.get_one(Own, own_str)
+        for i, own_id in enumerate(own_ids):
+            own = db.session.get_one(Own, own_id)
             own.quantity -= quantities[i]
+            price_total += own.price * quantities[i]
+
+        user.balance -= price_total
 
         db.session.query(Cart).filter(Cart.fk_buyer == user.username).delete()
         db.session.commit()
     except exc.SQLAlchemyError:
         db.session.rollback()
-        return "<h1> KASJDHAKJSDASDH </h1>"
+        return "<h1> AN ERROR OCCOURED </h1>"
 
     return "<h1>All Good</h1>"
 

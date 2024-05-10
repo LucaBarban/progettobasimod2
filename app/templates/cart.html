@@ -27,22 +27,11 @@
             Title: {{ item.own.book.title }}
             Seller: {{ item.own.user.username }}
             Price: {{ item.own.price / 100 }}
-            Quantity: {{ item.quantity }}
+            Quantity: <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="10"/>
             Total Price: {{ '%0.2f'|format(item.own.price * item.quantity / 100) }}
         </div>
 
-        <!-- HACK (?) -->
-        <!-- <input type="hidden" name="item[{{ loop.index }}]user" value="{{ item.own.user.username }}"/>
-        <input type="hidden" name="item[{{ loop.index }}]book" value="{{ item.own.book.id }}"/>
-        <input type="hidden" name="item[{{ loop.index }}]state" value="{{ item.own.state }}"/>
-        <input type="hidden" name="item[{{ loop.index }}]price" value="{{ item.own.price }}"/> -->
-
-        <!-- HACK (?) -->
-        <input type="hidden" name="user" value="{{ item.own.user.username }}"/>
-        <input type="hidden" name="book" value="{{ item.own.book.id }}"/>
-        <input type="hidden" name="state" value="{{ item.own.state }}"/>
-        <input type="hidden" name="price" value="{{ item.own.price }}"/>
-        <input type="hidden" name="quantity" value="{{ item.quantity }}"/>
+        <input type="hidden" name="own" value="{{ item.own.id }}"/>
     {% endfor %}
 
     Total: {{ '%0.2f'|format(total / 100) }}

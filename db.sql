@@ -49,28 +49,25 @@ CREATE TYPE state AS ENUM ('new', 'as new', 'used');
 CREATE TYPE status AS ENUM ('shipped', 'on delivery', 'delivered');
 
 CREATE TABLE owns(
+    id SERIAL PRIMARY KEY,
     fk_username VARCHAR(100),
     fk_book INTEGER,
-    quantity INTEGER NOT NULl CONSTRAINT quantity_gt CHECK (quantity > 0),
+    quantity INTEGER NOT NULL,
     state state NOT NULL,
     price INTEGER,
-    PRIMARY KEY (fk_username, fk_book, state, price),
+    UNIQUE (fk_username, fk_book, state, price),
     FOREIGN KEY (fk_username) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
 
 CREATE TABLE carts(
     fk_buyer VARCHAR(100),
-    fk_seller VARCHAR(100),
-    fk_book INTEGER,
-    fk_state state,
-    fk_price INTEGER,
+    fk_own INT,
     quantity INTEGER NOT NULL,
-    PRIMARY KEY (fk_buyer, fk_seller, fk_book, fk_state, fk_price),
+    PRIMARY KEY (fk_buyer, fk_own),
     FOREIGN KEY (fk_buyer) REFERENCES users(username),
-    FOREIGN KEY(fk_seller, fk_book, fk_state, fk_price) REFERENCES owns(fk_username, fk_book, state, price)
+    FOREIGN KEY(fk_own) REFERENCES owns(id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE history(
     date DATE PRIMARY KEY,
@@ -86,3 +83,22 @@ CREATE TABLE history(
     FOREIGN KEY (fk_seller) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
+
+CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.quantity < 0 THEN
+        RAISE EXCEPTION 'Quantity must be positive';
+    ELSIF NEW.quantity = 0 THEN
+        DELETE FROM owns WHERE id = NEW.id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_quantity_zero_trigger
+AFTER UPDATE OF quantity ON owns
+FOR EACH ROW
+EXECUTE FUNCTION remove_if_quantity_zero();
+
