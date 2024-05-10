@@ -5,6 +5,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
 
+from app.models.user import User
+from app.models.book import Book
+
 
 class History(Base):
     __tablename__ = "history"
@@ -14,9 +17,9 @@ class History(Base):
     quantity: Mapped[int]
     status: Mapped[str]
     recensione: Mapped[str]
-    fk_buyer: Mapped[str] = mapped_column(ForeignKey("users.username"))
-    fk_seller: Mapped[str] = mapped_column(ForeignKey("users.username"))
-    fk_book: Mapped[int] = mapped_column(ForeignKey("books.id"))
+    fk_buyer: Mapped[str] = mapped_column(ForeignKey(User.username))
+    fk_seller: Mapped[str] = mapped_column(ForeignKey(User.username))
+    fk_book: Mapped[int] = mapped_column(ForeignKey(Book.id))
     state: Mapped[str]
 
     def __repr__(self) -> str:
