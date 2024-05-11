@@ -70,7 +70,7 @@ CREATE TABLE carts(
 );
 
 CREATE TABLE history(
-    idH SERIAL PRIMARY KEY
+    idH SERIAL PRIMARY KEY,
     date DATE,
     quantity INTEGER NOT NULL,
     status status NOT NULL,
