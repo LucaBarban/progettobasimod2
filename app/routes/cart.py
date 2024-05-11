@@ -5,7 +5,6 @@ from flask import current_app as app
 from flask import redirect, render_template, request
 from psycopg2.errors import CheckViolation, RaiseException
 from sqlalchemy import exc
-from typing_extensions import Tuple
 
 from app.database import db
 from app.models.cart import Cart
@@ -14,29 +13,24 @@ from app.models.own import Own
 from app.models.user import User
 from app.routes.auth import getLoggedInUser
 
-OwnIndex = Tuple[str, str, str, str]
-
 
 def cart_get(user: User, err: str | None = None) -> str:
     items = db.session.scalars(
         sq.select(Cart).filter(Cart.fk_buyer == user.username)
     ).all()
 
-    availables = [item.own.quantity for item in items]
-
     total = sum([item.own.price * item.quantity for item in items])
 
     return render_template(
         "cart.html",
         items=items,
-        availables=availables,
         user=user,
         total=total,
         error=err,
     )
 
 
-def add_history(own: Own, user: User, quantity: int):
+def add_history(own: Own, user: User, quantity: int) -> None:
     db.session.add(
         History(
             date=datetime.now(),
@@ -53,28 +47,40 @@ def add_history(own: Own, user: User, quantity: int):
 
 def cart_post(user: User) -> str:
     own_ids = request.form.getlist("own")
-    quantities = request.form.getlist("quantity")
-    quantities = [int(q) for q in quantities]
 
     price_total = 0
 
     try:
-        for i, own_id in enumerate(own_ids):
+        for own_id in own_ids:
             own = db.session.get_one(Own, own_id)
 
-            add_history(own, user, quantities[i])
+            quantity_str = request.form.get(f"quantity-{own.id}")
+            if quantity_str is None:
+                raise ValueError("Missing item quantity")
 
-            own.quantity -= quantities[i]
-            price_total += own.price * quantities[i]
+            quantity = int(quantity_str)
+
+            add_history(own, user, quantity)
+
+            own.quantity -= quantity
+            price_total += own.price * quantity
 
         user.balance -= price_total
 
         db.session.query(Cart).filter(Cart.fk_buyer == user.username).delete()
         db.session.commit()
+
+    except exc.NoResultFound:
+        db.session.rollback()
+        return cart_get(
+            user,
+            "The status of some insertion has changed, the page has been refreshed",
+        )
+
     except exc.SQLAlchemyError as e:
         db.session.rollback()
         err = e.__dict__["orig"]
-        print(err)
+
         if type(err) == RaiseException:
             return cart_get(
                 user, "Some insertions have been removed or their quantity decreased"

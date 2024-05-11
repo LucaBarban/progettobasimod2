@@ -51,7 +51,7 @@ CREATE TYPE status AS ENUM ('shipped', 'on delivery', 'delivered');
 CREATE TABLE owns(
     id SERIAL PRIMARY KEY,
     fk_username VARCHAR(100),
-    fk_book INTEGER,
+    fk_book INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
     state state NOT NULL,
     price INTEGER,
@@ -62,7 +62,7 @@ CREATE TABLE owns(
 
 CREATE TABLE carts(
     fk_buyer VARCHAR(100),
-    fk_own INT,
+    fk_own INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
     PRIMARY KEY (fk_buyer, fk_own),
     FOREIGN KEY (fk_buyer) REFERENCES users(username),
@@ -71,7 +71,7 @@ CREATE TABLE carts(
 
 CREATE TABLE history(
     id SERIAL PRIMARY KEY,
-    date TIMESTAMP,
+    date TIMESTAMP NOT NULL,
     quantity INTEGER NOT NULL,
     status status NOT NULL,
     price INTEGER NOT NULL,

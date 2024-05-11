@@ -32,8 +32,8 @@
                 Title: {{ item.own.book.title }}
                 Seller: {{ item.own.user.username }}
                 Price: {{ item.own.price / 100 }}
-                Quantity: <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="10"/>
-                Available: {{ availables[loop.index0] }}
+                Quantity: <input type="number" name="quantity-{{item.own.id}}" value="{{ item.quantity }}" min="1" max="10"/>
+                Available: {{ item.own.quantity }}
                 Total Price: {{ '%0.2f'|format(item.own.price * item.quantity / 100) }}
             </div>
 
