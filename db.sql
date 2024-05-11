@@ -37,7 +37,7 @@ CREATE TABLE users(
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     password TEXT NOT NULL,
-    created_at DATE NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     balance INTEGER NOT NULl CONSTRAINT balance_ge CHECK (balance >= 0),
     seller BOOLEAN NOT NULL,
     last_logged_in_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
@@ -70,8 +70,8 @@ CREATE TABLE carts(
 );
 
 CREATE TABLE history(
-    idH SERIAL PRIMARY KEY,
-    date DATE,
+    id SERIAL PRIMARY KEY,
+    date TIMESTAMP,
     quantity INTEGER NOT NULL,
     status status NOT NULL,
     price INTEGER NOT NULL,

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import sqlalchemy as sq
 from flask import current_app as app
 from flask import redirect, render_template, request
@@ -7,6 +9,7 @@ from typing_extensions import Tuple
 
 from app.database import db
 from app.models.cart import Cart
+from app.models.history import History
 from app.models.own import Own
 from app.models.user import User
 from app.routes.auth import getLoggedInUser
@@ -33,6 +36,21 @@ def cart_get(user: User, err: str | None = None) -> str:
     )
 
 
+def add_history(own: Own, user: User, quantity: int):
+    db.session.add(
+        History(
+            date=datetime.now(),
+            quantity=quantity,
+            status="shipped",
+            price=own.price,
+            fk_buyer=user.username,
+            fk_seller=own.fk_username,
+            fk_book=own.fk_book,
+            state=own.state,
+        )
+    )
+
+
 def cart_post(user: User) -> str:
     own_ids = request.form.getlist("own")
     quantities = request.form.getlist("quantity")
@@ -43,6 +61,9 @@ def cart_post(user: User) -> str:
     try:
         for i, own_id in enumerate(own_ids):
             own = db.session.get_one(Own, own_id)
+
+            add_history(own, user, quantities[i])
+
             own.quantity -= quantities[i]
             price_total += own.price * quantities[i]
 
