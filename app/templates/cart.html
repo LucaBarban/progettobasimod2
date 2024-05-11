@@ -9,34 +9,42 @@
 
 {% include 'components/navbar.html' %}
 
-<h1> CART! </h1>
+{% if error %}
+    <h2> {{ error }} </h2>
+{% endif %}
 
-{% for item in missing %}
-{{ item }}
-{% endfor %}
+{% if items|length == 0 %}
 
-<form action="/cart" method="post">
+    <h2> Your cart is empty</h2>
+    You can <a href="/search">find books from here</a>
 
-    {% for item in items %}
-        <div>
-            <img
-                width=200
-                src="{{ url_for('static', filename='covers/' ~ item.own.book.id ~ ".png") }}"
-                onerror="this.src='{{ url_for('static', filename='404.png') }}'"
-            />
-            Title: {{ item.own.book.title }}
-            Seller: {{ item.own.user.username }}
-            Price: {{ item.own.price / 100 }}
-            Quantity: <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="10"/>
-            Total Price: {{ '%0.2f'|format(item.own.price * item.quantity / 100) }}
-        </div>
+{% else %}
 
-        <input type="hidden" name="own" value="{{ item.own.id }}"/>
-    {% endfor %}
+    <form action="/cart" method="post">
 
-    Total: {{ '%0.2f'|format(total / 100) }}
+        {% for item in items %}
+            <div>
+                <img
+                    width=200
+                    src="{{ url_for('static', filename='covers/' ~ item.own.book.id ~ ".png") }}"
+                    onerror="this.src='{{ url_for('static', filename='404.png') }}'"
+                />
+                Title: {{ item.own.book.title }}
+                Seller: {{ item.own.user.username }}
+                Price: {{ item.own.price / 100 }}
+                Quantity: <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="10"/>
+                Available: {{ availables[loop.index0] }}
+                Total Price: {{ '%0.2f'|format(item.own.price * item.quantity / 100) }}
+            </div>
 
-    <input type="submit" value="Buy"/>
-</form>
+            <input type="hidden" name="own" value="{{ item.own.id }}"/>
+        {% endfor %}
+
+        Total: {{ '%0.2f'|format(total / 100) }}
+
+        <input type="submit" value="Buy"/>
+    </form>
+
+{% endif %}
 
 {% endblock content %}

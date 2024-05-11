@@ -1,6 +1,7 @@
 import sqlalchemy as sq
 from flask import current_app as app
 from flask import redirect, render_template, request
+from psycopg2.errors import CheckViolation, RaiseException
 from sqlalchemy import exc
 from typing_extensions import Tuple
 
@@ -13,14 +14,23 @@ from app.routes.auth import getLoggedInUser
 OwnIndex = Tuple[str, str, str, str]
 
 
-def cart_get(user: User) -> str:
+def cart_get(user: User, err: str | None = None) -> str:
     items = db.session.scalars(
         sq.select(Cart).filter(Cart.fk_buyer == user.username)
     ).all()
 
+    availables = [item.own.quantity for item in items]
+
     total = sum([item.own.price * item.quantity for item in items])
 
-    return render_template("cart.html", items=items, user=user, total=total)
+    return render_template(
+        "cart.html",
+        items=items,
+        availables=availables,
+        user=user,
+        total=total,
+        error=err,
+    )
 
 
 def cart_post(user: User) -> str:
@@ -40,9 +50,18 @@ def cart_post(user: User) -> str:
 
         db.session.query(Cart).filter(Cart.fk_buyer == user.username).delete()
         db.session.commit()
-    except exc.SQLAlchemyError:
+    except exc.SQLAlchemyError as e:
         db.session.rollback()
-        return "<h1> AN ERROR OCCOURED </h1>"
+        err = e.__dict__["orig"]
+        print(err)
+        if type(err) == RaiseException:
+            return cart_get(
+                user, "Some insertions have been removed or their quantity decreased"
+            )
+        elif type(err) == CheckViolation:
+            return cart_get(user, "Not enough money on account")
+        else:
+            return cart_get(user, "An error occoured")
 
     return "<h1>All Good</h1>"
 

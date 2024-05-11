@@ -236,15 +236,15 @@ INSERT INTO carts (fk_buyer, fk_own, quantity) VALUES
 
 
 -- Add historical records to the 'history' table
-INSERT INTO history (date, quantity, status, recensione, fk_buyer, fk_seller, fk_book, state) VALUES
-    (1, '2023-01-20', 2, 'delivered', 'Great transaction!', 'alice123', 'mike87', 1, 'new'),
-    (2, '2023-02-25', 3, 'shipped', NULL, 'bob_smith', 'max_king', 4, 'as new'),
-    (3, '2023-03-12', 4, 'on delivery', NULL, 'jane_doe', 'chris99', 11, 'new'),
-    (4, '2023-04-05', 1, 'delivered', 'Smooth transaction.', 'sara_miller', 'alice123', 2, 'used'),
-    (5, '2023-05-10', 2, 'delivered', 'Excellent service!', 'max_king', 'mike87', 3,'new'),
-    (6, '2023-06-18', 3, 'shipped', NULL, 'emily_green', 'max_king', 5, 'as new'),
-    (7, '2023-07-01', 4, 'on delivery', NULL, 'chris99', 'mike87', 6, 'used'),
-    (8, '2023-08-14', 2, 'delivered', 'Book arrived in perfect condition.', 'lisa_wang', 'chris99', 7, 'used'),
-    (9, '2023-09-22', 3, 'delivered', 'Fast shipping!', 'alex23', 'chris99', 8, 'as new'),
-    (10, '2023-10-05', 1, 'delivered', 'Happy with the purchase.', 'alice123', 'chris99', 9, 'used');
+INSERT INTO history (idH, date, quantity, price, status, recensione, fk_buyer, fk_seller, fk_book, state) VALUES
+    (1, '2023-01-20', 2, 1099, 'delivered', 'Great transaction!', 'alice123', 'mike87', 1, 'new'),
+    (2, '2023-02-25', 3, 1500, 'shipped', NULL, 'bob_smith', 'max_king', 4, 'as new'),
+    (3, '2023-03-12', 4, 1350, 'on delivery', NULL, 'jane_doe', 'chris99', 11, 'new'),
+    (4, '2023-04-05', 1, 1299, 'delivered', 'Smooth transaction.', 'sara_miller', 'alice123', 2, 'used'),
+    (5, '2023-05-10', 2, 1000, 'delivered', 'Excellent service!', 'max_king', 'mike87', 3,'new'),
+    (6, '2023-06-18', 3, 1200, 'shipped', NULL, 'emily_green', 'max_king', 5, 'as new'),
+    (7, '2023-07-01', 4, 1550, 'on delivery', NULL, 'chris99', 'mike87', 6, 'used'),
+    (8, '2023-08-14', 2, 1399, 'delivered', 'Book arrived in perfect condition.', 'lisa_wang', 'chris99', 7, 'used'),
+    (9, '2023-09-22', 3, 1150, 'delivered', 'Fast shipping!', 'alex23', 'chris99', 8, 'as new'),
+    (10, '2023-10-05', 1, 499, 'delivered', 'Happy with the purchase.', 'alice123', 'chris99', 9, 'used');
 
