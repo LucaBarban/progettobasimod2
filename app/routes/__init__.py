@@ -1,1 +1,1 @@
-from . import auth, index, book, library
+from . import auth, index, book, library, insertionmanager

@@ -9,6 +9,14 @@
 
 {% include 'components/navbar.html' %}
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            {{ msg }}<br>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 <div class="lib__container">
     <div class="lib__item">
         <h1 class="lib__title"> {{ user.username }}'s library </h1>
