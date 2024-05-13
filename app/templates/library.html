@@ -27,7 +27,7 @@
                         <h2 class="own__title"> {{ book.title }} </h1>
                         <img
                             width=200
-                            src="{{ url_for('static', filename='image/' ~ book.id) }}"
+                            src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
                             onerror="this.src='{{ url_for('static', filename='404.png') }}'"
                         />
                         <hr class="own__separator"/>
@@ -38,7 +38,7 @@
                         <span> x{{ own.quantity }} </span>
                     </div>
 
-                    {% if own.on_sale %}
+                    {% if own.price %}
                         <a class="lib__btn" href="/insertion/{{own.fk_book}}"> edit </a>
                         <a class="lib__btn" href="/insertion/remove/{{own.fk_book}}"> remove </a>
                     {% elif own.user.seller %}

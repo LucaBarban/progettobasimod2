@@ -1,12 +1,12 @@
 from typing import List
 
-from app.routes.auth import getLoggedInUser
 import sqlalchemy as sq
-from flask import current_app as app, redirect
-from flask import render_template
+from flask import current_app as app
+from flask import redirect, render_template
 
 from app.database import db
 from app.models.own import Own
+from app.routes.auth import getLoggedInUser
 
 
 def page_list(current: int, last: int, offset: int = 2) -> List[int]:
@@ -18,7 +18,7 @@ def page_list(current: int, last: int, offset: int = 2) -> List[int]:
 def library(page: int = 1) -> str:
     user = getLoggedInUser()
     if user is None:
-        return redirect('/login')
+        return redirect("/login")
 
     limit = 10
 

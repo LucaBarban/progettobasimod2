@@ -37,7 +37,7 @@ CREATE TABLE users(
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     password TEXT NOT NULL,
-    created_at DATE NOT NULL,
+    created_at TIMESTAMP NOT NULL,
     balance INTEGER NOT NULl CONSTRAINT balance_ge CHECK (balance >= 0),
     seller BOOLEAN NOT NULL,
     last_logged_in_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
@@ -49,34 +49,32 @@ CREATE TYPE state AS ENUM ('new', 'as new', 'used');
 CREATE TYPE status AS ENUM ('shipped', 'on delivery', 'delivered');
 
 CREATE TABLE owns(
+    id SERIAL PRIMARY KEY,
     fk_username VARCHAR(100),
-    fk_book INTEGER,
-    quantity INTEGER NOT NULl CONSTRAINT quantity_gt CHECK (quantity > 0),
+    fk_book INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
     state state NOT NULL,
-    on_sale BOOLEAN NOT NULL,
-    PRIMARY KEY (fk_username, fk_book, state, on_sale),
+    price INTEGER,
+    UNIQUE (fk_username, fk_book, state, price),
     FOREIGN KEY (fk_username) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
 
 CREATE TABLE carts(
     fk_buyer VARCHAR(100),
-    fk_seller VARCHAR(100),
-    fk_book INTEGER,
-    fk_state state,
-    fk_sale BOOLEAN,
+    fk_own INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
-    PRIMARY KEY (fk_buyer, fk_seller, fk_book),
+    PRIMARY KEY (fk_buyer, fk_own),
     FOREIGN KEY (fk_buyer) REFERENCES users(username),
-    FOREIGN KEY(fk_seller, fk_book, fk_state, fk_sale) REFERENCES owns(fk_username, fk_book, state, on_sale)
+    FOREIGN KEY(fk_own) REFERENCES owns(id) ON DELETE CASCADE
 );
 
-
 CREATE TABLE history(
-    idH SERIAL PRIMARY KEY
-    date DATE,
+    id SERIAL PRIMARY KEY,
+    date TIMESTAMP NOT NULL,
     quantity INTEGER NOT NULL,
     status status NOT NULL,
+    price INTEGER NOT NULL,
     recensione TEXT,
     fk_buyer VARCHAR(100),
     fk_seller VARCHAR(100),
@@ -86,3 +84,22 @@ CREATE TABLE history(
     FOREIGN KEY (fk_seller) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
+
+CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.quantity < 0 THEN
+        RAISE EXCEPTION 'Quantity must be positive';
+    ELSIF NEW.quantity = 0 THEN
+        DELETE FROM owns WHERE id = NEW.id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_quantity_zero_trigger
+AFTER UPDATE OF quantity ON owns
+FOR EACH ROW
+EXECUTE FUNCTION remove_if_quantity_zero();
+
