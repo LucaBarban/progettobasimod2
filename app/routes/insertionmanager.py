@@ -8,8 +8,9 @@ from werkzeug.wrappers.response import Response
 from app.models.own import Own
 from app.models.user import User
 
-@app.route("/manager", methods=['GET', 'POST'])
-def manager() -> str | Response:
+@app.route("/insertion", methods=['GET', 'POST'])
+def insertion() -> str | Response:
+    return("/library")
     usr: User|None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
@@ -27,40 +28,43 @@ def manager() -> str | Response:
 
     return render_template("intertionmanager.html", ownedbooks = ownedbooks, sellingbooks = sellingbooks)
 
-@app.route("/manager/update/", methods=['GET'])
+@app.route("/insertion/update/", methods=['GET'])
 def getInsertionUpdateForm() -> str | Response:
-    if getLoggedInUser() is None:
+    usr : User|None = getLoggedInUser()
+    if usr is None:
         return redirect("/login/")
     book:str|None = request.args.get("book")
     bookstate:str|None = request.args.get("bookstate")
     quantity:str|None = request.args.get("quantity")
     oldprice:str|None = request.args.get("oldprice")
     if book is None or bookstate is None or quantity is None or oldprice is None:
-        return redirect("/manager")
-    return render_template("updateinsertion.html", book = book, bookstate = bookstate, quantity = quantity, oldprice = oldprice)
+        return redirect("/insertion")
+    return render_template("updateinsertion.html", user = usr, book = book, bookstate = bookstate, quantity = quantity, oldprice = oldprice)
 
-@app.route("/manager/list/", methods=['GET'])
+@app.route("/insertion/list/", methods=['GET'])
 def getInsertionListForm() -> str | Response:
-    if getLoggedInUser() is None:
+    usr : User|None = getLoggedInUser()
+    if usr is None:
         return redirect("/login/")
     book:str|None = request.args.get("book")
     bookstate:str|None = request.args.get("bookstate")
     if book is None or bookstate is None:
-        return redirect("/manager")
-    return render_template("listinsertion.html", book = book, bookstate = bookstate)
+        return redirect("/insertion")
+    return render_template("listinsertion.html", user = usr, book = book, bookstate = bookstate)
 
-@app.route("/manager/unlist/", methods=['GET'])
+@app.route("/insertion/unlist/", methods=['GET'])
 def getInsertionUnListForm() -> str | Response:
-    if getLoggedInUser() is None:
+    usr : User|None = getLoggedInUser()
+    if usr is None:
         return redirect("/login/")
     book:str|None = request.args.get("book")
     bookstate:str|None = request.args.get("bookstate")
     if book is None or bookstate is None:
-        return redirect("/manager")
-    return render_template("unlistinsertion.html", book = book, bookstate = bookstate)
+        return redirect("/insertion")
+    return render_template("unlistinsertion.html", user = usr, book = book, bookstate = bookstate)
 
 
-@app.route("/manager/update/", methods=['POST'])
+@app.route("/insertion/update/", methods=['POST'])
 def updatebook() -> str | Response:
     usr: User|None = getLoggedInUser()
     if usr is None:
@@ -70,21 +74,21 @@ def updatebook() -> str | Response:
     if (quantity is None or oldprice is None):
         flash("Missing parameters, be sure to compile them (if the new price is not compiled, " +
               "the operation will be threated like an insertion removal)")
-        return redirect("/manager")
+        return redirect("/insertion")
 
     if oldPriceBooks is None:
         flash("You don't own the selected book or it's not being sold")
-        return redirect("/manager")
+        return redirect("/insertion")
 
     if quantity <= 0:
         flash("Invalid quantity")
-        return redirect("/manager")
+        return redirect("/insertion")
 
     if newprice is None:
         insState: Tuple[str, bool] = manageInsertion(usr, newPriceBooks, oldPriceBooks, quantity, oldprice, False)
         if not insState[1]:
             flash("An error occured during insertion's deletion/update: " + insState[0])
-            return redirect("/manager")
+            return redirect("/insertion")
     else:
         try:
             if newPriceBooks is not None: # if an insertion with the same price exists already
@@ -101,13 +105,13 @@ def updatebook() -> str | Response:
         except exc.SQLAlchemyError as e:
             db.session.rollback()
             flash("An unexpected error occured while interacting with the database")
-            return redirect("/manager")
+            return redirect("/insertion")
 
     db.session.commit()
-    return redirect("/manager")
+    return redirect("/insertion")
 
 
-@app.route("/manager/list/", methods=['POST'])
+@app.route("/insertion/list/", methods=['POST'])
 def listbook() -> str | Response:
     usr: User|None = getLoggedInUser()
     if usr is None:
@@ -116,25 +120,25 @@ def listbook() -> str | Response:
     (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
     if (quantity is None or price is None):
         flash("Missing parameters, be sure to compile them all")
-        return redirect("/manager")
+        return redirect("/insertion")
 
     if ownedBook is None:
         flash("You don't own the selected book")
-        return redirect("/manager")
+        return redirect("/insertion")
 
     if ownedBook.quantity < quantity or quantity <= 0:
         flash("You dont have enough books to sell ('%s' when %s are avaiable )" % (quantity, ownedBook.quantity, ))
-        return redirect("/manager")
+        return redirect("/insertion")
 
     insState: Tuple[str, bool] = manageInsertion(usr, ownedBook, ownedBookOnSale, quantity, price, True)
     if not insState[1]:
         flash("An error occured during insertion's creation/update: " + insState[0])
-        return redirect("/manager")
+        return redirect("/insertion")
 
-    return redirect("/manager")
+    return redirect("/insertion")
 
 
-@app.route("/manager/unlist/", methods=['POST'])
+@app.route("/insertion/unlist/", methods=['POST'])
 def unlistbook() -> str|Response:
     usr: User|None = getLoggedInUser()
     if usr is None:
@@ -143,22 +147,22 @@ def unlistbook() -> str|Response:
     (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
     if (quantity is None or price is None):
         flash("Missing parameters, be sure to compile them all")
-        return redirect("/manager")
+        return redirect("/insertion")
 
     if ownedBookOnSale is None:
         flash("You aren't selling the selected book")
-        return redirect("/manager")
+        return redirect("/insertion")
 
     if ownedBookOnSale.quantity < quantity or quantity <= 0:
         flash("You dont have enough books to unlist ('%s' when %s are avaiable )" % (quantity, ownedBookOnSale.quantity, ))
-        return redirect("/manager")
+        return redirect("/insertion")
 
     insState: Tuple[str, bool] = manageInsertion(usr, ownedBook, ownedBookOnSale, quantity, price, False)
     if not insState[1]:
         flash("An error occured during insertion's deletion/update: " + insState[0])
-        return redirect("/manager")
+        return redirect("/insertion")
 
-    return redirect("/manager")
+    return redirect("/insertion")
 
 
 def retriveBooks(usr:User) -> tuple[Own|None, Own|None, int|None, int|None]:
