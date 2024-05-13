@@ -27,6 +27,38 @@ def manager() -> str | Response:
 
     return render_template("intertionmanager.html", ownedbooks = ownedbooks, sellingbooks = sellingbooks)
 
+@app.route("/manager/update/", methods=['GET'])
+def getInsertionUpdateForm() -> str | Response:
+    if getLoggedInUser() is None:
+        return redirect("/login/")
+    book:str|None = request.args.get("book")
+    bookstate:str|None = request.args.get("bookstate")
+    quantity:str|None = request.args.get("quantity")
+    oldprice:str|None = request.args.get("oldprice")
+    if book is None or bookstate is None or quantity is None or oldprice is None:
+        return redirect("/manager")
+    return render_template("updateinsertion.html", book = book, bookstate = bookstate, quantity = quantity, oldprice = oldprice)
+
+@app.route("/manager/list/", methods=['GET'])
+def getInsertionListForm() -> str | Response:
+    if getLoggedInUser() is None:
+        return redirect("/login/")
+    book:str|None = request.args.get("book")
+    bookstate:str|None = request.args.get("bookstate")
+    if book is None or bookstate is None:
+        return redirect("/manager")
+    return render_template("listinsertion.html", book = book, bookstate = bookstate)
+
+@app.route("/manager/unlist/", methods=['GET'])
+def getInsertionUnListForm() -> str | Response:
+    if getLoggedInUser() is None:
+        return redirect("/login/")
+    book:str|None = request.args.get("book")
+    bookstate:str|None = request.args.get("bookstate")
+    if book is None or bookstate is None:
+        return redirect("/manager")
+    return render_template("unlistinsertion.html", book = book, bookstate = bookstate)
+
 
 @app.route("/manager/update/", methods=['POST'])
 def updatebook() -> str | Response:
