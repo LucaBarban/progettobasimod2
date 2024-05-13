@@ -16,8 +16,8 @@ class Book(Base):
     published: Mapped[date]
     pages: Mapped[int]
     isbn: Mapped[int]
-    author: Mapped[int] = mapped_column(ForeignKey(Author.id))
-    publisher: Mapped[str] = mapped_column(ForeignKey(Publisher.name))
+    fk_author: Mapped[int] = mapped_column(ForeignKey(Author.id))
+    fk_publisher: Mapped[str] = mapped_column(ForeignKey(Publisher.name))
 
     def __repr__(self) -> str:
-        return f"Book {{{self.id},{self.title},{self.published},{self.pages},{self.isbn},{self.author},{self.publisher}}}"
+        return f"Book {{{self.id},{self.title},{self.published},{self.pages},{self.isbn},{self.fk_author},{self.fk_publisher}}}"
