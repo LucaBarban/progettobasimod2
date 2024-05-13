@@ -1,6 +1,7 @@
 from typing import Tuple
 from flask import current_app as app, flash, render_template, request, redirect
 import sqlalchemy as sq
+from sqlalchemy import exc
 from app.database import db
 from app.routes.auth import getLoggedInUser #type: ignore
 from werkzeug.wrappers.response import Response
@@ -13,7 +14,6 @@ def manager() -> str | Response:
     if usr is None:
         return redirect("/login/")
 
-    #books = db.session.scalars(sq.select(Own).join(User).where(User.username == usr.username)).fetchall()
     books = db.session.scalars(sq.select(Own).where(Own.fk_username == usr.username)).fetchall()
 
     ownedbooks = []
@@ -127,67 +127,71 @@ def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, q
         return "A price was not guven to the function", False
 
     opreatinMsg: str
-    if add and ownedBook is not None: # selling books
-        if ownedBook.quantity == quantity:
-            if ownedBookOnSale is not None:
-                ownedBookOnSale.quantity += quantity
-                opreatinMsg = "Existing insertion has been updated with '%i' more books, none remaining"%(quantity)
+    try:
+        if add and ownedBook is not None: # selling books
+            if ownedBook.quantity == quantity:
+                if ownedBookOnSale is not None:
+                    ownedBookOnSale.quantity += quantity
+                    opreatinMsg = "Existing insertion has been updated with '%i' more books, none remaining"%(quantity)
+                else:
+                    db.session.add(Own(
+                        usr.username,
+                        ownedBook.fk_book,
+                        ownedBook.state,
+                        price,
+                        quantity
+                    ))
+                    opreatinMsg = "New insertion has been created with '%i' books, none remaining"%(quantity)
+                db.session.delete(ownedBook)
             else:
-                db.session.add(Own(
-                    usr.username,
-                    ownedBook.fk_book,
-                    ownedBook.state,
-                    price,
-                    quantity
-                ))
-                opreatinMsg = "New insertion has been created with '%i' books, none remaining"%(quantity)
-            db.session.delete(ownedBook)
-        else:
-            if ownedBookOnSale is not None:
-                ownedBookOnSale.quantity += quantity
-                opreatinMsg = "Existing insertion has been updated with '%i' more books, some remain to sell"%(quantity)
-            else:
-                db.session.add(Own(
-                    usr.username,
-                    ownedBook.fk_book,
-                    ownedBook.state,
-                    price,
-                    quantity
-                ))
-                opreatinMsg = "New insertion has been created with '%i' books, some remain to sell"%(quantity)
-            ownedBook.quantity -= quantity
-    elif not add and ownedBookOnSale is not None: # removing books from insertion
-        if ownedBookOnSale.quantity == quantity:
-            if ownedBook is not None:
-                ownedBook.quantity += quantity
-                opreatinMsg = "Insertion has been deleted, '%i' existing books added to library"%(quantity)
-            else:
-                db.session.add(Own(
-                    usr.username,
-                    ownedBookOnSale.fk_book,
-                    ownedBookOnSale.state,
-                    None,
-                    quantity
-                ))
-                opreatinMsg = "Insertion has been deleted, '%i' new books added to library"%(quantity)
-            db.session.delete(ownedBookOnSale)
+                if ownedBookOnSale is not None:
+                    ownedBookOnSale.quantity += quantity
+                    opreatinMsg = "Existing insertion has been updated with '%i' more books, some remain to sell"%(quantity)
+                else:
+                    db.session.add(Own(
+                        usr.username,
+                        ownedBook.fk_book,
+                        ownedBook.state,
+                        price,
+                        quantity
+                    ))
+                    opreatinMsg = "New insertion has been created with '%i' books, some remain to sell"%(quantity)
+                ownedBook.quantity -= quantity
+        elif not add and ownedBookOnSale is not None: # removing books from insertion
+            if ownedBookOnSale.quantity == quantity:
+                if ownedBook is not None:
+                    ownedBook.quantity += quantity
+                    opreatinMsg = "Insertion has been deleted, '%i' existing books added to library"%(quantity)
+                else:
+                    db.session.add(Own(
+                        usr.username,
+                        ownedBookOnSale.fk_book,
+                        ownedBookOnSale.state,
+                        None,
+                        quantity
+                    ))
+                    opreatinMsg = "Insertion has been deleted, '%i' new books added to library"%(quantity)
+                db.session.delete(ownedBookOnSale)
 
-        else:
-            if ownedBook is not None:
-                ownedBook.quantity += quantity
-                opreatinMsg = "'%i' existing books moved to the library, some remain listed"%(quantity)
             else:
-                db.session.add(Own(
-                    usr.username,
-                    ownedBookOnSale.fk_book,
-                    ownedBookOnSale.state,
-                    None,
-                    quantity
-                ))
-                opreatinMsg = "'%i' new books moved to the library, some remain listed"%(quantity)
-            ownedBookOnSale.quantity -= quantity
-    else:
-        return "Invalid state of owned/insertioned books passed to function", False
+                if ownedBook is not None:
+                    ownedBook.quantity += quantity
+                    opreatinMsg = "'%i' existing books moved to the library, some remain listed"%(quantity)
+                else:
+                    db.session.add(Own(
+                        usr.username,
+                        ownedBookOnSale.fk_book,
+                        ownedBookOnSale.state,
+                        None,
+                        quantity
+                    ))
+                    opreatinMsg = "'%i' new books moved to the library, some remain listed"%(quantity)
+                ownedBookOnSale.quantity -= quantity
+        else:
+            return "Invalid state of owned/insertioned books passed to function", False
+    except exc.SQLAlchemyError as e:
+        db.session.rollback()
+        return "An unexpected error occured while interacting with the database", False
 
     db.session.commit()
     return opreatinMsg, True
