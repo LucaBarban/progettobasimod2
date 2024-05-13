@@ -133,5 +133,5 @@ token.pickle
 *.ics
 config.toml
 
-# images
-./statics/
+# excluding book covers
+./statics/covers
