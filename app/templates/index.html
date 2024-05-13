@@ -1,22 +1,31 @@
 {% extends "layout.html" %}
-
 {% block pagestyles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='palette.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 {% endblock pagestyles %}
-
 {% block content %}
-
-{% include 'components/navbar.html' %}
-
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for msg in messages %}
-            {{ msg }}<br>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
-<h1> HOME </h1>
-
+    {% include 'components/navbar.html' %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                {{ msg }}
+                <br>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="home__greeter">
+        {% if user is none %}
+            <h1>WELCOME TO BOOKWORM</h1>
+            <h2>The best place for your books</h2>
+        {% else %}
+            <h1>WELCOME BACK {{ user.username }}</h1>
+            <div class="home__greeter--shortcuts">
+                <a href="/library" class="home__greeter--shortcut home__greeter--shortcut--primary">Library</a>
+                <a href="/history" class="home__greeter--shortcut home__greeter--shortcut--secondary">History</a>
+            </div>
+        {% endif %}
+    </div>
 {% endblock content %}
