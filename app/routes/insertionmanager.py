@@ -35,31 +35,9 @@ def listbook() -> str | Response:
     if usr is None:
         return redirect("/login/")
 
-    book: str|None = request.form.get("book") or None
-    bookstate: str|None = request.form.get("bookstate") or None
-    quantity: int|None = request.form.get("quantity", type=int) or None
-    price: int|None = request.form.get("price", type=int) or None
-
-    if book is None or bookstate is None or quantity is None or price is None:
+    (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
+    if (quantity is None or price is None):
         return redirect("/manager")
-
-    book = str(book)
-    bookstate = str(bookstate)
-    quantity = int(quantity)
-    price = int(price)
-
-    ownedBook: Own|None = db.session.scalar(sq.select(Own)
-                                       .where(Own.fk_username == usr.username)
-                                       .where(Own.fk_book == book)
-                                       .where(Own.state == bookstate)
-                                       .where(Own.price == None)
-                                       )
-    ownedBookOnSale: Own|None = db.session.scalar(sq.select(Own)
-                                       .where(Own.fk_username == usr.username)
-                                       .where(Own.fk_book == book)
-                                       .where(Own.state == bookstate)
-                                       .where(Own.price == price)
-                                       )
 
     if ownedBook is None:
         flash("You don't own the selected book")
@@ -83,13 +61,38 @@ def unlistbook() -> str|Response:
     if usr is None:
         return redirect("/login/")
 
+    (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
+    if (quantity is None or price is None):
+        return redirect("/manager")
+
+    if ownedBookOnSale is None:
+        flash("You aren't selling the selected book")
+        return redirect("/manager")
+
+    if ownedBookOnSale.quantity < quantity or quantity <= 0:
+        flash("You dont have enough books to unlist ('%s' when %s are avaiable )" % (quantity, ownedBookOnSale.quantity, ))
+        return redirect("/manager")
+
+    insState: Tuple[str, bool] = manageInsertion(usr, ownedBook, ownedBookOnSale, quantity, price, False)
+    if not insState[1]:
+        flash("An error occured during insertion's deletion/update: " + insState[0])
+        return redirect("/manager")
+
+    return redirect("/manager")
+
+
+def retriveBooks(usr:User) -> tuple[Own|None, Own|None, int|None, int|None]:
+    """
+    Returns the books owned by the user divided in not selling and slelling ones,
+    the quantity requested by the user and the specified price
+    """
     book: str|None = request.form.get("book") or None
     bookstate: str|None = request.form.get("bookstate") or None
     quantity: int|None = request.form.get("quantity", type=int) or None
     price: int|None = request.form.get("price", type=int) or None
 
     if book is None or bookstate is None or quantity is None or price is None:
-        return redirect("/manager")
+        return None, None, None, None
 
     book = str(book)
     bookstate = str(bookstate)
@@ -108,23 +111,7 @@ def unlistbook() -> str|Response:
                                        .where(Own.state == bookstate)
                                        .where(Own.price == price)
                                        )
-
-    if ownedBookOnSale is None:
-        flash("You aren't selling the selected book")
-        return redirect("/manager")
-
-    if ownedBookOnSale.quantity < quantity or quantity <= 0:
-        flash("You dont have enough books to unlist ('%s' when %s are avaiable )" % (quantity, ownedBookOnSale.quantity, ))
-        return redirect("/manager")
-
-    insState: Tuple[str, bool] = manageInsertion(usr, ownedBook, ownedBookOnSale, quantity, price, False)
-    if not insState[1]:
-        flash("An error occured during insertion's deletion/update: " + insState[0])
-        return redirect("/manager")
-
-    return redirect("/manager")
-
-
+    return ownedBook, ownedBookOnSale, quantity, price
 
 def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, quantity:int, price:int|None, add:bool) -> Tuple[str, bool]:
     """
