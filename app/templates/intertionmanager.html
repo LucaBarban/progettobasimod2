@@ -42,6 +42,29 @@
 
     <input type="submit" value="Unlist">
 </form>
+<h1>Update</h1>
+<form action="/manager/update/" method="POST">
+    <label for="book">Foreign Key Book:</label>
+    <input type="text" id="book" name="book"><br>
+
+    <label for="bookstate">Book State:</label>
+    <select id="bookstate" name="bookstate"><br>
+        <option value="new">New</option>
+        <option value="as new">As New</option>
+        <option value="used">Used</option>
+    </select><br>
+
+    <label for="quantity">Quantity:</label>
+    <input type="number" id="quantity" name="quantity", min="0", value="0"><br>
+
+    <label for="oldprice">Old Price:</label>
+    <input type="number" id="oldprice" name="oldprice", min="0", value="0"><br>
+
+    <label for="newprice">New Price:</label>
+    <input type="number" id="newprice" name="newprice", min="0", value="0"><br>
+
+    <input type="submit" value="Update">
+</form>
 Error: {{ error }}
 
 {% with messages = get_flashed_messages() %}
