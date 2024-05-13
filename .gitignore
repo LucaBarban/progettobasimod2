@@ -132,3 +132,6 @@ dmypy.json
 token.pickle
 *.ics
 config.toml
+
+# excluding book covers
+./statics/covers
