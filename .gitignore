@@ -132,3 +132,6 @@ dmypy.json
 token.pickle
 *.ics
 config.toml
+
+# images
+./statics/
