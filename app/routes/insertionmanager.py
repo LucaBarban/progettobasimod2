@@ -25,8 +25,54 @@ def manager() -> str | Response:
         else:
             sellingbooks.append(books[i])
 
-    return render_template("intertionmanager.html", ownedbooks=ownedbooks, sellingbooks=sellingbooks)
+    return render_template("intertionmanager.html", ownedbooks = ownedbooks, sellingbooks = sellingbooks)
 
+
+@app.route("/manager/update/", methods=['POST'])
+def updatebook() -> str | Response:
+    usr: User|None = getLoggedInUser()
+    if usr is None:
+        return redirect("/login/")
+
+    (oldPriceBooks, newPriceBooks, quantity, oldprice, newprice) = retriveExistingBooks(usr)
+    if (quantity is None or oldprice is None):
+        flash("Missing parameters, be sure to compile them (if the new price is not compiled, " +
+              "the operation will be threated like an insertion removal)")
+        return redirect("/manager")
+
+    if oldPriceBooks is None:
+        flash("You don't own the selected book or it's not being sold")
+        return redirect("/manager")
+
+    if quantity <= 0:
+        flash("Invalid quantity")
+        return redirect("/manager")
+
+    if newprice is None:
+        insState: Tuple[str, bool] = manageInsertion(usr, newPriceBooks, oldPriceBooks, quantity, oldprice, False)
+        if not insState[1]:
+            flash("An error occured during insertion's deletion/update: " + insState[0])
+            return redirect("/manager")
+    else:
+        try:
+            if newPriceBooks is not None: # if an insertion with the same price exists already
+                newPriceBooks.quantity += quantity
+            else:
+                db.session.add(Own(
+                            usr.username,
+                            oldPriceBooks.fk_book,
+                            oldPriceBooks.state,
+                            newprice,
+                            quantity
+                        ))
+            db.session.delete(oldPriceBooks)
+        except exc.SQLAlchemyError as e:
+            db.session.rollback()
+            flash("An unexpected error occured while interacting with the database")
+            return redirect("/manager")
+
+    db.session.commit()
+    return redirect("/manager")
 
 
 @app.route("/manager/list/", methods=['POST'])
@@ -37,6 +83,7 @@ def listbook() -> str | Response:
 
     (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
     if (quantity is None or price is None):
+        flash("Missing parameters, be sure to compile them all")
         return redirect("/manager")
 
     if ownedBook is None:
@@ -63,6 +110,7 @@ def unlistbook() -> str|Response:
 
     (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
     if (quantity is None or price is None):
+        flash("Missing parameters, be sure to compile them all")
         return redirect("/manager")
 
     if ownedBookOnSale is None:
@@ -112,6 +160,34 @@ def retriveBooks(usr:User) -> tuple[Own|None, Own|None, int|None, int|None]:
                                        .where(Own.price == price)
                                        )
     return ownedBook, ownedBookOnSale, quantity, price
+
+def retriveExistingBooks(usr:User) -> tuple[Own|None, Own|None, int|None, int|None, int|None]:
+    """
+    Returns the books owned by the user divided in not selling and slelling ones,
+    the quantity requested by the user and the specified old and new prices
+    """
+    book: str|None = request.form.get("book") or None
+    bookstate: str|None = request.form.get("bookstate") or None
+    quantity: int|None = request.form.get("quantity", type=int) or None
+    oldprice: int|None = request.form.get("oldprice", type=int) or None
+    newprice: int|None = request.form.get("newprice", type=int) or None
+
+    if book is None or bookstate is None or quantity is None or oldprice is None:
+        return None, None, None, None, None
+
+    oldPriceBooks: Own|None = db.session.scalar(sq.select(Own)
+                                       .where(Own.fk_username == usr.username)
+                                       .where(Own.fk_book == book)
+                                       .where(Own.state == bookstate)
+                                       .where(Own.price == oldprice)
+                                       )
+    newPriceBooks: Own|None = db.session.scalar(sq.select(Own)
+                                       .where(Own.fk_username == usr.username)
+                                       .where(Own.fk_book == book)
+                                       .where(Own.state == bookstate)
+                                       .where(Own.price == newprice)
+                                       )
+    return oldPriceBooks, newPriceBooks, quantity, oldprice, newprice
 
 def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, quantity:int, price:int|None, add:bool) -> Tuple[str, bool]:
     """
