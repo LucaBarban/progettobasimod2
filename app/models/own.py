@@ -10,7 +10,7 @@ from app.models.user import User
 class Own(Base):
     __tablename__ = "owns"
 
-    id: Column[int] = Column(Integer, Sequence("owns_id_seq"), primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, Sequence("owns_id_seq"), primary_key=True)
     fk_username: Mapped[str] = mapped_column(ForeignKey(User.username))
     fk_book: Mapped[str] = mapped_column(ForeignKey(Book.id))
     state: Mapped[str] = mapped_column(String)
