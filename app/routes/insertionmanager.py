@@ -10,7 +10,7 @@ from app.models.user import User
 
 @app.route("/insertion", methods=['GET', 'POST'])
 def insertion() -> str | Response:
-    return("/library")
+    return redirect("/library")
     usr: User|None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
