@@ -3,6 +3,7 @@ from typing import List
 import sqlalchemy as sq
 from flask import current_app as app
 from flask import redirect, render_template
+from werkzeug.wrappers.response import Response
 
 from app.database import db
 from app.models.own import Own
@@ -15,7 +16,7 @@ def page_list(current: int, last: int, offset: int = 2) -> List[int]:
 
 @app.route("/library/")
 @app.route("/library/<int:page>")
-def library(page: int = 1) -> str:
+def library(page: int = 1) -> str | Response:
     user = getLoggedInUser()
     if user is None:
         return redirect("/login")
