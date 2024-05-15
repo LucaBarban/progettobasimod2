@@ -1,30 +1,25 @@
-from flask import current_app as app, render_template, request
-from app.models.book import Book
+from flask import current_app as app
+from flask import render_template
+
 from app.database import db
-import sqlalchemy as sq
+from app.models.book import Book
+from app.models.own import Own
+from app.routes.auth import getLoggedInUser
 
-@app.route("/book/")
-def products() -> str:
-    books = db.session.scalars(sq.select(Book))
-
-    return render_template("books.html", books=books)
-
-# /book/add?name=...&author=...
-@app.route("/book/add")
-def add() -> str:
-    name = request.args.get("name") or "..."
-    author = request.args.get("author") or "..."
-
-    book = Book(name = name, author = author)
-
-    db.session.add(book)
-    db.session.commit()
-
-    return f"<h1>Added {book.id}</h1>"
 
 @app.route("/book/<int:id>")
 def get(id: int) -> str:
-    book = db.get_or_404(Book, id)
-    print(book)
+    user = getLoggedInUser()
 
-    return render_template("book.html", book=book)
+    if user is None:
+        username = None
+    else:
+        username = user.username
+
+    book = db.get_or_404(Book, id)
+
+    insertions = db.session.query(Own).filter(
+        Own.fk_book == id, Own.price != None, Own.fk_username != username
+    )
+
+    return render_template("book.html", book=book, insertions=insertions, user=user)
