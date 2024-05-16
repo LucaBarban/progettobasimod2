@@ -244,7 +244,7 @@ def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, q
             if ownedBook.quantity == quantity:
                 if ownedBookOnSale is not None:
                     ownedBookOnSale.quantity += quantity
-                    opreatinMsg = "Existing insertion has been updated with '%i' more books, none remaining"%(quantity)
+                    opreatinMsg = f"Existing insertion has been updated with {{{quantity}}} more books, none remaining"
                 else:
                     db.session.add(Own(
                         usr.username,
@@ -253,12 +253,12 @@ def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, q
                         price,
                         quantity
                     ))
-                    opreatinMsg = "New insertion has been created with '%i' books, none remaining"%(quantity)
+                    opreatinMsg = f"New insertion has been created with {{{quantity}}} books, none remaining"
                 db.session.delete(ownedBook)
             else:
                 if ownedBookOnSale is not None:
                     ownedBookOnSale.quantity += quantity
-                    opreatinMsg = "Existing insertion has been updated with '%i' more books, some remain to sell"%(quantity)
+                    opreatinMsg = f"Existing insertion has been updated with {{{quantity}}} more books, some remain to sell"
                 else:
                     db.session.add(Own(
                         usr.username,
@@ -267,13 +267,13 @@ def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, q
                         price,
                         quantity
                     ))
-                    opreatinMsg = "New insertion has been created with '%i' books, some remain to sell"%(quantity)
+                    opreatinMsg = f"New insertion has been created with {{{quantity}}} books, some remain to sell"
                 ownedBook.quantity -= quantity
         elif not add and ownedBookOnSale is not None: # removing books from insertion
             if ownedBookOnSale.quantity == quantity:
                 if ownedBook is not None:
                     ownedBook.quantity += quantity
-                    opreatinMsg = "Insertion has been deleted, '%i' existing books added to library"%(quantity)
+                    opreatinMsg = f"Insertion has been deleted, {{{quantity}}} existing books added to library"
                 else:
                     db.session.add(Own(
                         usr.username,
@@ -282,13 +282,13 @@ def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, q
                         None,
                         quantity
                     ))
-                    opreatinMsg = "Insertion has been deleted, '%i' new books added to library"%(quantity)
+                    opreatinMsg = f"Insertion has been deleted, {{{quantity}}} new books added to library"
                 db.session.delete(ownedBookOnSale)
 
             else:
                 if ownedBook is not None:
                     ownedBook.quantity += quantity
-                    opreatinMsg = "'%i' existing books moved to the library, some remain listed"%(quantity)
+                    opreatinMsg = f"{{{quantity}}} existing books moved to the library, some remain listed"
                 else:
                     db.session.add(Own(
                         usr.username,
@@ -297,9 +297,10 @@ def manageInsertion(usr: User, ownedBook: Own|None, ownedBookOnSale: Own|None, q
                         None,
                         quantity
                     ))
-                    opreatinMsg = "'%i' new books moved to the library, some remain listed"%(quantity)
+                    opreatinMsg = f"{{{quantity}}} new books moved to the library, some remain listed"
                 ownedBookOnSale.quantity -= quantity
         else:
+            db.session.rollback()
             return "Invalid state of owned/insertioned books passed to function", False
     except exc.SQLAlchemyError as e:
         db.session.rollback()
