@@ -3,6 +3,7 @@ from flask import render_template
 
 from app.database import db
 from app.models.book import Book
+from app.models.history import History
 from app.models.own import Own
 from app.routes.auth import getLoggedInUser
 
@@ -22,4 +23,8 @@ def get(id: int) -> str:
         Own.fk_book == id, Own.price != None, Own.fk_username != username
     )
 
-    return render_template("book.html", book=book, insertions=insertions, user=user)
+    reviews = db.session.query(History).filter(History.fk_book == id)
+
+    return render_template(
+        "book.html", book=book, insertions=insertions, user=user, reviews=reviews
+    )

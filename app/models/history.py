@@ -1,7 +1,7 @@
 from datetime import date as dt
 
 from sqlalchemy import Column, ForeignKey, Integer, Sequence
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 from app.models.book import Book
@@ -21,6 +21,9 @@ class History(Base):
     fk_seller: Mapped[str] = mapped_column(ForeignKey(User.username))
     fk_book: Mapped[int] = mapped_column(ForeignKey(Book.id))
     state: Mapped[str]
+
+    buyer: Mapped[User] = relationship(User, foreign_keys=[fk_buyer])
+    seller: Mapped[User] = relationship(User, foreign_keys=[fk_seller])
 
     def __repr__(self) -> str:
         return f"History {{{self.id}, {self.date}, {self.quantity}, {self.status}, {self.recensione}, {self.fk_buyer}, {self.fk_seller}, {self.fk_book}, {self.state}}}"

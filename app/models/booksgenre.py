@@ -6,7 +6,7 @@ from app.models.book import Book
 from app.models.genre import Genre
 
 
-class Bookgenre(Base):
+class Booksgenre(Base):
     __tablename__ = "booksgenres"
 
     fk_idb: Mapped[int] = mapped_column(
