@@ -31,5 +31,5 @@ def history() -> str | Response:
         else:
             flash("Be sure to give a review that has some sense")
 
-    books = db.session.scalars(sq.select(History).where(History.fk_buyer == usr.username).order_by(History.id.desc())).fetchall()
-    return render_template("history.html", user = usr, books = books)
+    hsts = db.session.scalars(sq.select(History).where(History.fk_buyer == usr.username).order_by(History.id.desc())).fetchall()
+    return render_template("history.html", user = usr, hsts = hsts)

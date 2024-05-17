@@ -24,28 +24,28 @@
         You havent bought any books, you can find them here :D
     {% endif %}
 
-    {% for book in books %}
+    {% for hst in hsts %}
         <div class="history__book">
             <div class="history__left">
-                <b>{{ book.book.title }}</b> (isbn: {{ book.book.isbn }}) <br>
-                Status: {{ book.status }} <br>
-                Payed Price: {{ book.price }} <br>
+                <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }}) <br>
+                Status: {{ hst.status }} <br>
+                Payed Price: {{ hst.price }} <br>
                 <img
                     width=200
-                    src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
+                    src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
                     onerror="this.src='{{ url_for('static', filename='404.png') }}'"
                 />
             </div>
             <div class="history__right">
-                {% if not book.recensione %}
+                {% if not hst.recensione %}
                 <form action="/history" method="POST">
-                    <input type="hidden" id="hid" name="hid" value="{{ book.id }}"><br>
+                    <input type="hidden" id="hid" name="hid" value="{{ hst.id }}"><br>
                     <label for="review">Recensione:</label><br>
                     <textarea id="review" name="review"></textarea><br>
                     <input type="submit" class="history__button" value="Send Review">
                 </form>
                 {% else %}
-                    <textarea disabled>{{ book.recensione }}</textarea>
+                    <textarea disabled>{{ hst.recensione }}</textarea>
                 {% endif %}
             </div>
         </div>
