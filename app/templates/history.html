@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block pagestyles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
+{% endblock pagestyles %}
+
+{% block content %}
+
+{% include 'components/navbar.html' %}
+
+<h1>History</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            {{ msg }}<br>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<div class="history__border">
+    {% if books|length == 0 %}
+        You havent bought any books, you can find them here :D
+    {% endif %}
+
+    {% for book in books %}
+        <div class="history__book">
+            <div class="history__left">
+                <b>{{ book.book.title }}</b> (isbn: {{ book.book.isbn }}) <br>
+                Status: {{ book.status }} <br>
+                Payed Price: {{ book.price }} <br>
+                <img
+                    width=200
+                    src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
+                    onerror="this.src='{{ url_for('static', filename='404.png') }}'"
+                />
+            </div>
+            <div class="history__right">
+                {% if not book.recensione %}
+                <form action="/history" method="POST">
+                    <input type="hidden" id="hid" name="hid" value="{{ book.id }}"><br>
+                    <label for="review">Recensione:</label><br>
+                    <textarea id="review" name="review"></textarea><br>
+                    <input type="submit" class="history__button" value="Send Review">
+                </form>
+                {% else %}
+                    <textarea disabled>{{ book.recensione }}</textarea>
+                {% endif %}
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+</div>
+
+{% endblock content %}
