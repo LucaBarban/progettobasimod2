@@ -56,14 +56,14 @@ html {
 .home__library--box__footer {
     width: auto;
     height: 10px;
-    background: #63452c;
+    background: var(--wood);
 }
 
 .messages {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f8e45c;
+    background: var(--warning);
     color: var(--page-background);
     padding: 3px;
 }
