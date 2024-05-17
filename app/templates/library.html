@@ -9,6 +9,14 @@
 
 {% include 'components/navbar.html' %}
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            {{ msg }}<br>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 <div class="lib__container">
     <div class="lib__item">
         <h1 class="lib__title"> {{ user.username }}'s library </h1>
@@ -31,10 +39,10 @@
                     </div>
 
                     {% if own.price %}
-                        <a class="lib__btn" href="/insertion/{{own.fk_book}}"> edit </a>
-                        <a class="lib__btn" href="/insertion/remove/{{own.fk_book}}"> remove </a>
+                        <a class="lib__btn" href="/insertion/update/?book={{own.fk_book}}&bookstate={{own.state}}&quantity={{own.quantity}}&oldprice={{own.price}}"> edit </a>
+                        <a class="lib__btn" href="/insertion/unlist/?book={{own.fk_book}}&bookstate={{own.state}}"> remove </a>
                     {% elif own.user.seller %}
-                        <a class="lib__btn" href="/insertion/add/{{own.fk_book}}"> create </a>
+                        <a class="lib__btn" href="/insertion/list/?book={{own.fk_book}}&bookstate={{own.state}}"> create </a>
                     {% endif %}
                 </div>
             {% endfor %}

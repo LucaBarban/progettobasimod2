@@ -17,8 +17,20 @@ tokenSize: int = 32
 
 @app.route("/login/", methods=['GET', 'POST'])
 def login() -> str | Response:
+    """
+    If a GET request is made, the login form will be returned. Via a get request,
+    a link can also be passed to redirect automatically the user to another page.
+    The function will also parse and check the parameters passed via a POST
+    request to actually log in the user (this should only be done via the
+    login form)
+
+    Example:
+        return redirect("/login?link=/mylink")
+    """
     if request.method == 'GET':
-        return render_template("login.html", error="")
+        link: str|None = request.args.get("link")
+        link = "" if link is None else link
+        return render_template("login.html", error="", link=link)
 
     usr = request.form.get("usr") or None
     pwd = request.form.get("pwd") or None
@@ -39,8 +51,12 @@ def login() -> str | Response:
 
     db.session.commit()
 
-    flash('You have successfully logged in')
-    return redirect("/")
+    rlink: str|None = request.form.get("link")
+    if rlink  is not None:
+        return redirect(rlink)
+    else:
+        flash('You have successfully logged in')
+        return redirect("/login/")
 
 class RegForm(FlaskForm): # type: ignore
     usr = StringField('Username', validators=[InputRequired()])

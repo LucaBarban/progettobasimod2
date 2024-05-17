@@ -1,0 +1,49 @@
+html {
+    background: var(--page-background);
+    color: var(--main-foreground);
+    --library-border: #8B4513;
+    --library-separator: #6F4E37;
+}
+
+hr {
+    display: block;
+    width: 100%;
+    border: 4px solid var(--library-border)
+}
+
+.history__border {
+    border: 10px solid var(--library-border);
+    padding: 20px;
+    border-radius: 30px;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.history__book {
+    display: inline-block;
+    width: 100%;
+}
+
+.history__left {
+    float: left;
+}
+.history__right {
+    float: right;
+}
+
+.history__right textarea {
+    width: 500px;
+    height: 120px;
+}
+
+.history__button {
+    border-radius: 10px;
+    padding: 5px 10px;
+    margin: 5px;
+    color: #000;
+    background: var(--accent-color);
+    text-decoration: none;
+}
+
