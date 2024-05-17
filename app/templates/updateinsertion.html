@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block pagestyles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+{% endblock pagestyles %}
+
+{% block content %}
+
+{% include 'components/navbar.html' %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            {{ msg }}<br>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<h1>Update Book</h1>
+<form action="/insertion/update/" method="POST">
+    <input type="hidden" id="book" name="book" value="{{ book }}"><br>
+    <input type="hidden" id="bookstate" name="bookstate" value="{{ bookstate }}"><br>
+    <input type="hidden" id="quantity" name="quantity", value="{{ quantity }}"><br>
+    <input type="hidden" id="oldprice" name="oldprice", value="{{ oldprice}}"><br>
+    <label for="newprice">New Price:</label>
+    <input type="number" id="newprice" name="newprice", min="0", value="0"><br>
+
+    <input type="submit" value="Update">
+</form>
+
+{% endblock content %}
