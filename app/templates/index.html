@@ -7,15 +7,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% include 'components/navbar.html' %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
+            <div class="messages">
+                {% for msg in messages %}
+                    {{ msg }}
+                    <br>
+                {% endfor %}
+                <a class="close" href="/">&times;</a>
+            </div>
         {% endif %}
     {% endwith %}
+    {% include 'components/navbar.html' %}
     <div class="home__greeter">
         {% if user is none %}
             <h1>WELCOME TO BOOKWORM</h1>
@@ -23,9 +26,27 @@
         {% else %}
             <h1>WELCOME BACK {{ user.username }}</h1>
             <div class="home__greeter--shortcuts">
-                <a href="/library" class="home__greeter--shortcut home__greeter--shortcut--primary">Library</a>
-                <a href="/history" class="home__greeter--shortcut home__greeter--shortcut--secondary">History</a>
+                <a href="/library"
+                   class="home__greeter--shortcut home__greeter--shortcut--primary">Library</a>
+                <a href="/history"
+                   class="home__greeter--shortcut home__greeter--shortcut--secondary">History</a>
             </div>
         {% endif %}
+    </div>
+    <div class="home__library">
+        {% for genre in books %}
+            <div class="home__library--box">
+                <h1 class="home__library--box__title">{{ genre.name }}</h1>
+                <div class="home__library--box__books">
+                    {% for book in genre.books %}
+                        <img class="home__library--box__book"
+                             width="200"
+                             src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
+                             onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+                    {% endfor %}
+                </div>
+                <div class="home__library--box__footer"></div>
+            </div>
+        {% endfor %}
     </div>
 {% endblock content %}
