@@ -7,8 +7,6 @@ from app.models.genre import Genre
 
 
 class BookListByGenre:
-    genres: List[Genre] = []
-
     def __init__(self) -> None:
         self.genres = db.session.query(Genre).all()
         for x in self.genres:
