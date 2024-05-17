@@ -17,17 +17,18 @@ def history() -> str | Response:
     hid: str|None = request.form.get("hid")
     rew: str|None = request.form.get("review")
 
-    if hid is not None and rew is not None and len(rew) < 2:
-        hsToUpd = db.session.scalars(sq.select(History).where(History.id == hid)).one()
+    if request.method != 'POST':
+        if hid is not None and rew is not None and len(rew) >= 2:
+            hsToUpd = db.session.scalars(sq.select(History).where(History.id == hid)).one()
 
-        if hsToUpd is None:
-            flash("Invalid book selectet for review")
-        elif hsToUpd.recensione is not None:
-            flash("You have already reviewed this book")
+            if hsToUpd is None:
+                flash("Invalid book selectet for review")
+            elif hsToUpd.recensione is not None:
+                flash("You have already reviewed this book")
+            else:
+                hsToUpd.recensione = rew
+                db.session.commit()
         else:
-            hsToUpd.recensione = rew
-            db.session.commit()
-    elif request.method != 'GET' and ((hid is None and rew is None) or (hid is not None and rew is None)):
             flash("Be sure to give a review that has some sense")
 
     books = db.session.scalars(sq.select(History).where(History.fk_buyer == usr.username).order_by(History.id.desc())).fetchall()
