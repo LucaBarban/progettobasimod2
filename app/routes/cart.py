@@ -5,6 +5,7 @@ from flask import current_app as app
 from flask import redirect, render_template, request
 from psycopg2.errors import CheckViolation, RaiseException
 from sqlalchemy import exc
+from werkzeug.wrappers.response import Response
 
 from app.database import db
 from app.models.cart import Cart
@@ -45,6 +46,33 @@ def add_history(own: Own, user: User, quantity: int) -> None:
     )
 
 
+def add_library(own: Own, user: User, quantity: int) -> None:
+    insertion = (
+        db.session.query(Own)
+        .filter(
+            Own.fk_username == user.username,
+            Own.fk_book == own.fk_book,
+            Own.state == own.state,
+            Own.price == -1,
+        )
+        .one_or_none()
+    )
+
+    if insertion is not None:
+        insertion.quantity += quantity
+    else:
+        db.session.add(
+            Own(
+                fk_username=user.username,
+                fk_book=own.fk_book,
+                state=own.state,
+                quantity=quantity,
+            )
+        )
+
+    db.session.commit()
+
+
 def cart_post(user: User) -> str:
     own_ids = request.form.getlist("own")
 
@@ -61,6 +89,7 @@ def cart_post(user: User) -> str:
             quantity = int(quantity_str)
 
             add_history(own, user, quantity)
+            add_library(own, user, quantity)
 
             own.quantity -= quantity
             price_total += own.price * quantity
@@ -90,11 +119,15 @@ def cart_post(user: User) -> str:
         else:
             return cart_get(user, "An error occoured")
 
+    except:
+        db.session.rollback()
+        return cart_get(user, "An error occoured")
+
     return "<h1>All Good</h1>"
 
 
 @app.route("/cart/", methods=["GET", "POST"])
-def cart() -> str:
+def cart() -> str | Response:
     user = getLoggedInUser()
     if user is None:
         return redirect("/login")
@@ -103,3 +136,28 @@ def cart() -> str:
         return cart_get(user)
     else:
         return cart_post(user)
+
+
+@app.route("/cart/remove/<int:id>")
+def cart_remove(id: int) -> Response:
+    user = getLoggedInUser()
+    if user is None:
+        return redirect("/login")
+
+    try:
+        item = (
+            db.session.query(Cart)
+            .join(Cart.own)
+            .filter(Cart.fk_buyer == user.username, Own.id == id)
+            .one()
+        )
+
+        db.session.query(Cart).filter(
+            Cart.own == item.own, Cart.fk_buyer == item.fk_buyer
+        ).delete()
+
+        db.session.commit()
+    except:
+        db.session.rollback()
+
+    return redirect("/cart")
