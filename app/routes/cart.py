@@ -2,9 +2,10 @@ from datetime import datetime
 
 import sqlalchemy as sq
 from flask import current_app as app
-from flask import redirect, render_template, request
+from flask import flash, redirect, render_template, request
 from psycopg2.errors import CheckViolation, RaiseException
 from sqlalchemy import exc
+from sqlalchemy.util import warn
 from werkzeug.wrappers.response import Response
 
 from app.database import db
@@ -87,6 +88,8 @@ def cart_post(user: User) -> str:
                 raise ValueError("Missing item quantity")
 
             quantity = int(quantity_str)
+            if quantity <= 0:
+                raise ValueError("Quantity must be positive")
 
             add_history(own, user, quantity)
             add_library(own, user, quantity)
@@ -136,6 +139,47 @@ def cart() -> str | Response:
         return cart_get(user)
     else:
         return cart_post(user)
+
+
+@app.route("/cart/add/<int:id>", methods=["POST"])
+def cart_add(id: int) -> Response:
+    user = getLoggedInUser()
+
+    quantity = request.form.get("quantity")
+
+    insertion = db.session.get(Own, id)
+
+    if insertion is None:
+        flash("An error occoured")
+        return redirect("/")
+    elif quantity is None or int(quantity) <= 0:
+        flash("Wrong value for quantity")
+        return redirect(f"/book/{insertion.book.id}")
+    elif int(quantity) > insertion.quantity:
+        flash("Maximum quantity exceeded")
+        return redirect(f"/book/{insertion.book.id}")
+    elif user is None:
+        flash("User not logged in")
+        return redirect(f"/book/{insertion.book.id}")
+
+    cart = (
+        db.session.query(Cart)
+        .filter(Cart.fk_buyer == user.username, Cart.fk_own == id)
+        .one_or_none()
+    )
+
+    if cart is None:
+        db.session.add(Cart(fk_buyer=user.username, fk_own=id, quantity=quantity))
+    else:
+        cart.quantity += int(quantity)
+
+    try:
+        db.session.commit()
+    except:
+        flash("An error occoured")
+        db.session.rollback()
+
+    return redirect(f"/book/{insertion.book.id}")
 
 
 @app.route("/cart/remove/<int:id>")

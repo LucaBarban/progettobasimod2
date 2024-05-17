@@ -1,12 +1,63 @@
 {% extends "layout.html" %}
 
+{% block pagestyles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+{% endblock pagestyles %}
+
 {% block content %}
+
+{% include 'components/navbar.html' %}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            {{ msg }}<br>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
 <h1> Book {{ book.name }} </h1>
 
 <div>
+    <img
+        width=200
+        src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
+        onerror="this.src='{{ url_for('static', filename='404.png') }}'"
+    />
     <div> id: {{ book.id }} </div>
+    <div> title: {{ book.title }} </div>
     <div> author: {{ book.author }} </div>
+    <div> publisher: {{ book.publisher }} </div>
+    <div> genres: {{ book.genres }} </div>
 </div>
+
+<div>
+    {% for insertion in insertions %}
+        <br />
+        <div> Insertion </div>
+        <div> From: {{ insertion.user.username }} </div>
+        <div> Price: {{ insertion.price }} </div>
+        <div> Quantity: {{ insertion.quantity }} </div>
+        <div> State: {{ insertion.state }} </div>
+        <div></div>
+        {% if user %}
+            <form action="/cart/add/{{ insertion.id }}" method="POST">
+                <input type="number" name="quantity" min="1" value="1" />
+                <input type="submit" value="Add to cart" />
+            </form>
+        {% else %}
+            <div> Login before buying </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+{% for review in reviews %}
+    <br />
+    <div> From: {{ review.buyer.username }} </div>
+    <div> To: {{ review.seller.username }} </div>
+    <div> Review: {{ review.recensione }} </div>
+{% endfor %}
 
 {% endblock content %}
