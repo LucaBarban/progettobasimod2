@@ -46,7 +46,7 @@ CREATE TABLE users(
 
 CREATE TYPE state AS ENUM ('new', 'as new', 'used');
 
-CREATE TYPE status AS ENUM ('shipped', 'on delivery', 'delivered');
+CREATE TYPE status AS ENUM ('processing', 'packing', 'shipped', 'on delivery', 'delivered');
 
 CREATE TABLE owns(
     id SERIAL PRIMARY KEY,

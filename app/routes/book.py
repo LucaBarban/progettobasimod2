@@ -23,7 +23,9 @@ def get(id: int) -> str:
         Own.fk_book == id, Own.price != None, Own.fk_username != username
     )
 
-    reviews = db.session.query(History).filter(History.fk_book == id)
+    reviews = db.session.query(History).filter(
+        History.fk_book == id, History.recensione != None
+    )
 
     return render_template(
         "book.html", book=book, insertions=insertions, user=user, reviews=reviews

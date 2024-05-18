@@ -5,7 +5,6 @@ from flask import current_app as app
 from flask import flash, redirect, render_template, request
 from psycopg2.errors import CheckViolation, RaiseException
 from sqlalchemy import exc
-from sqlalchemy.util import warn
 from werkzeug.wrappers.response import Response
 
 from app.database import db
@@ -21,7 +20,7 @@ def cart_get(user: User, err: str | None = None) -> str:
         sq.select(Cart).filter(Cart.fk_buyer == user.username)
     ).all()
 
-    total = sum([item.own.price * item.quantity for item in items])
+    total = sum([item.own.price * item.quantity for item in items])  # type: ignore
 
     return render_template(
         "cart.html",
@@ -37,7 +36,7 @@ def add_history(own: Own, user: User, quantity: int) -> None:
         History(
             date=datetime.now(),
             quantity=quantity,
-            status="shipped",
+            status="processing",
             price=own.price,
             fk_buyer=user.username,
             fk_seller=own.fk_username,
@@ -68,6 +67,7 @@ def add_library(own: Own, user: User, quantity: int) -> None:
                 fk_book=own.fk_book,
                 state=own.state,
                 quantity=quantity,
+                price=None,
             )
         )
 
@@ -83,6 +83,9 @@ def cart_post(user: User) -> str:
         for own_id in own_ids:
             own = db.session.get_one(Own, own_id)
 
+            if own.price is None:
+                raise ValueError("Cannot buy a book not on sale")
+
             quantity_str = request.form.get(f"quantity-{own.id}")
             if quantity_str is None:
                 raise ValueError("Missing item quantity")
@@ -95,6 +98,7 @@ def cart_post(user: User) -> str:
             add_library(own, user, quantity)
 
             own.quantity -= quantity
+            own.user.balance += own.price * quantity
             price_total += own.price * quantity
 
         user.balance -= price_total
