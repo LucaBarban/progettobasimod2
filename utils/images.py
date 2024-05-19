@@ -74,7 +74,7 @@ def cover(text, id):
     strings = wrap(text, width=15)
     string = "\n".join(strings)
 
-    font = ImageFont.truetype("../app/static/fonts/Roboto-Regular.ttf", size=size)
+    font = ImageFont.truetype("./app/static/fonts/Roboto-Regular.ttf", size=size)
 
     img = Image.new("RGBA", (400, 600))
     draw = ImageDraw.Draw(img)
