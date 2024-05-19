@@ -37,7 +37,7 @@
                 />
             </div>
             <div class="history__right">
-                {% if not hst.recensione %}
+                {% if not hst.review %}
                 <form action="/history" method="POST">
                     <input type="hidden" id="hid" name="hid" value="{{ hst.id }}"><br>
                     <label for="review">Recensione:</label><br>
@@ -45,7 +45,7 @@
                     <input type="submit" class="history__button" value="Send Review">
                 </form>
                 {% else %}
-                    <textarea disabled>{{ hst.recensione }}</textarea>
+                    <textarea disabled>{{ hst.review }}</textarea>
                 {% endif %}
             </div>
         </div>

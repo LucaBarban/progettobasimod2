@@ -24,7 +24,7 @@ def get(id: int) -> str:
     )
 
     reviews = db.session.query(History).filter(
-        History.fk_book == id, History.recensione != None
+        History.fk_book == id, History.review != None
     )
 
     return render_template(

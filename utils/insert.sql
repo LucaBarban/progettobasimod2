@@ -236,7 +236,7 @@ INSERT INTO carts (fk_buyer, fk_own, quantity) VALUES
 
 
 -- Add historical records to the 'history' table
-INSERT INTO history (date, quantity, price, status, recensione, fk_buyer, fk_seller, fk_book, state) VALUES
+INSERT INTO history (date, quantity, price, status, review, fk_buyer, fk_seller, fk_book, state) VALUES
     ('2023-01-20', 2, 1099, 'delivered', 'Great transaction!', 'alice123', 'mike87', 1, 'new'),
     ('2023-02-25', 3, 1500, 'shipped', NULL, 'bob_smith', 'max_king', 4, 'as new'),
     ('2023-03-12', 4, 1350, 'on delivery', NULL, 'jane_doe', 'chris99', 11, 'new'),

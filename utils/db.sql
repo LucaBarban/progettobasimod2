@@ -75,7 +75,7 @@ CREATE TABLE history(
     quantity INTEGER NOT NULL,
     status status NOT NULL,
     price INTEGER NOT NULL,
-    recensione TEXT,
+    review TEXT,
     fk_buyer VARCHAR(100),
     fk_seller VARCHAR(100),
     fk_book INTEGER,
@@ -84,6 +84,16 @@ CREATE TABLE history(
     FOREIGN KEY (fk_seller) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
+
+CREATE TABLE notifications(
+    id SERIAL PRIMARY KEY,
+    fk_order INTEGER NOT NULL,
+    message TEXT NOT NULL,
+    archived BOOLEAN NOT NULL,
+    FOREIGN KEY (fk_order) REFERENCES history(id)
+);
+
+-- Trigger for Own.quantity
 
 CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
 RETURNS TRIGGER AS $$
@@ -103,3 +113,18 @@ AFTER UPDATE OF quantity ON owns
 FOR EACH ROW
 EXECUTE FUNCTION remove_if_quantity_zero();
 
+-- Trigger for History.status
+
+CREATE OR REPLACE FUNCTION notify_status_change() RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO notifications (fk_order, message, archived)
+    VALUES (OLD.id, 'Status changed to ' || NEW.status, FALSE);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_status_change
+AFTER UPDATE ON history
+FOR EACH ROW
+WHEN (OLD.status IS DISTINCT FROM NEW.status)
+EXECUTE FUNCTION notify_status_change();
