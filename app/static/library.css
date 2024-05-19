@@ -3,6 +3,8 @@ html {
     color: var(--main-foreground);
     --library-border: #8B4513;
     --library-separator: #6F4E37;
+    --detail-border: #0000ff;
+    --detail-background: #0000ff80;
 }
 
 .lib__container {
@@ -17,7 +19,6 @@ html {
 }
 
 .lib__library {
-    border: 10px solid var(--library-border);
     padding: 20px;
     border-radius: 30px;
     display: flex;
@@ -32,11 +33,17 @@ html {
 }
 
 .own__details {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    height: 50px;
+    width: 100px;
+    position: absolute;
+}
+
+.detail__box {
+    border-radius: 10px;
+    border: 2px solid var(--detail-border);
+    background-color: var(--detail-background);
+    position: relative;
+    top: -65px;
+    left: 85px;
 }
 
 .lib__btn {
@@ -60,7 +67,7 @@ html {
 }
 
 .own__separator {
-    border: 2px solid var(--library-separator);
+    border: 10px solid var(--library-separator);
 }
 
 .lib__pagination {
