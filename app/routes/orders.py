@@ -55,8 +55,6 @@ def orders() -> str | Response:
     if user is None:
         return redirect("/login/?link=/orders")
 
-    print(user)
-
     if user.seller == False:
         # Mabye custom page?
         abort(404)

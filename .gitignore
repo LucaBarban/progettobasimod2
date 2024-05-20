@@ -134,4 +134,4 @@ token.pickle
 config.toml
 
 # excluding book covers
-./static/covers/
+app/static/covers/*
