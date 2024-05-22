@@ -52,11 +52,12 @@ def login() -> str | Response:
     db.session.commit()
 
     rlink: str|None = request.form.get("link")
-    if rlink  is not None:
+
+    if rlink is not None and rlink != "":
         return redirect(rlink)
     else:
         flash('You have successfully logged in')
-        return redirect("/login/")
+        return redirect("/")
 
 class RegForm(FlaskForm): # type: ignore
     usr = StringField('Username', validators=[InputRequired()])
