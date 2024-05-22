@@ -1,1 +1,1 @@
-from . import auth, index, book, library, cart, insertionmanager, history
+from . import auth, index, book, search, library, cart, insertionmanager, history

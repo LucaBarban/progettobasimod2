@@ -1,28 +1,18 @@
-from random import randint
-from typing import List
+from random import sample
+from typing import List, Tuple
 
 from flask import current_app as app
 from flask import render_template
 
 from app.database import db
 from app.models.genre import Genre
+from app.models.book import Book
 from app.routes.auth import getLoggedInUser
 
 
-def generate_book_list(n_books: int = 5) -> List[Genre]:
+def generate_book_list(n_books: int = 5) -> Tuple[Tuple[str, List[Book]]]:
     query = [x for x in db.session.query(Genre).all() if len(x.books) >= n_books]
-    for x in query:
-        if len(x.books) >= n_books:
-            books = []
-            for _ in range(n_books):
-                while True:
-                    index = randint(0, len(x.books) - 1)
-                    book = x.books[index]
-                    if book not in books:
-                        break
-                books.append(book)
-            x.books = books
-    return query
+    return ((genre.name, sample(genre.books, n_books)) for genre in query)
 
 
 @app.route("/")
