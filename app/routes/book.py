@@ -1,5 +1,6 @@
 from datetime import date, datetime
 import re
+from typing import List
 from flask import current_app as app, flash, render_template, request, redirect
 from app.routes.auth import getLoggedInUser #type: ignore
 from werkzeug.wrappers.response import Response
@@ -18,7 +19,7 @@ from stdnum import isbn as isbnval #type: ignore
 @app.route("/book/")
 def products() -> Response:
     return redirect("/library/")
-  
+
 @app.route("/book/<int:id>")
 def get(id: int) -> str:
     user = getLoggedInUser()
@@ -33,9 +34,9 @@ def get(id: int) -> str:
     insertions = db.session.query(Own).filter(
         Own.fk_book == id, Own.price != None, Own.fk_username != username
     )
-    
+
     reviews = db.session.query(History).filter(History.fk_book == id)
-    
+
     return render_template(
         "book.html", book=book, insertions=insertions, user=user, reviews=reviews
     )
@@ -71,8 +72,13 @@ def add() -> str|Response:
         flash("The date of pubblication is invalid")
     if pages <= 0:
         flash("The number of pages is invalid")
-    if isbn is None or not isbnval.validate(isbn):
-        isbn = None
+    isbres: bool = False
+    if isbn is not None:
+        try:
+            isbRes = isbnval.validate(isbn)
+        except:
+            pass
+    if not isbres:
         flash("Provide a valid ISBN code")
     if authorid is None:
         flash("An author has to be set")
@@ -80,18 +86,25 @@ def add() -> str|Response:
         flash("A publisher has to be set")
     if len(selectedGenres) == 0:
         flash("Select at least one genre")
-    if title is None or published is None or pages <= 0 or isbn is None or authorid is None or publishername is None or len(selectedGenres) == 0:
+    if title is None or published is None or pages <= 0 or not isbn or authorid is None or publishername is None or len(selectedGenres) == 0:
         return render_template("addbook.html", user=usr, genres=genres, authors=authors, publishers=publishers)
 
     book: Book
     author: Author|None = next((a for a in authors if a.id == authorid), None) # next iterates untill the iterator provided by the foor loop iterates afer the whole list
     publisher: Publisher|None = next((p for p in publishers if p.name == publishername), None)
+    bookgenres: List[Genre] = []
+    for sgen in selectedGenres:
+        for g in genres:
+            if sgen == g.name:
+                bookgenres.append(g)
+
+
     if author is None or publisher is None:
         flash("An unforeseen error occurred")
         return render_template("addbook.html", user=usr, genres=genres, authors=authors, publishers=publishers)
 
     try:
-        book = Book(title, published, pages, isbn, author, publisher)
+        book = Book(title, published, pages, isbn, author, publisher, bookgenres)
         db.session.add(book)
         db.session.commit()
     except exc.SQLAlchemyError as e:
