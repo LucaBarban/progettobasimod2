@@ -1,7 +1,16 @@
-from flask import current_app as app, render_template, request
+from datetime import date, datetime
+import re
+from flask import current_app as app, flash, render_template, request, redirect
+from app.routes.auth import getLoggedInUser #type: ignore
+from werkzeug.wrappers.response import Response
 from app.models.book import Book
+from app.models.user import User
+from app.models.genre import Genre
+from app.models.publisher import Publisher
+from app.models.author import Author
 from app.database import db
 import sqlalchemy as sq
+from sqlalchemy import exc
 
 @app.route("/book/")
 def products() -> str:
@@ -9,18 +18,59 @@ def products() -> str:
 
     return render_template("books.html", books=books)
 
-# /book/add?name=...&author=...
-@app.route("/book/add")
-def add() -> str:
-    name = request.args.get("name") or "..."
-    author = request.args.get("author") or "..."
+@app.route("/book/add", methods=['GET', 'POST'])
+def add() -> str|Response:
+    usr: User|None = getLoggedInUser()
+    if usr is None:
+        return redirect("/login/?link=/book/add")
 
-    book = Book(name = name, author = author)
+    genres = db.session.scalars(sq.select(Genre)).fetchall()
+    authors = db.session.scalars(sq.select(Author)).fetchall()
+    publishers = db.session.scalars(sq.select(Publisher)).fetchall()
 
-    db.session.add(book)
-    db.session.commit()
+    if request.method != 'POST':
+        return render_template("bookadd.html", user=usr, genres=genres, authors=authors, publishers=publishers)
 
-    return f"<h1>Added {book.id}</h1>"
+    title: str|None = request.form.get("title") or None
+    published: date|None
+    try:
+        published = datetime.strptime(request.form.get("published") or "", '%Y-%m-%d')
+    except ValueError:
+        published = None
+    pages: int = int(request.form.get("pages") or -1)
+    isbn: str|None = request.form.get("isbn") or None
+    author: int|None = int(request.form.get("author") or -1)
+    publisher: int|None =  int(request.form.get("publisher") or -1)
+    selectedGenres: list[str] = request.form.getlist("genres")
+
+    if title is None :
+        flash("The title has been found to be empty")
+    if published is None :
+        flash("The date of pubblication is invalid")
+    if pages <= 0:
+        flash("The number of pages is invalid")
+    if isbn is None or not checkIsbn(isbn):
+        isbn = None
+        flash("Provide a valid ISBN code")
+    if author is None:
+        flash("An author has to be set")
+    if publisher is None:
+        flash("A publisher has to be set")
+    if len(selectedGenres) == 0:
+        flash("Select at least one genre")
+    if title is None or published is None or pages <= 0 or isbn is None or author is None or publisher is None or len(selectedGenres) == 0:
+        return render_template("bookadd.html", user=usr, genres=genres, authors=authors, publishers=publishers)
+
+    book: Book
+    try:
+        book = Book(title, published, pages, isbn, author, publisher)
+        db.session.add(book)
+        db.session.commit()
+    except exc.SQLAlchemyError as e:
+        db.session.rollback()
+        flash("An error occured while adding the new book")
+
+    return render_template("bookadd.html", user=usr, genres=genres, authors=authors, publishers=publishers)
 
 @app.route("/book/<int:id>")
 def get(id: int) -> str:
@@ -28,3 +78,19 @@ def get(id: int) -> str:
     print(book)
 
     return render_template("book.html", book=book)
+
+def checkIsbn(isbn:str) -> bool:
+    """
+    Function used to check if a given ISBN code is correct. This
+    has been borrowed from https://stackoverflow.com/a/4047709
+    """
+    isbn = isbn.replace("-", "").replace(" ", "").upper()
+    match = re.search(r'^(\d{9})(\d|X)$', isbn)
+    if not match:
+        return False
+
+    digits = match.group(1)
+    check_digit = 10 if match.group(2) == 'X' else int(match.group(2))
+
+    result = sum((i + 1) * int(digit) for i, digit in enumerate(digits))
+    return (result % 11) == check_digit
