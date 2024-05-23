@@ -100,11 +100,11 @@ def addgenre() -> str|Response:
                 genre = Genre(genrename)
                 db.session.add(genre)
                 db.session.commit()
+                flash("Genre added correctly")
             except exc.SQLAlchemyError as e:
                 db.session.rollback()
                 flash("An error occured while adding the new genre")
 
-            flash("Genre added correctly")
             return redirect("/book/add/")
 
     return render_template("addgenre.html", user=usr)
@@ -124,11 +124,11 @@ def addpublisher() -> str|Response:
                 publisher = Publisher(publishername)
                 db.session.add(publisher)
                 db.session.commit()
+                flash("Publisher added correctly")
             except exc.SQLAlchemyError as e:
                 db.session.rollback()
                 flash("An error occured while adding the new publisher")
 
-            flash("Publisher added correctly")
             return redirect("/book/add/")
 
     return render_template("addpublisher.html", user=usr)
@@ -158,11 +158,11 @@ def addauthor() -> str|Response:
                 author = Author(first_name, last_name)
                 db.session.add(author)
                 db.session.commit()
+                flash("Author added correctly")
             except exc.SQLAlchemyError as e:
                 db.session.rollback()
                 flash("An error occured while adding the new author")
 
-            flash("Author added correctly")
             return redirect("/book/add/")
 
     return render_template("addauthor.html", user=usr)
