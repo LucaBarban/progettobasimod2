@@ -108,6 +108,7 @@ def add() -> str|Response:
         book = Book(title, published, pages, isbn, author, publisher, bookgenres)
         db.session.add(book)
         db.session.commit()
+        flash("Book added correctly")
     except exc.SQLAlchemyError as e:
         db.session.rollback()
         flash("An error occured while adding the new book")
