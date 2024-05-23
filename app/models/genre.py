@@ -8,5 +8,8 @@ class Genre(Base):
 
     name: Mapped[str] = mapped_column(primary_key=True)
 
+    def __init__(self, name:str):
+        self.name = name
+
     def __repr__(self) -> str:
         return f"Genre {{{self.name}}}"
