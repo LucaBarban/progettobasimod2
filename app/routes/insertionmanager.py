@@ -8,7 +8,7 @@ from werkzeug.wrappers.response import Response
 from app.models.own import Own
 from app.models.user import User
 
-@app.route("/insertion", methods=['GET', 'POST'])
+@app.route("/insertion/", methods=['GET', 'POST'])
 def insertion() -> str | Response:
     return redirect("/library")
     usr: User|None = getLoggedInUser()

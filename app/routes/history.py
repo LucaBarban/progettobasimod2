@@ -8,7 +8,7 @@ from werkzeug.wrappers.response import Response
 from app.models.history import History
 from app.models.user import User
 
-@app.route("/history", methods=['GET', 'POST'])
+@app.route("/history/", methods=['GET', 'POST'])
 def history() -> str | Response:
     usr: User|None = getLoggedInUser()
     if usr is None:
