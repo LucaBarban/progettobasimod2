@@ -1,0 +1,69 @@
+html {
+    background: var(--page-background);
+    color: var(--main-foreground);
+}
+
+.home__greeter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.home__greeter--shortcuts {
+    display: flex;
+}
+
+.home__greeter--shortcut {
+    position: relative;
+    font-size: var(--font-size);
+    text-decoration: none;
+    overflow: hidden;
+    border-radius: 5px;
+    border: none;
+    padding: 8px 10px;
+    margin: 5px;
+}
+
+.home__greeter--shortcut--primary {
+    position: relative;
+    background: var(--accent-color);
+    color: var(--main-foreground);
+}
+
+.home__greeter--shortcut--secondary {
+    position: relative;
+    background: none;
+    color: var(--accent-color);
+    border-style: solid;
+    border-color: var(--accent-color);
+}
+
+.home__library--box__title,
+.home__library--box__books {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.home__library--box__book {
+    --padding: 10px;
+    padding-left: var(--padding);
+    padding-right: var(--padding);
+    padding-top: var(--padding);
+}
+
+.home__library--box__footer {
+    width: auto;
+    height: 10px;
+    background: var(--wood);
+}
+
+.messages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--warning);
+    color: var(--page-background);
+    padding: 3px;
+}

@@ -8,6 +8,8 @@ from app.models.user import User
 from app.models.genre import Genre
 from app.models.publisher import Publisher
 from app.models.author import Author
+from app.models.own import Own
+from app.models.history import History
 from app.database import db
 import sqlalchemy as sq
 from sqlalchemy import and_, exc
@@ -15,8 +17,28 @@ from stdnum import isbn as isbnval #type: ignore
 
 @app.route("/book/")
 def products() -> Response:
-
     return redirect("/library/")
+  
+@app.route("/book/<int:id>")
+def get(id: int) -> str:
+    user = getLoggedInUser()
+
+    if user is None:
+        username = None
+    else:
+        username = user.username
+
+    book = db.get_or_404(Book, id)
+
+    insertions = db.session.query(Own).filter(
+        Own.fk_book == id, Own.price != None, Own.fk_username != username
+    )
+    
+    reviews = db.session.query(History).filter(History.fk_book == id)
+    
+    return render_template(
+        "book.html", book=book, insertions=insertions, user=user, reviews=reviews
+    )
 
 @app.route("/book/add/", methods=['GET', 'POST'])
 def add() -> str|Response:
@@ -77,13 +99,6 @@ def add() -> str|Response:
         flash("An error occured while adding the new book")
 
     return render_template("addbook.html", user=usr, genres=genres, authors=authors, publishers=publishers)
-
-@app.route("/book/<int:id>")
-def get(id: int) -> str:
-    book = db.get_or_404(Book, id)
-    print(book)
-
-    return render_template("book.html", book=book)
 
 @app.route("/book/add/genre/", methods=['GET', 'POST'])
 def addgenre() -> str|Response:
