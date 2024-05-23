@@ -1,12 +1,6 @@
-{% extends "layout.html" %}
-{% block pagestyles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
-{% endblock pagestyles %}
+{% extends "add.html" %}
 
-{% block content %}
-
-{% include 'components/navbar.html' %}
+{% block addform %}
 
 <h1>Bookadd</h1>
 
@@ -18,7 +12,8 @@
     {% endif %}
 {% endwith %}
 
-<form action="#" method="post">
+
+<form action="/book/add/" method="post">
     <label for="title">Title:</label>
     <input type="text" id="title" name="title" required><br><br>
 
@@ -56,4 +51,4 @@
     <button type="submit">Add</button>
 </form>
 
-{% endblock content %}
+{% endblock %}

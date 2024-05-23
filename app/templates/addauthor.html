@@ -1,0 +1,26 @@
+{% extends "add.html" %}
+
+{% block addform %}
+
+<h1>AuthorAdd</h1>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for msg in messages %}
+            {{ msg }}<br>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+<form action="/book/add/" method="post">
+    <label for="first_name">First Name:</label>
+    <input type="text" id="first_name" name="first_name" required><br><br>
+
+    <label for="last_name">Last Name:</label>
+    <input type="text" id="last_name" name="last_name" required><br><br>
+
+    <button type="submit">Add</button>
+</form>
+
+{% endblock %}
