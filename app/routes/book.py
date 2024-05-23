@@ -75,20 +75,21 @@ def add() -> str|Response:
     isbres: bool = False
     if isbn is not None:
         try:
-            isbRes = isbnval.validate(isbn)
+            isbres = isbnval.is_valid(isbn)
         except:
             pass
     if not isbres:
-        flash("Provide a valid ISBN code")
+        flash("Provide a valid ISBN code (" + str(isbn) + ")")
     if authorid is None:
         flash("An author has to be set")
     if publishername is None:
         flash("A publisher has to be set")
     if len(selectedGenres) == 0:
         flash("Select at least one genre")
-    if title is None or published is None or pages <= 0 or not isbn or authorid is None or publishername is None or len(selectedGenres) == 0:
+    if title is None or published is None or pages <= 0 or not isbres or authorid is None or publishername is None or len(selectedGenres) == 0:
         return render_template("addbook.html", user=usr, genres=genres, authors=authors, publishers=publishers)
 
+    isbn = str(isbnval.validate(isbn))
     book: Book
     author: Author|None = next((a for a in authors if a.id == authorid), None) # next iterates untill the iterator provided by the foor loop iterates afer the whole list
     publisher: Publisher|None = next((p for p in publishers if p.name == publishername), None)

@@ -10,7 +10,7 @@ class Genre(Base):
     __tablename__ = "genres"
 
     name: Mapped[str] = mapped_column(primary_key=True)
-    books: Mapped[List[Book]] = relationship(Book, secondary="booksgenres")
+    books: Mapped[List[Book]] = relationship(Book, secondary="booksgenres", back_populates="genres")
 
     def __init__(self, name:str):
         self.name = name
