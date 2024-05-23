@@ -39,8 +39,8 @@ def add() -> str|Response:
         published = None
     pages: int = int(request.form.get("pages") or -1)
     isbn: str|None = request.form.get("isbn") or None
-    author: int|None = int(request.form.get("author") or -1)
-    publisher: int|None =  int(request.form.get("publisher") or -1)
+    authorid: int|None = int(request.form.get("author") or -1)
+    publishername: str|None =  request.form.get("publisher") or None
     selectedGenres: list[str] = request.form.getlist("genres")
 
     if title is None :
@@ -52,16 +52,22 @@ def add() -> str|Response:
     if isbn is None or not checkIsbn(isbn):
         isbn = None
         flash("Provide a valid ISBN code")
-    if author is None:
+    if authorid is None:
         flash("An author has to be set")
-    if publisher is None:
+    if publishername is None:
         flash("A publisher has to be set")
     if len(selectedGenres) == 0:
         flash("Select at least one genre")
-    if title is None or published is None or pages <= 0 or isbn is None or author is None or publisher is None or len(selectedGenres) == 0:
+    if title is None or published is None or pages <= 0 or isbn is None or authorid is None or publishername is None or len(selectedGenres) == 0:
         return render_template("bookadd.html", user=usr, genres=genres, authors=authors, publishers=publishers)
 
     book: Book
+    author: Author|None = next((a for a in authors if a.id == authorid), None) # next iterates untill the iterator provided by the foor loop iterates afer the whole list
+    publisher: Publisher|None = next((p for p in publishers if p.name == publishername), None)
+    if author is None or publisher is None:
+        flash("An unforeseen error occurred")
+        return render_template("bookadd.html", user=usr, genres=genres, authors=authors, publishers=publishers)
+
     try:
         book = Book(title, published, pages, isbn, author, publisher)
         db.session.add(book)
