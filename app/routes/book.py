@@ -10,7 +10,7 @@ from app.models.publisher import Publisher
 from app.models.author import Author
 from app.database import db
 import sqlalchemy as sq
-from sqlalchemy import exc
+from sqlalchemy import and_, exc
 
 @app.route("/book/")
 def products() -> Response:
@@ -84,7 +84,7 @@ def get(id: int) -> str:
 
     return render_template("book.html", book=book)
 
-@app.route("/book/add/genre")
+@app.route("/book/add/genre/", methods=['GET', 'POST'])
 def addgenre() -> str|Response:
     usr: User|None = getLoggedInUser()
     if usr is None:
@@ -103,9 +103,12 @@ def addgenre() -> str|Response:
                 db.session.rollback()
                 flash("An error occured while adding the new genre")
 
+            flash("Genre added correctly")
+            return redirect("/book/add/")
+
     return render_template("addgenre.html", user=usr)
 
-@app.route("/book/add/publisher")
+@app.route("/book/add/publisher/", methods=['GET', 'POST'])
 def addpublisher() -> str|Response:
     usr: User|None = getLoggedInUser()
     if usr is None:
@@ -124,9 +127,12 @@ def addpublisher() -> str|Response:
                 db.session.rollback()
                 flash("An error occured while adding the new publisher")
 
+            flash("Publisher added correctly")
+            return redirect("/book/add/")
+
     return render_template("addpublisher.html", user=usr)
 
-@app.route("/book/add/author")
+@app.route("/book/add/author/", methods=['GET', 'POST'])
 def addauthor() -> str|Response:
     usr: User|None = getLoggedInUser()
     if usr is None:
@@ -140,12 +146,23 @@ def addauthor() -> str|Response:
             flash("You must compile all the fields")
         else:
             try:
+                if len(db.session.scalars(sq.select(Author)
+                                          .filter(and_
+                                              (Author.first_name == first_name,
+                                               Author.last_name == last_name)
+                                          )).fetchall()) != 0:
+                    flash("Author already exists")
+                    return redirect("/book/add/author/")
+
                 author = Author(first_name, last_name)
                 db.session.add(author)
                 db.session.commit()
             except exc.SQLAlchemyError as e:
                 db.session.rollback()
                 flash("An error occured while adding the new author")
+
+            flash("Author added correctly")
+            return redirect("/book/add/")
 
     return render_template("addauthor.html", user=usr)
 
