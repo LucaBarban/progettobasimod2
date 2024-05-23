@@ -11,6 +11,7 @@ from app.models.author import Author
 from app.database import db
 import sqlalchemy as sq
 from sqlalchemy import and_, exc
+from stdnum import isbn as isbnval #type: ignore
 
 @app.route("/book/")
 def products() -> Response:
@@ -48,7 +49,7 @@ def add() -> str|Response:
         flash("The date of pubblication is invalid")
     if pages <= 0:
         flash("The number of pages is invalid")
-    if isbn is None or not checkIsbn(isbn):
+    if isbn is None or not isbnval.validate(isbn):
         isbn = None
         flash("Provide a valid ISBN code")
     if authorid is None:
@@ -165,22 +166,3 @@ def addauthor() -> str|Response:
             return redirect("/book/add/")
 
     return render_template("addauthor.html", user=usr)
-
-def checkIsbn(isbn:str) -> bool:
-    """
-    Function used to check if a given ISBN code is correct. This
-    has been borrowed from https://stackoverflow.com/a/4047709
-    """
-    isbn = isbn.replace("-", "").replace(" ", "").upper()
-    match = re.search(r'^(\d{9})(\d|X)$', isbn) # treating the string as raw (things like \ are treated as literal characters)
-                                                # from the start of the string (^) take 9 characters (\d{9}) and a tenth that
-                                                # can also be an X
-
-    if not match:
-        return False
-
-    digits = match.group(1)
-    check_digit = 10 if match.group(2) == 'X' else int(match.group(2))
-
-    result = sum((i + 1) * int(digit) for i, digit in enumerate(digits))
-    return (result % 11) == check_digit
