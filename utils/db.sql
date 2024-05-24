@@ -85,13 +85,24 @@ CREATE TABLE history(
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
 
+CREATE TYPE disc_notif AS ENUM ('order updated');
+
 CREATE TABLE notifications(
     id SERIAL PRIMARY KEY,
-    fk_order INTEGER NOT NULL,
-    message TEXT NOT NULL,
+    context disc_notif NOT NULL,
+    fk_username VARCHAR(100) NOT NULL,
+    message TEXT,
     archived BOOLEAN NOT NULL,
-    FOREIGN KEY (fk_order) REFERENCES history(id)
+
+    -- Order
+    fk_history INTEGER,
+    order_status_old status,
+    order_status_new status,
+    FOREIGN KEY (fk_history) REFERENCES history(id)
 );
+
+CREATE VIEW notifications_count (username, count)
+AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
 
 -- Trigger for Own.quantity
 
@@ -117,8 +128,8 @@ EXECUTE FUNCTION remove_if_quantity_zero();
 
 CREATE OR REPLACE FUNCTION notify_status_change() RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO notifications (fk_order, message, archived)
-    VALUES (OLD.id, 'Status changed to ' || NEW.status, FALSE);
+    INSERT INTO notifications (fk_username, context, archived, fk_history, order_status_old, order_status_new)
+    VALUES (NEW.fk_buyer, 'order updated', FALSE, NEW.id, OLD.status, NEW.status);
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

@@ -7,12 +7,10 @@ from flask import flash, redirect, render_template, request
 from werkzeug.wrappers.response import Response
 
 from app.database import db
-from app.models.history import History
+from app.models.history import History, Statuses
 from app.routes.auth import getLoggedInUser
 
 T = TypeVar("T")
-
-statuses = {"processing", "packing", "shipped", "on delivery", "delivered"}
 
 
 def partition(fn: Callable[[T], bool], items: List[T]) -> tuple[List[T], List[T]]:
@@ -32,7 +30,7 @@ def update(id: int) -> Response:
     user = getLoggedInUser()
     status = request.form.get("status")
 
-    if user is None or status not in statuses:
+    if user is None or status not in Statuses:
         flash("An error occoured")
         return redirect("/")
 

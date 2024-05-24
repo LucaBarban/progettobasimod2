@@ -8,6 +8,8 @@ from app.database import Base
 from app.models.book import Book
 from app.models.user import User
 
+Statuses = {"processing", "packing", "shipped", "on delivery", "delivered"}
+
 
 class History(Base):
     __tablename__ = "history"

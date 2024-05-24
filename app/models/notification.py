@@ -1,8 +1,11 @@
+from typing import Optional
+
 from sqlalchemy import ForeignKey, Integer, Sequence
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 from app.models.history import History
+from app.models.user import User
 
 
 class Notification(Base):
@@ -11,11 +14,15 @@ class Notification(Base):
     id: Mapped[int] = mapped_column(
         Integer, Sequence("notifications_id_seq"), primary_key=True
     )
-    fk_order: Mapped[int] = mapped_column(ForeignKey(History.id))
-    message: Mapped[str]
+    context: Mapped[str]
+    fk_username: Mapped[str] = mapped_column(ForeignKey(User.username))
+    message: Mapped[Optional[str]]
     archived: Mapped[bool]
 
-    order: Mapped[History] = relationship()
+    fk_history: Mapped[Optional[int]] = mapped_column(ForeignKey(History.id))
+    order_status_old: Mapped[Optional[str]]
+    order_status_new: Mapped[Optional[str]]
+    order: Mapped[Optional[History]] = relationship()
 
     def __repr__(self) -> str:
-        return f"Notification {{{self.id}, {self.fk_order}, {self.message}, archived: {self.archived} -> {self.order}}}"
+        return f"Notification {{{self.id}, {self.fk_username}, {self.message}, archived: {self.archived} | [Order: {self.fk_history}, {self.order_status_old}, {self.order_status_new}]}}"
