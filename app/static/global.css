@@ -1,0 +1,4 @@
+html {
+    background: var(--page-background);
+    color: var(--main-foreground);
+}
