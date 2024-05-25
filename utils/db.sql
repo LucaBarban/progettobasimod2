@@ -46,7 +46,7 @@ CREATE TABLE users(
 
 CREATE TYPE state AS ENUM ('new', 'as new', 'used');
 
-CREATE TYPE status AS ENUM ('shipped', 'on delivery', 'delivered');
+CREATE TYPE status AS ENUM ('processing', 'packing', 'shipped', 'on delivery', 'delivered');
 
 CREATE TABLE owns(
     id SERIAL PRIMARY KEY,
@@ -75,7 +75,7 @@ CREATE TABLE history(
     quantity INTEGER NOT NULL,
     status status NOT NULL,
     price INTEGER NOT NULL,
-    recensione TEXT,
+    review TEXT,
     fk_buyer VARCHAR(100),
     fk_seller VARCHAR(100),
     fk_book INTEGER,
@@ -84,6 +84,27 @@ CREATE TABLE history(
     FOREIGN KEY (fk_seller) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
+
+CREATE TYPE disc_notif AS ENUM ('order updated');
+
+CREATE TABLE notifications(
+    id SERIAL PRIMARY KEY,
+    context disc_notif NOT NULL,
+    fk_username VARCHAR(100) NOT NULL,
+    message TEXT,
+    archived BOOLEAN NOT NULL,
+
+    -- Order
+    fk_history INTEGER,
+    order_status_old status,
+    order_status_new status,
+    FOREIGN KEY (fk_history) REFERENCES history(id)
+);
+
+CREATE VIEW notifications_count (username, count)
+AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
+
+-- Trigger for Own.quantity
 
 CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
 RETURNS TRIGGER AS $$
@@ -103,3 +124,18 @@ AFTER UPDATE OF quantity ON owns
 FOR EACH ROW
 EXECUTE FUNCTION remove_if_quantity_zero();
 
+-- Trigger for History.status
+
+CREATE OR REPLACE FUNCTION notify_status_change() RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO notifications (fk_username, context, archived, fk_history, order_status_old, order_status_new)
+    VALUES (NEW.fk_buyer, 'order updated', FALSE, NEW.id, OLD.status, NEW.status);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_status_change
+AFTER UPDATE ON history
+FOR EACH ROW
+WHEN (OLD.status IS DISTINCT FROM NEW.status)
+EXECUTE FUNCTION notify_status_change();

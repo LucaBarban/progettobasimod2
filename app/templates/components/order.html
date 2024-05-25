@@ -1,0 +1,34 @@
+<div>
+
+    <div> Book: {{ order.book.title }} </div>
+    <div> To: {{ order.buyer.username }} </div>
+    <div> State: {{ order.state }} </div>
+    <div> Quantity: {{ order.quantity }} </div>
+
+    {% set statuses = ['processing', 'packing', 'shipped', 'on delivery', 'delivered'] %}
+
+    {% if delivered %}
+        {% if order.review %}
+            {{ order.buyer.username }} says: "{{ order.review }}"
+        {% else %}
+            Awaiting review...
+        {% endif %}
+    {% else %}
+        <form action="/orders/{{ order.id }}" method="POST">
+            <select name="status">
+                {% for status in statuses %}
+                    <option
+                        value="{{ status }}"
+                        {% if order.status == status %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ status }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Update" />
+        </form>
+    {% endif %}
+
+</div>
