@@ -1,0 +1,18 @@
+html {
+    background: var(--page-background);
+    color: var(--main-foreground);
+}
+
+.search__books {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search__book {
+    --padding: 10px;
+    padding-left: var(--padding);
+    padding-right: var(--padding);
+    padding-top: var(--padding);
+}

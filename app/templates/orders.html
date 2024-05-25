@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block pagestyles %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+
+{% endblock pagestyles %}
+
+{% block content %}
+
+{% include 'components/navbar.html' %}
+
+<div>
+
+    <h2> Processing </h2>
+    {% for order in processing %}
+        {% include 'components/order.html' %}
+        <br/>
+    {% else %}
+        Nothing here...
+    {% endfor %}
+
+    <h2> Shipping </h2>
+    {% for order in shipping %}
+        {% include 'components/order.html' %}
+        <br/>
+    {% else %}
+        Nothing here...
+    {% endfor %}
+
+    <h2> Delivered </h2>
+    {% for order in done %}
+        {% with delivered = true %}
+            {% include 'components/order.html' %}
+            <br/>
+        {% endwith %}
+    {% else %}
+        Nothing here...
+    {% endfor %}
+
+{% endblock content %}

@@ -36,9 +36,9 @@
     <div class="home__library">
         {% for genre in books %}
             <div class="home__library--box">
-                <h1 class="home__library--box__title">{{ genre.name }}</h1>
+                <h1 class="home__library--box__title">{{ genre[0] }}</h1>
                 <div class="home__library--box__books">
-                    {% for book in genre.books %}
+                    {% for book in genre[1] %}
                         <img class="home__library--box__book"
                              width="200"
                              src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
