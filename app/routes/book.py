@@ -3,7 +3,6 @@ import os
 import re
 from typing import List
 from flask import current_app as app, flash, render_template, request, redirect
-from app.book_list import AllowedExtensions
 from app.routes.auth import getLoggedInUser  # type: ignore
 from werkzeug.wrappers.response import Response
 from app.models.book import Book
@@ -18,6 +17,7 @@ import sqlalchemy as sq
 from sqlalchemy import and_, exc
 from stdnum import isbn as isbnval  # type: ignore
 
+AllowedExtensions = {'png', 'jpeg', 'jpg'}
 
 @app.route("/book/")
 def products() -> Response:
