@@ -1,10 +1,12 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='library.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='navbar.css') }}">
 {% endblock pagestyles %}
-
 {% block content %}
+<<<<<<< HEAD
 
 {% include 'components/navbar.html' %}
 
@@ -35,26 +37,24 @@
                                 <span> x{{ own.quantity }} </span>
                             </div>
                         </div>
-
-                        <hr class="own__separator"/>
-                    {% endwith %}
-
-                    {% if own.price %}
-                        <a class="lib__btn" href="/insertion/update/?book={{own.fk_book}}&bookstate={{own.state}}&quantity={{own.quantity}}&oldprice={{own.price}}"> edit </a>
-                        <a class="lib__btn" href="/insertion/unlist/?book={{own.fk_book}}&bookstate={{own.state}}"> remove </a>
-                    {% elif own.user.seller %}
-                        <a class="lib__btn" href="/insertion/list/?book={{own.fk_book}}&bookstate={{own.state}}"> create </a>
-                    {% endif %}
-                </div>
-            {% endfor %}
-            {% if page == last_page %}
-                <div class="lib__add">
-                    <a href="/book/add" class="add__btn"> + </a>
-                </div>
-            {% endif %}
+                        {% if own.price %}
+                            <a class="lib__btn"
+                               href="/insertion/update/?book={{ own.fk_book }}&bookstate={{ own.state }}&quantity={{ own.quantity }}&oldprice={{ own.price }}"> edit </a>
+                            <a class="lib__btn"
+                               href="/insertion/unlist/?book={{ own.fk_book }}&bookstate={{ own.state }}">remove</a>
+                        {% elif own.user.seller %}
+                            <a class="lib__btn"
+                               href="/insertion/list/?book={{ own.fk_book }}&bookstate={{ own.state }}">create</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                {% if page == last_page %}
+                    <div class="lib__add">
+                        <a href="/book/add" class="add__btn">+</a>
+                    </div>
+                {% endif %}
+            </div>
+            {% include "components/pagination.html" %}
         </div>
-        {% include "components/pagination.html" %}
     </div>
-</div>
-
 {% endblock content %}

@@ -3,11 +3,11 @@
     <head>
         <meta charset="utf-8" />
         <title>{{ title }}</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}" />
         <link rel="stylesheet"
-              href="{{ url_for('static', filename='palette.css') }}">
+              href="{{ url_for('static', filename='palette.css') }}" />
         <link rel="stylesheet"
-              href="{{ url_for('static', filename='global.css') }}">
+              href="{{ url_for('static', filename='global.css') }}" />
         {% block pagestyles %}{% endblock %}
     </head>
     <body class="{{ template }}">
