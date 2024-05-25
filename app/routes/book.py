@@ -1,7 +1,9 @@
 from datetime import date, datetime
+import os
 import re
 from typing import List
 from flask import current_app as app, flash, render_template, request, redirect
+from app.book_list import AllowedExtensions
 from app.routes.auth import getLoggedInUser  # type: ignore
 from werkzeug.wrappers.response import Response
 from app.models.book import Book
@@ -22,7 +24,7 @@ def products() -> Response:
     return redirect("/library/")
 
 
-@app.route("/book/<int:id>")
+@app.route("/book/<int:id>/")
 def get(id: int) -> str:
     user = getLoggedInUser()
 
@@ -95,6 +97,18 @@ def add() -> str | Response:
         flash("A publisher has to be set")
     if len(selectedGenres) == 0:
         flash("Select at least one genre")
+    tmpfilename: str = ""
+    tmpfileextension: str = ""
+    if "file" not in request.files:
+        flash("Book's cover is missing")
+    elif request.files["file"].filename == "":
+        flash("Select a file to upload as the book's cover")
+    else:
+        tmpfilename = str(request.files["file"].filename)
+        tmpfileextension = tmpfilename.rsplit('.', 1)[-1].lower()
+        if '.' in tmpfilename and tmpfileextension not in AllowedExtensions:
+            flash("Invalid file extension")
+            tmpfilename = ""
     if (
         title is None
         or published is None
@@ -103,6 +117,7 @@ def add() -> str | Response:
         or authorid is None
         or publishername is None
         or len(selectedGenres) == 0
+        or tmpfilename == ""
     ):
         return render_template(
             "addbook.html",
@@ -125,6 +140,7 @@ def add() -> str | Response:
         for g in genres:
             if sgen == g.name:
                 bookgenres.append(g)
+    bookcover = request.files["file"]
 
     if author is None or publisher is None:
         flash("An unforeseen error occurred")
@@ -139,11 +155,16 @@ def add() -> str | Response:
     try:
         book = Book(title, published, pages, isbn, author, publisher, bookgenres)
         db.session.add(book)
+        db.session.flush()
+        bookcover.save(os.path.join(app.config['UPLOAD_FOLDER'], f"{book.id}.{tmpfileextension}"))
         db.session.commit()
         flash("Book added correctly")
     except exc.SQLAlchemyError as e:
         db.session.rollback()
         flash("An error occured while adding the new book")
+    except:
+        db.session.rollback()
+        flash("An unhandled error occured while adding the new book")
 
     return render_template(
         "addbook.html", user=usr, genres=genres, authors=authors, publishers=publishers

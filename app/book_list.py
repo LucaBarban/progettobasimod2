@@ -5,6 +5,7 @@ from app.database import db
 from app.models.book import Book
 from app.models.genre import Genre
 
+AllowedExtensions = {'png', 'jpeg', 'jpg'}
 
 class BookListByGenre:
     def __init__(self) -> None:

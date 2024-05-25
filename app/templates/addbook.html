@@ -13,7 +13,7 @@
 {% endwith %}
 
 
-<form action="/book/add/" method="post">
+<form action="/book/add/" method="post" enctype=multipart/form-data>
     <label for="title">Title:</label>
     <input type="text" id="title" name="title" required><br><br>
 
@@ -47,6 +47,9 @@
             <option value="{{ publisher.name }}">{{ publisher.name }}</option>
         {% endfor %}
     </select><br><br>
+
+    <label for="file">Book's Cover:</label>
+    <input type="file" name="file" id="file"><br><br>
 
     <button type="submit">Add</button>
 </form>
