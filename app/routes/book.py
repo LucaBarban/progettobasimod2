@@ -105,8 +105,8 @@ def add() -> str | Response:
         flash("Select a file to upload as the book's cover")
     else:
         tmpfilename = str(request.files["file"].filename)
-        tmpfileextension = tmpfilename.rsplit('.', 1)[-1].lower()
-        if '.' in tmpfilename and tmpfileextension not in AllowedExtensions:
+        tmpfileextension = tmpfilename.rsplit(".", 1)[-1].lower()
+        if "." in tmpfilename and tmpfileextension not in AllowedExtensions:
             flash("Invalid file extension")
             tmpfilename = ""
     if (
@@ -156,7 +156,9 @@ def add() -> str | Response:
         book = Book(title, published, pages, isbn, author, publisher, bookgenres)
         db.session.add(book)
         db.session.flush()
-        bookcover.save(os.path.join(app.config['UPLOAD_FOLDER'], f"{book.id}.{tmpfileextension}"))
+        bookcover.save(
+            os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.{tmpfileextension}")
+        )
         db.session.commit()
         flash("Book added correctly")
     except exc.SQLAlchemyError as e:
@@ -236,17 +238,15 @@ def addauthor() -> str | Response:
         else:
             try:
                 if (
-                    len(
-                        db.session.scalars(
-                            sq.select(Author).filter(
-                                and_(
-                                    Author.first_name == first_name,
-                                    Author.last_name == last_name,
-                                )
+                    db.session.scalars(
+                        sq.select(Author).filter(
+                            and_(
+                                Author.first_name == first_name,
+                                Author.last_name == last_name,
                             )
-                        ).fetchall()
-                    )
-                    != 0
+                        )
+                    ).one_or_none()
+                    is not None
                 ):
                     flash("Author already exists")
                     return redirect("/book/add/author/")
