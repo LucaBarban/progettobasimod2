@@ -13,6 +13,7 @@ if TYPE_CHECKING:
 else:
     Genre = "Genre"
 
+
 class Book(Base):
     __tablename__ = "books"
 
@@ -26,9 +27,20 @@ class Book(Base):
 
     author: Mapped[Author] = relationship()
     publisher: Mapped[Publisher] = relationship()
-    genres: Mapped[List[Genre]] = relationship(Genre, secondary="booksgenres", back_populates="books")
+    genres: Mapped[List[Genre]] = relationship(
+        Genre, secondary="booksgenres", back_populates="books"
+    )
 
-    def __init__(self, title:str, published:date, pages:int, isbn:str, author:Author, publisher:Publisher, genres:List[Genre]):
+    def __init__(
+        self,
+        title: str,
+        published: date,
+        pages: int,
+        isbn: str,
+        author: Author,
+        publisher: Publisher,
+        genres: List[Genre],
+    ):
         self.title = title
         self.published = published
         self.pages = pages
