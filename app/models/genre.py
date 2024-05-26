@@ -14,5 +14,8 @@ class Genre(Base):
         Book, secondary="booksgenres", back_populates="genres"
     )
 
+    def __init__(self, name: str):
+        self.name = name
+
     def __repr__(self) -> str:
         return f"Genre {{{self.name}, {self.books}}}"

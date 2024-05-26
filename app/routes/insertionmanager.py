@@ -12,7 +12,7 @@ from app.models.user import User
 from app.routes.auth import getLoggedInUser
 
 
-@app.route("/insertion", methods=["GET", "POST"])
+@app.route("/insertion/", methods=['GET', 'POST'])
 def insertion() -> str | Response:
     return redirect("/library")
     usr: User | None = getLoggedInUser()

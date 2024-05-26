@@ -5,6 +5,7 @@ from typing import Optional
 
 # TODO: aggiungere colonna token (nullable + indice) e logingdate (not null) al db
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -18,7 +19,18 @@ class User(Base):
     seller: Mapped[bool]
     token: Mapped[Optional[str]]
 
-    def __init__(self, username: str, first_name: str, last_name: str, password: str, created_at: datetime, last_logged_in_at:datetime, balance:int, seller:bool, token:str):
+    def __init__(
+        self,
+        username: str,
+        first_name: str,
+        last_name: str,
+        password: str,
+        created_at: datetime,
+        last_logged_in_at: datetime,
+        balance: int,
+        seller: bool,
+        token: str,
+    ):
         self.username = username
         self.first_name = first_name
         self.last_name = last_name
@@ -30,4 +42,16 @@ class User(Base):
         self.token = token
 
     def __repr__(self) -> str:
-        return "User: '%s' ('%s', '%s' at '%s' s:'%s') -> bal='%s'<br>pwd: '%s'<br>token: '%s'" % (self.username, self.first_name, self.last_name, str(self.last_logged_in_at), self.seller, self.balance, self.password, self.token)
+        return (
+            "User: '%s' ('%s', '%s' at '%s' s:'%s') -> bal='%s'<br>pwd: '%s'<br>token: '%s'"
+            % (
+                self.username,
+                self.first_name,
+                self.last_name,
+                str(self.last_logged_in_at),
+                self.seller,
+                self.balance,
+                self.password,
+                self.token,
+            )
+        )

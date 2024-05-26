@@ -9,7 +9,7 @@ from app.models.user import User
 from app.routes.auth import getLoggedInUser
 
 
-@app.route("/history", methods=["GET", "POST"])
+@app.route("/history/", methods=['GET', 'POST'])
 def history() -> str | Response:
     usr: User | None = getLoggedInUser()
     if usr is None:
