@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base, db
 
 
+
 class User(Base):
     __tablename__ = "users"
 

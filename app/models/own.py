@@ -1,5 +1,4 @@
-from sqlalchemy import (Column, ForeignKey, Integer, Sequence, String,
-                        UniqueConstraint)
+from sqlalchemy import Column, ForeignKey, Integer, Sequence, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -9,12 +8,12 @@ from app.models.user import User
 
 class Own(Base):
     __tablename__ = "owns"
-    
+
     id: Mapped[int] = mapped_column(Integer, Sequence("owns_id_seq"), primary_key=True)
     fk_username: Mapped[str] = mapped_column(ForeignKey(User.username))
     fk_book: Mapped[str] = mapped_column(ForeignKey(Book.id))
     state: Mapped[str] = mapped_column(String)
-    price: Mapped[int|None] = mapped_column(Integer, nullable=True)
+    price: Mapped[int | None] = mapped_column(Integer, nullable=True)
     quantity: Mapped[int]
 
     user: Mapped[User] = relationship(User)
@@ -22,7 +21,14 @@ class Own(Base):
 
     __table_args__ = (UniqueConstraint(fk_username, fk_book, state, price),)
 
-    def __init__(self, fk_username:str, fk_book:str, state:str, price:int|None, quantity:int):
+    def __init__(
+        self,
+        fk_username: str,
+        fk_book: str,
+        state: str,
+        price: int | None,
+        quantity: int,
+    ):
         self.fk_username = fk_username
         self.fk_book = fk_book
         self.state = state
