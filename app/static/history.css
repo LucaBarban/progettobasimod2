@@ -1,6 +1,4 @@
-html {
-    background: var(--page-background);
-    color: var(--main-foreground);
+:root {
     --library-border: #8B4513;
     --library-separator: #6F4E37;
 }

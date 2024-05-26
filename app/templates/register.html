@@ -1,21 +1,19 @@
 {% extends "layout.html" %}
-
 {% block content %}
-
-<h2>Reg Form</h2>
-<form action="/register/" method="POST">
-    {{ regform.csrf_token }}
-
-    {{ regform.usr.label }} {{ regform.usr }} <br>
-    {{ regform.frname.label }} {{ regform.frname }} <br>
-    {{ regform.lsname.label }} {{ regform.lsname }} <br>
-    {{ regform.pwd.label }} {{ regform.pwd }} <br>
-    {{ regform.checkpwd.label }} {{ regform.checkpwd }} <br>
-    {{ regform.seller.label }}  {{ regform.seller }} <br>
-
-    {{ regform.sub }}
-</form>
-
-{{ error }}
-
+    <h2>Reg Form</h2>
+    <form action="/register/" method="POST">
+        {{ regform.csrf_token }}
+        {{ regform.usr.label }} {{ regform.usr }}
+        <br>
+        {{ regform.frname.label }} {{ regform.frname }}
+        <br>
+        {{ regform.lsname.label }} {{ regform.lsname }}
+        <br>
+        {{ regform.pwd.label }} {{ regform.pwd }}
+        <br>
+        {{ regform.checkpwd.label }} {{ regform.checkpwd }}
+        <br>
+        {{ regform.sub }}
+    </form>
+    {{ error }}
 {% endblock content %}
