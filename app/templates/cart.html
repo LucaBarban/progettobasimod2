@@ -1,51 +1,40 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='library.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='navbar.css') }}">
 {% endblock pagestyles %}
-
 {% block content %}
-
-{% include 'components/navbar.html' %}
-
-{% if error %}
-    <h2> {{ error }} </h2>
-{% endif %}
-
-{% if items|length == 0 %}
-
-    <h2> Your cart is empty</h2>
-    You can <a href="/search">find books from here</a>
-
-{% else %}
-
-    <form action="/cart" method="post">
-
-        {% for item in items %}
-            <div>
-                <img
-                    width=200
-                    src="{{ url_for('static', filename='covers/' ~ item.own.book.id ~ ".png") }}"
-                    onerror="this.src='{{ url_for('static', filename='404.png') }}'"
-                />
-                Title: {{ item.own.book.title }}
-                Seller: {{ item.own.user.username }}
-                Price: {{ item.own.price / 100 }}
-                Quantity: <input type="number" name="quantity-{{item.own.id}}" value="{{ item.quantity }}" min="1" max="10"/>
-                Available: {{ item.own.quantity }}
-                Total Price: {{ '%0.2f'|format(item.own.price * item.quantity / 100) }}
-                <a href="/cart/remove/{{item.own.id}}"> Remove </a>
-            </div>
-
-            <input type="hidden" name="own" value="{{ item.own.id }}"/>
-        {% endfor %}
-
-        Total: {{ '%0.2f'|format(total / 100) }}
-
-        <input type="submit" value="Buy"/>
-    </form>
-
-{% endif %}
-
+    {% include 'components/navbar.html' %}
+    {% if error %}<h2>{{ error }}</h2>{% endif %}
+    {% if items|length == 0 %}
+        <h2>Your cart is empty</h2>
+        You can <a href="/search">find books from here</a>
+    {% else %}
+        <form action="/cart" method="post">
+            {% for item in items %}
+                <div>
+                    <img width="200"
+                         src="{{ url_for('static', filename='covers/' ~ item.own.book.id ~ ".png") }}"
+                         onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+                    Title: {{ item.own.book.title }}
+                    Seller: {{ item.own.user.username }}
+                    Price: {{ item.own.price / 100 }}
+                    Quantity:
+                    <input type="number"
+                           name="quantity-{{ item.own.id }}"
+                           value="{{ item.quantity }}"
+                           min="1"
+                           max="10" />
+                    Available: {{ item.own.quantity }}
+                    Total Price: {{ '%0.2f'|format(item.own.price * item.quantity / 100) }}
+                    <a href="/cart/remove/{{ item.own.id }}">Remove</a>
+                </div>
+                <input type="hidden" name="own" value="{{ item.own.id }}" />
+            {% endfor %}
+            Total: {{ '%0.2f'|format(total / 100) }}
+            <input type="submit" value="Buy" />
+        </form>
+    {% endif %}
 {% endblock content %}
