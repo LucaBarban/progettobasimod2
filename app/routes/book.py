@@ -1,21 +1,24 @@
-from datetime import date, datetime
 import os
-import re
+from datetime import date, datetime
 from typing import List
-from flask import current_app as app, flash, render_template, request, redirect
-from app.routes.auth import getLoggedInUser  # type: ignore
-from werkzeug.wrappers.response import Response
-from app.models.book import Book
-from app.models.user import User
-from app.models.genre import Genre
-from app.models.publisher import Publisher
-from app.models.author import Author
-from app.models.own import Own
-from app.models.history import History
-from app.database import db
+
 import sqlalchemy as sq
+from flask import current_app as app
+from flask import flash, redirect, render_template, request
 from sqlalchemy import and_, exc
 from stdnum import isbn as isbnval  # type: ignore
+from werkzeug.wrappers.response import Response
+
+from app.database import db
+from app.models.author import Author
+from app.models.book import Book
+from app.models.genre import Genre
+from app.models.history import History
+from app.models.own import Own
+from app.models.publisher import Publisher
+from app.models.user import User
+from app.routes.auth import getLoggedInUser
+
 
 @app.route("/book/")
 def products() -> Response:
@@ -104,7 +107,7 @@ def add() -> str | Response:
         flash("Select a file to upload as the book's cover")
     else:
         tmpfilename = str(request.files["file"].filename)
-        if "." in tmpfilename or tmpfilename.rsplit(".", 1)[-1].lower() != 'png':
+        if "." in tmpfilename or tmpfilename.rsplit(".", 1)[-1].lower() != "png":
             flash("Invalid file extension (it must be a png file)")
             tmpfilename = ""
     if (
@@ -154,9 +157,7 @@ def add() -> str | Response:
         book = Book(title, published, pages, isbn, author, publisher, bookgenres)
         db.session.add(book)
         db.session.flush()
-        bookcover.save(
-            os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png")
-        )
+        bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
         db.session.commit()
         flash("Book added correctly")
     except exc.SQLAlchemyError as e:
