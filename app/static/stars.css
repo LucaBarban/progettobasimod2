@@ -15,20 +15,20 @@
     transition: color 0.3s ease;
 }
 
-.star-rating input[type="radio"]:not(:disabled) ~ label:hover,
-.star-rating input[type="radio"]:not(:disabled) ~ label:hover ~ label {
+.star-rating input[type="radio"]:not(:disabled)~label:hover,
+.star-rating input[type="radio"]:not(:disabled)~label:hover~label {
     color: gold;
 }
 
-.star-rating input[type="radio"]:checked ~ label {
+.star-rating input[type="radio"]:checked~label {
     color: gold;
 }
 
-.star-rating input[type="radio"]:disabled ~ label {
+.star-rating input[type="radio"]:disabled~label {
     pointer-events: none;
     cursor: not-allowed;
 }
 
-.star-rating:not(:hover) input[type="radio"]:checked ~ label {
+.star-rating:not(:hover) input[type="radio"]:checked~label {
     color: gold;
 }
