@@ -1,0 +1,40 @@
+{% block pagestyles %}
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+.notif__btn {
+    position: relative;
+    color: #333333;
+    background: #dddddd;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    padding: 10px 12px;
+    margin: 15px;
+}
+
+.notif__badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 25px;
+    height: 25px;
+    background: red;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+</style>
+
+{% endblock %}
+
+{% with count = user.unread_count() %}
+    <a class="notif__btn" href="/notifications/">
+        <span class="material-icons">notifications</span>
+        {% if count %}
+            <span class="notif__badge">{{ count }}</span>
+        {% endif %}
+    </a>
+{% endwith %}

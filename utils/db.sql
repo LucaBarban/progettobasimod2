@@ -101,7 +101,7 @@ CREATE TABLE notifications(
     FOREIGN KEY (fk_history) REFERENCES history(id)
 );
 
-CREATE VIEW notifications_count (username, count)
+CREATE MATERIALIZED VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
 
 -- Trigger for Own.quantity
