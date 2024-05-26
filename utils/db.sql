@@ -40,6 +40,9 @@ CREATE TABLE users(
     created_at TIMESTAMP NOT NULL,
     balance INTEGER NOT NULl CONSTRAINT balance_ge CHECK (balance >= 0),
     seller BOOLEAN NOT NULL,
+    nreviews INTEGER NOT NULL,
+    stars INTEGER NOT NULL,
+    average NUMERIC NOT NULL,
     last_logged_in_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     token CHARACTER(64)[]
 );
@@ -76,6 +79,7 @@ CREATE TABLE history(
     status status NOT NULL,
     price INTEGER NOT NULL,
     review TEXT,
+    stars INTEGER,
     fk_buyer VARCHAR(100),
     fk_seller VARCHAR(100),
     fk_book INTEGER,
@@ -139,3 +143,25 @@ AFTER UPDATE ON history
 FOR EACH ROW
 WHEN (OLD.status IS DISTINCT FROM NEW.status)
 EXECUTE FUNCTION notify_status_change();
+
+-- Trigger for Users.nreviews
+
+CREATE OR REPLACE FUNCTION update_user_rating()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM users WHERE username = OLD.fk_seller AND seller) THEN
+        UPDATE users
+        SET nreviews = nreviews + 1,
+            stars = stars + NEW.stars,
+            average = (stars + NEW.stars) / (nreviews + 1)
+        WHERE username = OLD.fk_seller;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_user_rating
+BEFORE UPDATE ON history
+FOR EACH ROW
+EXECUTE FUNCTION update_user_rating();
+
