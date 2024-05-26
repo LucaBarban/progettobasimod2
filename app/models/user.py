@@ -17,6 +17,9 @@ class User(Base):
     last_logged_in_at: Mapped[datetime]
     balance: Mapped[int]
     seller: Mapped[bool]
+    nreviews: Mapped[int]
+    stars: Mapped[int]
+    average: Mapped[float]
     token: Mapped[Optional[str]]
 
     def __init__(
@@ -39,6 +42,9 @@ class User(Base):
         self.last_logged_in_at = last_logged_in_at
         self.balance = balance
         self.seller = seller
+        self.nreviews = 0
+        self.stars = 0
+        self.average = 0
         self.token = token
 
     def __repr__(self) -> str:
