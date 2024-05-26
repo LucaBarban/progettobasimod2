@@ -17,8 +17,6 @@ import sqlalchemy as sq
 from sqlalchemy import and_, exc
 from stdnum import isbn as isbnval  # type: ignore
 
-AllowedExtensions = {'png', 'jpeg', 'jpg'}
-
 @app.route("/book/")
 def products() -> Response:
     return redirect("/library/")
@@ -100,16 +98,14 @@ def add() -> str | Response:
     if len(selectedGenres) == 0:
         flash("Select at least one genre")
     tmpfilename: str = ""
-    tmpfileextension: str = ""
     if "file" not in request.files:
         flash("Book's cover is missing")
     elif request.files["file"].filename == "":
         flash("Select a file to upload as the book's cover")
     else:
         tmpfilename = str(request.files["file"].filename)
-        tmpfileextension = tmpfilename.rsplit(".", 1)[-1].lower()
-        if "." in tmpfilename and tmpfileextension not in AllowedExtensions:
-            flash("Invalid file extension")
+        if "." in tmpfilename or tmpfilename.rsplit(".", 1)[-1].lower() != 'png':
+            flash("Invalid file extension (it must be a png file)")
             tmpfilename = ""
     if (
         title is None
@@ -159,7 +155,7 @@ def add() -> str | Response:
         db.session.add(book)
         db.session.flush()
         bookcover.save(
-            os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.{tmpfileextension}")
+            os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png")
         )
         db.session.commit()
         flash("Book added correctly")
