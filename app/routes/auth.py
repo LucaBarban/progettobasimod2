@@ -7,7 +7,7 @@ from flask import flash, redirect, render_template, request, session
 from flask_wtf import FlaskForm  # type: ignore
 from flask_wtf.csrf import CSRFError  # type: ignore
 from werkzeug.wrappers.response import Response
-from wtforms import PasswordField, StringField, SubmitField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import InputRequired, Length
 
 from app.database import db
@@ -84,6 +84,7 @@ class RegForm(FlaskForm):  # type: ignore
         ],
     )
     checkpwd = PasswordField("Repeat Password", validators=[InputRequired()])
+    seller = BooleanField("Seller Account")
     sub = SubmitField("Register")
 
 
@@ -100,8 +101,9 @@ def register() -> str | Response:
     lsname = request.form.get("frname") or None
     pwd = request.form.get("pwd") or None
     checkpwd = request.form.get("checkpwd") or None
+    seller = request.form.get("seller") or None
 
-    for field in [usr, frname, lsname, pwd, checkpwd]:
+    for field in [usr, frname, lsname, pwd, checkpwd, seller]:
         if field is None:
             return render_template(
                 "register.html",
@@ -154,7 +156,7 @@ def register() -> str | Response:
             datetime.now(),
             datetime.now(),
             0,
-            False,
+            True if seller == "y" else False,
             newUsersToken,
         )
     )
