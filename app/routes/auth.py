@@ -103,13 +103,12 @@ def register() -> str | Response:
     checkpwd = request.form.get("checkpwd") or None
     seller = request.form.get("seller") or None
 
-    for field in [usr, frname, lsname, pwd, checkpwd, seller]:
-        if field is None:
-            return render_template(
-                "register.html",
-                regform=regform,
-                error="You have to compile all the fields",
-            )
+    if None in [usr, frname, lsname, pwd, checkpwd, seller]:
+        return render_template(
+            "register.html",
+            regform=regform,
+            error="You have to compile all the fields",
+        )
 
     whitelistnum = ["^a-zA-Z0-9"]
     whitelist = ["^a-zA-Z"]

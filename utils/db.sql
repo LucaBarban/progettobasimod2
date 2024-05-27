@@ -40,9 +40,6 @@ CREATE TABLE users(
     created_at TIMESTAMP NOT NULL,
     balance INTEGER NOT NULl CONSTRAINT balance_ge CHECK (balance >= 0),
     seller BOOLEAN NOT NULL,
-    nreviews INTEGER NOT NULL,
-    stars INTEGER NOT NULL,
-    average NUMERIC NOT NULL,
     last_logged_in_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     token CHARACTER(64)[]
 );
@@ -108,6 +105,15 @@ CREATE TABLE notifications(
 CREATE VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
 
+CREATE MATERIALIZED VIEW star_count
+AS
+SELECT fk_seller, CAST(SUM(stars) AS DECIMAL)/COUNT(*) AS vote FROM history
+WHERE review IS NOT NULL
+GROUP BY fk_seller
+WITH NO DATA;
+
+CREATE INDEX idx_fk_seller ON history(fk_seller);
+
 -- Trigger for Own.quantity
 
 CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
@@ -144,24 +150,20 @@ FOR EACH ROW
 WHEN (OLD.status IS DISTINCT FROM NEW.status)
 EXECUTE FUNCTION notify_status_change();
 
--- Trigger for Users.nreviews
+-- Trigger for star_count
 
-CREATE OR REPLACE FUNCTION update_user_rating()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION refresh_star_count()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM users WHERE username = OLD.fk_seller AND seller) THEN
-        UPDATE users
-        SET nreviews = nreviews + 1,
-            stars = stars + NEW.stars,
-            average = (stars + NEW.stars) / (nreviews + 1)
-        WHERE username = OLD.fk_seller;
-    END IF;
-    RETURN NEW;
+     REFRESH MATERIALIZED VIEW star_count;
+    RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 CREATE TRIGGER trigger_user_rating
-BEFORE UPDATE ON history
-FOR EACH ROW
-EXECUTE FUNCTION update_user_rating();
+AFTER UPDATE ON history
+FOR EACH STATEMENT
+EXECUTE PROCEDURE refresh_star_count();
 
