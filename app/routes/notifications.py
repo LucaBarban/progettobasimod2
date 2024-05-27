@@ -65,8 +65,6 @@ def notifications() -> str | Response:
         .all()
     )
 
-    print(unreads, archived)
-
     return render_template(
         "notifications.html", user=user, unreads=unreads, archived=archived
     )
