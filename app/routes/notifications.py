@@ -31,14 +31,17 @@ def read_all_notifications() -> Response:
 
 @app.route("/notifications/read/<int:id>", methods=["POST"])
 def read_notification(id: int) -> Response:
+    user = getLoggedInUser()
+
     notif = db.session.get(Notification, id)
 
-    if notif is None:
+    if user is None:
+        return redirect("/login?link=/notifications")
+    elif notif is None or notif.fk_username != user.username:
         flash("Notification not found")
     else:
         notif.archived = True
-
-    db.session.commit()
+        db.session.commit()
 
     return redirect("/notifications")
 
