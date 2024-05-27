@@ -46,14 +46,15 @@
                                href="/insertion/list/?book={{ own.fk_book }}&bookstate={{ own.state }}">create</a>
                         {% endif %}
                     </div>
-                {% endfor %}
-                {% if page == last_page %}
-                    <div class="lib__add">
-                        <a href="/book/add" class="add__btn">+</a>
-                    </div>
-                {% endif %}
-            </div>
-            {% include "components/pagination.html" %}
+                {% endwith %}
+            {% endfor %}
+            {% if page == last_page %}
+                <div class="lib__add">
+                    <a href="/book/add" class="add__btn">+</a>
+                </div>
+            {% endif %}
         </div>
+        {% include "components/pagination.html" %}
     </div>
+</div>
 {% endblock content %}
