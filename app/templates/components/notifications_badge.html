@@ -1,13 +1,12 @@
 {% block pagestyles %}
 
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='notification.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notification.css') }}">
 
 {% endblock %}
 
 {% with count = user.unread_count() %}
     <a class="notif__btn" href="/notifications/">
-        <span class="material-icons">notifications</span>
+        <img src="{{ url_for('static', filename='images/notification.svg') }}" />
         {% if count %}
             <span class="notif__badge">{{ count }}</span>
         {% endif %}

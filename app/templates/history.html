@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}">
+          href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='history.css') }}">
+          href="{{ url_for('static', filename='css/history.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% include 'components/navbar.html' %}
@@ -29,7 +29,7 @@
                     <br>
                     <img width="200"
                          src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
-                         onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+                         onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
                 </div>
                 <div class="history__right">
                     {% if not hst.review %}

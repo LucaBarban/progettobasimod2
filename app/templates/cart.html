@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='library.css') }}">
+          href="{{ url_for('static', filename='css/library.css') }}">
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}">
+          href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% include 'components/navbar.html' %}
@@ -17,7 +17,7 @@
                 <div>
                     <img width="200"
                          src="{{ url_for('static', filename='covers/' ~ item.own.book.id ~ ".png") }}"
-                         onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+                         onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
                     Title: {{ item.own.book.title }}
                     Seller: {{ item.own.user.username }}
                     Price: {{ item.own.price / 100 }}
