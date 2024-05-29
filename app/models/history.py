@@ -22,6 +22,7 @@ class History(Base):
     status: Mapped[str]
     price: Mapped[int]
     review: Mapped[Optional[str]]
+    stars: Mapped[Optional[int]]
     fk_buyer: Mapped[str] = mapped_column(ForeignKey(User.username))
     fk_seller: Mapped[str] = mapped_column(ForeignKey(User.username))
     fk_book: Mapped[int] = mapped_column(ForeignKey(Book.id))

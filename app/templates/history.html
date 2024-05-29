@@ -1,48 +1,70 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/navbar.css') }}">
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/history.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
 {% endblock pagestyles %}
+
 {% block content %}
+
     {% include 'components/navbar.html' %}
+
     <h1>History</h1>
+
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
-                {{ msg }}
-                <br>
+                {{ msg }}<br>
             {% endfor %}
         {% endif %}
     {% endwith %}
+
     <div class="history__border">
-        {% if hsts|length == 0 %}You havent bought any books, you can find them here :D{% endif %}
+        {% if hsts|length == 0 %}
+            You havent bought any books, you can find them here :D
+        {% endif %}
+
         {% for hst in hsts %}
             <div class="history__book">
                 <div class="history__left">
-                    <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }})
-                    <br>
-                    Status: {{ hst.status }}
-                    <br>
-                    Payed Price: {{ hst.price }}
-                    <br>
-                    <img width="200"
-                         src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
-                         onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
+                    <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }}) <br>
+                    Status: {{ hst.status }} <br>
+                    Payed Price: {{ hst.price }} <br>
+                    <img width=200 src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ " .png") }}"
+                        onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
                 </div>
                 <div class="history__right">
                     {% if not hst.review %}
                         <form action="/history" method="POST">
-                            <input type="hidden" id="hid" name="hid" value="{{ hst.id }}">
-                            <br>
-                            <label for="review">Recensione:</label>
-                            <br>
-                            <textarea id="review" name="review"></textarea>
-                            <br>
+                            <input type="hidden" id="hid" name="hid" value="{{ hst.id }}"><br>
+
+                            <p>Rating: <span class="star-rating">
+                                    <input type="radio" name="rating" id="rate-5" value="5">
+                                    <label for="rate-5">&#9734;</label>
+                                    <input type="radio" name="rating" id="rate-4" value="4">
+                                    <label for="rate-4">&#9734;</label>
+                                    <input type="radio" name="rating" id="rate-3" value="3">
+                                    <label for="rate-3">&#9734;</label>
+                                    <input type="radio" name="rating" id="rate-2" value="2">
+                                    <label for="rate-2">&#9734;</label>
+                                    <input type="radio" name="rating" id="rate-1" value="1">
+                                    <label for="rate-1">&#9734;</label>
+                                </span></p>
+
+
+                            <label for="review">Review:</label><br>
+                            <textarea id="review" name="review"></textarea><br>
                             <input type="submit" class="history__button" value="Send Review">
                         </form>
                     {% else %}
+                        <p>Rating: <span class="star-rating">
+                            {% for star in range(5) %}
+                                <input type="radio" name="rating{{ hst.id }}" id="rate-{{ hst.id }}-{{ star }}" value="{{ star }}"
+                                    {% if hst.stars == star %} checked {% endif %}
+                                disabled>
+                                <label for="rate-{{ hst.id }}-{{ star }}">&#9734;</label>
+                            {% endfor %}
+                        </span></p>
                         <textarea disabled>{{ hst.review }}</textarea>
                     {% endif %}
                 </div>
