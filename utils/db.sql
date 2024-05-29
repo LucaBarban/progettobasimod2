@@ -76,6 +76,7 @@ CREATE TABLE history(
     status status NOT NULL,
     price INTEGER NOT NULL,
     review TEXT,
+    stars INTEGER,
     fk_buyer VARCHAR(100),
     fk_seller VARCHAR(100),
     fk_book INTEGER,
@@ -103,6 +104,15 @@ CREATE TABLE notifications(
 
 CREATE VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
+
+CREATE MATERIALIZED VIEW star_count
+AS
+SELECT fk_seller, CAST(SUM(stars) AS DECIMAL)/COUNT(*) AS vote FROM history
+WHERE review IS NOT NULL
+GROUP BY fk_seller
+WITH NO DATA;
+
+CREATE INDEX idx_fk_seller ON history(fk_seller);
 
 -- Trigger for Own.quantity
 
@@ -139,3 +149,21 @@ AFTER UPDATE ON history
 FOR EACH ROW
 WHEN (OLD.status IS DISTINCT FROM NEW.status)
 EXECUTE FUNCTION notify_status_change();
+
+-- Trigger for star_count
+
+CREATE OR REPLACE FUNCTION refresh_star_count()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+     REFRESH MATERIALIZED VIEW star_count;
+    RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER trigger_user_rating
+AFTER INSERT OR UPDATE ON history
+FOR EACH STATEMENT
+EXECUTE PROCEDURE refresh_star_count();
+

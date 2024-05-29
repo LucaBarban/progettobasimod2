@@ -236,15 +236,17 @@ INSERT INTO carts (fk_buyer, fk_own, quantity) VALUES
 
 
 -- Add historical records to the 'history' table
-INSERT INTO history (date, quantity, price, status, review, fk_buyer, fk_seller, fk_book, state) VALUES
-    ('2023-01-20', 2, 1099, 'delivered', 'Great transaction!', 'alice123', 'mike87', 1, 'new'),
-    ('2023-02-25', 3, 1500, 'shipped', NULL, 'bob_smith', 'max_king', 4, 'as new'),
-    ('2023-03-12', 4, 1350, 'on delivery', NULL, 'jane_doe', 'chris99', 11, 'new'),
-    ('2023-04-05', 1, 1299, 'delivered', 'Smooth transaction.', 'sara_miller', 'alice123', 2, 'used'),
-    ('2023-05-10', 2, 1000, 'delivered', 'Excellent service!', 'max_king', 'mike87', 3,'new'),
-    ('2023-06-18', 3, 1200, 'shipped', NULL, 'emily_green', 'max_king', 5, 'as new'),
-    ('2023-07-01', 4, 1550, 'on delivery', NULL, 'chris99', 'mike87', 6, 'used'),
-    ('2023-08-14', 2, 1399, 'delivered', 'Book arrived in perfect condition.', 'lisa_wang', 'chris99', 7, 'used'),
-    ('2023-09-22', 3, 1150, 'delivered', 'Fast shipping!', 'alex23', 'chris99', 8, 'as new'),
-    ('2023-10-05', 1, 499, 'delivered', 'Happy with the purchase.', 'alice123', 'chris99', 9, 'used');
+INSERT INTO history (date, quantity, price, status, review, stars, fk_buyer, fk_seller, fk_book, state) VALUES
+    ('2023-01-20', 2, 1099, 'delivered', 'Great transaction!', 1, 'alice123', 'mike87', 1, 'new'),
+    ('2023-02-25', 3, 1500, 'shipped', NULL, NULL, 'bob_smith', 'max_king', 4, 'as new'),
+    ('2023-03-12', 4, 1350, 'on delivery', NULL, NULL, 'jane_doe', 'chris99', 11, 'new'),
+    ('2023-04-05', 1, 1299, 'delivered', 'Smooth transaction.', 2, 'sara_miller', 'alice123', 2, 'used'),
+    ('2023-05-10', 2, 1000, 'delivered', 'Excellent service!', 3, 'max_king', 'mike87', 3,'new'),
+    ('2023-06-18', 3, 1200, 'shipped', NULL, NULL, 'emily_green', 'max_king', 5, 'as new'),
+    ('2023-07-01', 4, 1550, 'on delivery', NULL, NULL, 'chris99', 'mike87', 6, 'used'),
+    ('2023-08-14', 2, 1399, 'delivered', 'Book arrived in perfect condition.', 4, 'lisa_wang', 'chris99', 7, 'used'),
+    ('2023-09-22', 3, 1150, 'delivered', 'Fast shipping!', 5, 'alex23', 'chris99', 8, 'as new'),
+    ('2023-10-05', 1, 499, 'delivered', 'Happy with the purchase.', 4, 'alice123', 'chris99', 9, 'used');
 
+-- Populate star_count (done automatically only for updates, as it should)
+REFRESH MATERIALIZED VIEW star_count;

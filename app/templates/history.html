@@ -1,53 +1,84 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}">
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='history.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='palette.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='navbar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='history.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='stars.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% include 'components/navbar.html' %}
-    <h1>History</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <div class="history__border">
-        {% if hsts|length == 0 %}You havent bought any books, you can find them here :D{% endif %}
-        {% for hst in hsts %}
-            <div class="history__book">
-                <div class="history__left">
-                    <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }})
-                    <br>
-                    Status: {{ hst.status }}
-                    <br>
-                    Payed Price: {{ hst.price }}
-                    <br>
-                    <img width="200"
-                         src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
-                         onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
-                </div>
-                <div class="history__right">
-                    {% if not hst.recensione %}
-                        <form action="/history" method="POST">
-                            <input type="hidden" id="hid" name="hid" value="{{ hst.id }}">
-                            <br>
-                            <label for="review">Recensione:</label>
-                            <br>
-                            <textarea id="review" name="review"></textarea>
-                            <br>
-                            <input type="submit" class="history__button" value="Send Review">
-                        </form>
-                    {% else %}
-                        <textarea disabled>{{ hst.recensione }}</textarea>
-                    {% endif %}
-                </div>
-            </div>
-            <hr>
-        {% endfor %}
+
+{% include 'components/navbar.html' %}
+
+<h1>History</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for msg in messages %}
+{{ msg }}<br>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="history__border">
+    {% if hsts|length == 0 %}
+    You havent bought any books, you can find them here :D
+    {% endif %}
+
+    {% for hst in hsts %}
+    <div class="history__book">
+        <div class="history__left">
+            <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }}) <br>
+            Status: {{ hst.status }} <br>
+            Payed Price: {{ hst.price }} <br>
+            <img width=200 src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ " .png") }}"
+                onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+        </div>
+        <div class="history__right">
+            {% if not hst.review %}
+            <form action="/history" method="POST">
+                <input type="hidden" id="hid" name="hid" value="{{ hst.id }}"><br>
+
+                <p>Rating: <span class="star-rating">
+                        <input type="radio" name="rating" id="rate-5" value="5">
+                        <label for="rate-5">&#9734;</label>
+                        <input type="radio" name="rating" id="rate-4" value="4">
+                        <label for="rate-4">&#9734;</label>
+                        <input type="radio" name="rating" id="rate-3" value="3">
+                        <label for="rate-3">&#9734;</label>
+                        <input type="radio" name="rating" id="rate-2" value="2">
+                        <label for="rate-2">&#9734;</label>
+                        <input type="radio" name="rating" id="rate-1" value="1">
+                        <label for="rate-1">&#9734;</label>
+                    </span></p>
+
+
+                <label for="review">Review:</label><br>
+                <textarea id="review" name="review"></textarea><br>
+                <input type="submit" class="history__button" value="Send Review">
+            </form>
+            {% else %}
+            <p>Rating: <span class="star-rating">
+                    <input type="radio" name="rating{{ hst.id }}" id="rate-{{ hst.id }}-5" value="5" {% if hst.stars==5
+                        %}checked{% endif %} disabled>
+                    <label for="rate-{{ hst.id }}-5">&#9734;</label>
+                    <input type="radio" name="rating{{ hst.id }}" id="rate-{{ hst.id }}-4" value="4" {% if hst.stars==4
+                        %}checked{% endif %} disabled>
+                    <label for="rate-{{ hst.id }}-4">&#9734;</label>
+                    <input type="radio" name="rating{{ hst.id }}" id="rate-{{ hst.id }}-3" value="3" {% if hst.stars==3
+                        %}checked{% endif %} disabled>
+                    <label for="rate-{{ hst.id }}-3">&#9734;</label>
+                    <input type="radio" name="rating{{ hst.id }}" id="rate-{{ hst.id }}-2" value="2" {% if hst.stars==2
+                        %}checked{% endif %} disabled>
+                    <label for="rate-{{ hst.id }}-2">&#9734;</label>
+                    <input type="radio" name="rating{{ hst.id }}" id="rate-{{ hst.id }}-1" value="1" {% if hst.stars==1
+                        %}checked{% endif %} disabled>
+                    <label for="rate-{{ hst.id }}-1">&#9734;</label>
+                </span></p>
+            <textarea disabled>{{ hst.review }}</textarea>
+            {% endif %}
+        </div>
     </div>
+    <hr>
+    {% endfor %}
+</div>
 {% endblock content %}
