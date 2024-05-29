@@ -163,7 +163,7 @@ END;
 $$;
 
 CREATE TRIGGER trigger_user_rating
-AFTER UPDATE ON history
+AFTER INSERT OR UPDATE ON history
 FOR EACH STATEMENT
 EXECUTE PROCEDURE refresh_star_count();
 

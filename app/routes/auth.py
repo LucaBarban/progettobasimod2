@@ -155,7 +155,7 @@ def register() -> str | Response:
             datetime.now(),
             datetime.now(),
             0,
-            True if seller == "y" else False,
+            seller == "y",
             newUsersToken,
         )
     )
