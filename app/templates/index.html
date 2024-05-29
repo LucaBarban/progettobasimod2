@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+          href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
@@ -40,7 +41,7 @@
                         <img class="home__library--box__book"
                              width="200"
                              src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-                             onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+                             onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
                     {% endfor %}
                 </div>
                 <div class="home__library--box__footer"></div>

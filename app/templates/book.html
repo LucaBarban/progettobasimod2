@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='library.css') }}">
+          href="{{ url_for('static', filename='css/library.css') }}">
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}">
+          href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% include 'components/navbar.html' %}
@@ -19,7 +19,7 @@
     <div>
         <img width="200"
              src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-             onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+             onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
         <div>id: {{ book.id }}</div>
         <div>title: {{ book.title }}</div>
         <div>author: {{ book.author }}</div>
@@ -49,6 +49,6 @@
         <br />
         <div>From: {{ review.buyer.username }}</div>
         <div>To: {{ review.seller.username }}</div>
-        <div>Review: {{ review.recensione }}</div>
+        <div>Review: {{ review.review }}</div>
     {% endfor %}
 {% endblock content %}

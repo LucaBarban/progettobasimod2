@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}" />
+          href="{{ url_for('static', filename='css/navbar.css') }}" />
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='search.css') }}" />
+          href="{{ url_for('static', filename='css/search.css') }}" />
 {% endblock pagestyles %}
 {% block content %}
     {% include 'components/navbar.html' %}
@@ -12,7 +12,7 @@
             <img class="search__book"
                  width="200"
                  src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-                 onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+                 onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
         {% endfor %}
     </div>
 {% endblock content %}

@@ -102,7 +102,7 @@ CREATE TABLE notifications(
     FOREIGN KEY (fk_history) REFERENCES history(id)
 );
 
-CREATE VIEW notifications_count (username, count)
+CREATE MATERIALIZED VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
 
 CREATE MATERIALIZED VIEW star_count
@@ -136,7 +136,8 @@ EXECUTE FUNCTION remove_if_quantity_zero();
 
 -- Trigger for History.status
 
-CREATE OR REPLACE FUNCTION notify_status_change() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION notify_status_change()
+RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO notifications (fk_username, context, archived, fk_history, order_status_old, order_status_new)
     VALUES (NEW.fk_buyer, 'order updated', FALSE, NEW.id, OLD.status, NEW.status);
@@ -149,6 +150,20 @@ AFTER UPDATE ON history
 FOR EACH ROW
 WHEN (OLD.status IS DISTINCT FROM NEW.status)
 EXECUTE FUNCTION notify_status_change();
+
+-- Trigger for Notifications
+
+CREATE OR REPLACE FUNCTION notifications_count_refresh()
+RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW notifications_count;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_notifications
+AFTER INSERT OR UPDATE OR DELETE ON notifications
+EXECUTE FUNCTION notifications_count_refresh();
 
 -- Trigger for star_count
 
@@ -166,4 +181,3 @@ CREATE TRIGGER trigger_user_rating
 AFTER INSERT OR UPDATE ON history
 FOR EACH STATEMENT
 EXECUTE PROCEDURE refresh_star_count();
-

@@ -7,6 +7,7 @@
     <div class="navbar__box">{% include 'components/searchbar.html' %}</div>
     <div class="navbar__box">
         {% if user is not none %}
+            {% include 'components/notifications_badge.html' %}
             <span class="navbar__user">hi {{ user.username }}</span>
             <a href="/logout" class="navbar__button">Logout</a>
         {% else %}

@@ -13,28 +13,23 @@
 
 <div>
 
-    <h2> Processing </h2>
-    {% for order in processing %}
-        {% include 'components/order.html' %}
+    <h2> Unread </h2>
+    {% if unreads|length != 0 %}
+    <form action="/notifications/read" method="POST">
+        <input type="submit" value="Read All"/>
+    </form>
+    {% endif %}
+    {% for notification in unreads %}
+        {% include 'components/notification.html' %}
         <br/>
     {% else %}
         Nothing here...
     {% endfor %}
 
-    <h2> Shipping </h2>
-    {% for order in shipping %}
-        {% include 'components/order.html' %}
+    <h2> Archived </h2>
+    {% for notification in archived %}
+        {% include 'components/notification.html' %}
         <br/>
-    {% else %}
-        Nothing here...
-    {% endfor %}
-
-    <h2> Delivered </h2>
-    {% for order in done %}
-        {% with delivered = true %}
-            {% include 'components/order.html' %}
-            <br/>
-        {% endwith %}
     {% else %}
         Nothing here...
     {% endfor %}

@@ -1,0 +1,7 @@
+Notification: {{ notification.id }}
+Context: {{ notification.context }}
+{% if notification.archived == false %}
+<form action="/notifications/read/{{ notification.id }}" method="POST">
+    <input type="submit" value="Read"/>
+</form>
+{% endif %}

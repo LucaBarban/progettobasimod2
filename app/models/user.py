@@ -1,9 +1,9 @@
 from datetime import date, datetime
-from sqlalchemy.orm import Mapped, mapped_column
-from app.database import Base
 from typing import Optional
 
-# TODO: aggiungere colonna token (nullable + indice) e logingdate (not null) al db
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.database import Base, db
 
 
 class User(Base):
@@ -42,16 +42,14 @@ class User(Base):
         self.token = token
 
     def __repr__(self) -> str:
-        return (
-            "User: '%s' ('%s', '%s' at '%s' s:'%s') -> bal='%s'<br>pwd: '%s'<br>token: '%s'"
-            % (
-                self.username,
-                self.first_name,
-                self.last_name,
-                str(self.last_logged_in_at),
-                self.seller,
-                self.balance,
-                self.password,
-                self.token,
-            )
-        )
+        return f"User: {{{self.username}, {self.first_name}, {self.last_name}, {self.last_logged_in_at}, {self.seller}, {self.balance}, {self.password}, {self.token}}}"
+
+    def unread_count(self) -> Optional[int]:
+        from app.models.notification import NotificationCount
+
+        nc = db.session.get(NotificationCount, self.username)
+
+        if nc is None:
+            return None
+
+        return nc.count

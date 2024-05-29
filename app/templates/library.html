@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='library.css') }}">
+          href="{{ url_for('static', filename='css/library.css') }}">
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}">
+          href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock pagestyles %}
 {% block content %}
 
@@ -27,7 +27,7 @@
                        <img
                             width=200
                             src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-                            onerror="this.src='{{ url_for('static', filename='404.png') }}'"
+                            onerror="this.src='{{ url_for('static', filename='images/404.png') }}'"
                         />
                         <div class="own__details">
                             <div class="detail__box">
@@ -46,14 +46,15 @@
                                href="/insertion/list/?book={{ own.fk_book }}&bookstate={{ own.state }}">create</a>
                         {% endif %}
                     </div>
-                {% endfor %}
-                {% if page == last_page %}
-                    <div class="lib__add">
-                        <a href="/book/add" class="add__btn">+</a>
-                    </div>
-                {% endif %}
-            </div>
-            {% include "components/pagination.html" %}
+                {% endwith %}
+            {% endfor %}
+            {% if page == last_page %}
+                <div class="lib__add">
+                    <a href="/book/add" class="add__btn">+</a>
+                </div>
+            {% endif %}
         </div>
+        {% include "components/pagination.html" %}
     </div>
+</div>
 {% endblock content %}
