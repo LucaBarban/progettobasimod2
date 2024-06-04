@@ -1,10 +1,7 @@
-from typing import Optional
-
-from sqlalchemy import ForeignKey, Integer, Sequence, String
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.models.history import History
 from app.models.user import User
 
 
@@ -13,6 +10,7 @@ class Star(Base):
 
     fk_seller: Mapped[str] = mapped_column(ForeignKey(User.username), primary_key=True)
     vote: Mapped[float]
+    total: Mapped[int]
 
     seller: Mapped[User] = relationship(User, foreign_keys=[fk_seller])
 

@@ -1,11 +1,11 @@
 import os
 from datetime import date, datetime
-from typing import List
+from typing import List, Optional, Tuple
 
 import sqlalchemy as sq
 from flask import current_app as app
 from flask import flash, redirect, render_template, request
-from sqlalchemy import and_, exc
+from sqlalchemy import Row, and_, exc, nulls_last
 from stdnum import isbn as isbnval  # type: ignore
 from werkzeug.wrappers.response import Response
 
@@ -16,6 +16,7 @@ from app.models.genre import Genre
 from app.models.history import History
 from app.models.own import Own
 from app.models.publisher import Publisher
+from app.models.star import Star
 from app.models.user import User
 from app.routes.auth import getLoggedInUser
 
@@ -25,7 +26,32 @@ def products() -> Response:
     return redirect("/library/")
 
 
-@app.route("/book/<int:id>/")
+def get_insertions(
+    id: int, username: Optional[str], sort: Optional[str], order: Optional[str]
+) -> List[Row[Tuple[Own, Star]]]:
+
+    if sort == "total":
+        query = Star.total
+    else:
+        # defaults to average
+        query = Star.vote  # type: ignore
+
+    if order == "asc":
+        query = query.asc()  # type: ignore
+    else:
+        # defaults to desc
+        query = query.desc()  # type: ignore
+
+    return (
+        db.session.query(Own, Star)
+        .join(Star, Own.fk_username == Star.fk_seller, isouter=True)
+        .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
+        .order_by(nulls_last(query))
+        .all()
+    )
+
+
+@app.route("/book/<int:id>/", methods=["GET"])
 def get(id: int) -> str:
     user = getLoggedInUser()
 
@@ -36,9 +62,12 @@ def get(id: int) -> str:
 
     book = db.get_or_404(Book, id)
 
-    insertions = db.session.query(Own).filter(
-        Own.fk_book == id, Own.price != None, Own.fk_username != username
-    )
+    sort = request.args.get("sort")
+    order = request.args.get("order")
+
+    insertions = get_insertions(book.id, username, sort, order)
+
+    print(insertions)
 
     reviews = db.session.query(History).filter(
         History.fk_book == id, History.review != None

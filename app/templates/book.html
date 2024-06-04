@@ -1,9 +1,8 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/library.css') }}">
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% include 'components/navbar.html' %}
@@ -24,17 +23,45 @@
         <div>title: {{ book.title }}</div>
         <div>author: {{ book.author }}</div>
         <div>publisher: {{ book.publisher }}</div>
-        <div>genres: {{ book.genres }}</div>
+        <div>genres:
+            {% for genre in book.genres %}
+                {{ genre.name }}
+            {% endfor %}
+        </div>
     </div>
+    <br />
     <div>
-        {% for insertion in insertions %}
+        <form action="" method="get">
+            <select name="sort">
+                <option value="average" selected> Average </option>
+                <option value="total"> Total Reviews </option>
+            </select>
+
+            <select name="order">
+                <option value="desc" selected> High to Low </option>
+                <option value="asc"> Low to High </option>
+            </select>
+            <input type="submit" value="Sort" />
+        </form>
+        {% for (insertion, star) in insertions %}
             <br />
             <div>Insertion</div>
-            <div>From: {{ insertion.user.username }}</div>
+            <div>From: {{ insertion.user.username }}
+                {% if star.vote %}
+                    <span class="star-rating">
+                        {% for value in range(5, 0, -1) %}
+                            <input type="radio" id="rate-{{ insertion.user.username }}-{{ value }}" value="{{ value }}"
+                                {% if star.vote >= value %} checked {% endif %}
+                            disabled>
+                            <label for="rate-{{ insertion.user.username }}-{{ value }}">&#9734;</label>
+                        {% endfor %}
+                    </span>
+                    ( {{ star.total }} )
+                {% endif %}
+            </div>
             <div>Price: {{ insertion.price }}</div>
             <div>Quantity: {{ insertion.quantity }}</div>
             <div>State: {{ insertion.state }}</div>
-            <div></div>
             {% if user %}
                 <form action="/cart/add/{{ insertion.id }}" method="POST">
                     <input type="number" name="quantity" min="1" value="1" />
@@ -45,10 +72,12 @@
             {% endif %}
         {% endfor %}
     </div>
-    {% for review in reviews %}
-        <br />
-        <div>From: {{ review.buyer.username }}</div>
-        <div>To: {{ review.seller.username }}</div>
-        <div>Review: {{ review.review }}</div>
-    {% endfor %}
+    <div>
+        {% for review in reviews %}
+            <br />
+            <div>From: {{ review.buyer.username }}</div>
+            <div>To: {{ review.seller.username }}</div>
+            <div>Review: {{ review.review }}</div>
+        {% endfor %}
+    </div>
 {% endblock content %}
