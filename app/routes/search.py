@@ -2,13 +2,12 @@ from typing import Set
 
 from flask import current_app as app
 from flask import redirect, render_template, request
+from sqlalchemy import or_
 from werkzeug.wrappers.response import Response
 
-
-from sqlalchemy import or_
 from app.database import db
-from app.models.book import Book
 from app.models.author import Author
+from app.models.book import Book
 from app.models.publisher import Publisher
 
 

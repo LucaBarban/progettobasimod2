@@ -1,6 +1,8 @@
+import itertools
+import math
 import os
 from datetime import date, datetime
-from typing import List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import sqlalchemy as sq
 from flask import current_app as app
@@ -26,29 +28,50 @@ def products() -> Response:
     return redirect("/library/")
 
 
-def get_insertions(
-    id: int, username: Optional[str], sort: Optional[str], order: Optional[str]
-) -> List[Row[Tuple[Own, Star]]]:
-
-    if sort == "total":
-        query = Star.total
+def star_sort(star: Optional[Star], sort: str, order: str) -> float:
+    if star is None:
+        value = math.inf
+    elif sort == "total":
+        value = star.total
     else:
         # defaults to average
-        query = Star.vote  # type: ignore
+        value = star.vote
 
-    if order == "asc":
-        query = query.asc()  # type: ignore
-    else:
-        # defaults to desc
-        query = query.desc()  # type: ignore
+    if order == "desc" and value != math.inf:
+        value = -value
 
-    return (
-        db.session.query(Own, Star)
-        .join(Star, Own.fk_username == Star.fk_seller, isouter=True)
+    return value
+
+
+def get_insertions(
+    id: int, username: Optional[str], sort: Optional[str], order: Optional[str]
+) -> List[Tuple[User, Star | None, List[Own]]]:
+    sort = sort or ""
+    order = order or "asc"
+
+    insertions = (
+        db.session.query(Own)
         .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
-        .order_by(nulls_last(query))
         .all()
     )
+
+    insertions_grouped = itertools.groupby(
+        sorted(insertions, key=lambda ins: ins.fk_username), lambda ins: ins.user
+    )
+
+    insertions_list = [
+        (user, user.stars(), list(owns)) for user, owns in insertions_grouped
+    ]
+
+    insertions_sorted = sorted(
+        insertions_list,
+        key=lambda item: star_sort(item[1], sort, order),
+    )
+
+    for user, star, data in insertions_sorted:
+        print(user, star, data)
+
+    return insertions_sorted
 
 
 @app.route("/book/<int:id>/", methods=["GET"])
@@ -67,14 +90,8 @@ def get(id: int) -> str:
 
     insertions = get_insertions(book.id, username, sort, order)
 
-    print(insertions)
-
-    reviews = db.session.query(History).filter(
-        History.fk_book == id, History.review != None
-    )
-
     return render_template(
-        "book.html", book=book, insertions=insertions, user=user, reviews=reviews
+        "book.html", book=book, insertions=insertions, user=user, sort=sort, order=order
     )
 
 
