@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block pagestyles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
+{% endblock pagestyles %}
+
+{% block content %}
+
+    {% include 'components/navbar.html' %}
+
+    <div> Seller: {{ seller }} </div>
+    <div> Star: {{ seller.stars() }} </div>
+
+    <br/>
+    Reviews:
+    {% for review in reviews %}
+        <div> {{ review }} </div>
+    {% endfor %}
+
+{% endblock content %}

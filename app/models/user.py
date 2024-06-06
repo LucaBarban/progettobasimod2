@@ -1,9 +1,14 @@
 from datetime import date, datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base, db
+
+if TYPE_CHECKING:
+    from app.models.star import Star
+else:
+    Star = "Star"
 
 
 class User(Base):
@@ -53,3 +58,8 @@ class User(Base):
             return None
 
         return nc.count
+
+    def stars(self) -> Optional[Star]:
+        from app.models.star import Star
+
+        return db.session.get(Star, self.username)
