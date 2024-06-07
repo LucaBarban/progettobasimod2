@@ -14,9 +14,24 @@
     <div> Star: {{ seller.stars() }} </div>
 
     <br/>
+
+    <div>
+    Insertions:
+    {% for insertion in insertions %}
+        <div> {{ insertion }} </div>
+        <a href="/book/{{ insertion.fk_book }}">
+            <img width="200"
+                 src="{{ url_for('static', filename='covers/' ~ insertion.fk_book ~ ".png") }}"
+                 onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
+        </a>
+    {% endfor %}
+    </div>
+
+    <div>
     Reviews:
     {% for review in reviews %}
         <div> {{ review }} </div>
     {% endfor %}
+    </div>
 
 {% endblock content %}

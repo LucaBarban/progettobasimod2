@@ -4,6 +4,7 @@ from flask import render_template
 
 from app.database import db
 from app.models.history import History
+from app.models.own import Own
 from app.models.user import User
 from app.routes.auth import getLoggedInUser
 
@@ -20,4 +21,13 @@ def seller(username: str) -> str:
         History.fk_seller == username, History.review != None
     )
 
-    return render_template("seller.html", user=user, seller=seller, reviews=reviews)
+    insertions = (
+        db.session.query(Own)
+        .distinct(Own.fk_book)
+        .filter(Own.fk_username == username, Own.price != None)
+        .all()
+    )
+
+    return render_template(
+        "seller.html", user=user, seller=seller, reviews=reviews, insertions=insertions
+    )

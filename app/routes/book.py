@@ -2,12 +2,12 @@ import itertools
 import math
 import os
 from datetime import date, datetime
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import sqlalchemy as sq
 from flask import current_app as app
 from flask import flash, redirect, render_template, request
-from sqlalchemy import Row, and_, exc, nulls_last
+from sqlalchemy import and_, exc
 from stdnum import isbn as isbnval  # type: ignore
 from werkzeug.wrappers.response import Response
 
@@ -15,7 +15,6 @@ from app.database import db
 from app.models.author import Author
 from app.models.book import Book
 from app.models.genre import Genre
-from app.models.history import History
 from app.models.own import Own
 from app.models.publisher import Publisher
 from app.models.star import Star
@@ -45,31 +44,27 @@ def star_sort(star: Optional[Star], sort: str, order: str) -> float:
 
 def get_insertions(
     id: int, username: Optional[str], sort: Optional[str], order: Optional[str]
-) -> List[Tuple[User, Star | None, List[Own]]]:
+) -> List[Tuple[User, Optional[Star], List[Own]]]:
     sort = sort or ""
     order = order or "asc"
 
     insertions = (
         db.session.query(Own)
         .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
+        .order_by(Own.fk_username)
         .all()
     )
 
-    insertions_grouped = itertools.groupby(
-        sorted(insertions, key=lambda ins: ins.fk_username), lambda ins: ins.user
-    )
+    insertions_grouped = itertools.groupby(insertions, lambda ins: ins.user)
 
-    insertions_list = [
+    insertions_list = (
         (user, user.stars(), list(owns)) for user, owns in insertions_grouped
-    ]
+    )
 
     insertions_sorted = sorted(
         insertions_list,
         key=lambda item: star_sort(item[1], sort, order),
     )
-
-    for user, star, data in insertions_sorted:
-        print(user, star, data)
 
     return insertions_sorted
 
@@ -206,7 +201,7 @@ def add() -> str | Response:
         bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
         db.session.commit()
         flash("Book added correctly")
-    except exc.SQLAlchemyError as e:
+    except exc.SQLAlchemyError:
         db.session.rollback()
         flash("An error occured while adding the new book")
     except:
@@ -234,7 +229,7 @@ def addgenre() -> str | Response:
                 db.session.add(genre)
                 db.session.commit()
                 flash("Genre added correctly")
-            except exc.SQLAlchemyError as e:
+            except exc.SQLAlchemyError:
                 db.session.rollback()
                 flash("An error occured while adding the new genre")
 
@@ -259,7 +254,7 @@ def addpublisher() -> str | Response:
                 db.session.add(publisher)
                 db.session.commit()
                 flash("Publisher added correctly")
-            except exc.SQLAlchemyError as e:
+            except exc.SQLAlchemyError:
                 db.session.rollback()
                 flash("An error occured while adding the new publisher")
 
@@ -300,7 +295,7 @@ def addauthor() -> str | Response:
                 db.session.add(author)
                 db.session.commit()
                 flash("Author added correctly")
-            except exc.SQLAlchemyError as e:
+            except exc.SQLAlchemyError:
                 db.session.rollback()
                 flash("An error occured while adding the new author")
 
