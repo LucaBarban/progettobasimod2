@@ -1,37 +1,28 @@
 {% extends "layout.html" %}
-
 {% block pagestyles %}
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
-
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/library.css') }}">
 {% endblock pagestyles %}
-
 {% block content %}
-
-{% include 'components/navbar.html' %}
-
-<div>
-
-    <h2> Unread </h2>
-    {% if unreads|length != 0 %}
-    <form action="/notifications/read" method="POST">
-        <input type="submit" value="Read All"/>
-    </form>
-    {% endif %}
-    {% for notification in unreads %}
-        {% include 'components/notification.html' %}
-        <br/>
-    {% else %}
-        Nothing here...
-    {% endfor %}
-
-    <h2> Archived </h2>
-    {% for notification in archived %}
-        {% include 'components/notification.html' %}
-        <br/>
-    {% else %}
-        Nothing here...
-    {% endfor %}
-
+    <div>
+        <h2>Unread</h2>
+        {% if unreads|length != 0 %}
+            <form action="/notifications/read" method="POST">
+                <input type="submit" value="Read All" />
+            </form>
+        {% endif %}
+        {% for notification in unreads %}
+            {% include 'components/notification.html' %}
+            <br />
+        {% else %}
+            Nothing here...
+        {% endfor %}
+        <h2>Archived</h2>
+        {% for notification in archived %}
+            {% include 'components/notification.html' %}
+            <br />
+        {% else %}
+            Nothing here...
+        {% endfor %}
+    </div>
 {% endblock content %}

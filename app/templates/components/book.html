@@ -3,7 +3,7 @@
         {% if link %}<a href="/book/{{ book.id }}">{% endif %}
             <img class="book__cover"
                  src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-                 onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+                 onerror="if (!this.src.endsWith('{{ url_for('static', filename='404.png') }}')) this.src='{{ url_for('static', filename='404.png') }}'" />
             {% if link %}</a>{% endif %}
         {% if metadata %}
             <table class="book__meta">

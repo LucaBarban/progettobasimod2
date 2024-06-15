@@ -1,18 +1,11 @@
 {% extends "layout.html" %}
 
 {% block pagestyles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
 {% endblock pagestyles %}
 
 {% block content %}
-<<<<<<< HEAD
-
-    {% include 'components/navbar.html' %}
-
-=======
->>>>>>> 9392c3a (Make navbar global to layout.html)
     <h1>History</h1>
 
     {% with messages = get_flashed_messages() %}

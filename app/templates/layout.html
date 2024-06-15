@@ -3,14 +3,6 @@
     <head>
         <meta charset="utf-8" />
         <title>{{ title }}</title>
-<<<<<<< HEAD
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}" />
-        <link rel="stylesheet"
-              href="{{ url_for('static', filename='css/palette.css') }}" />
-        <link rel="stylesheet"
-              href="{{ url_for('static', filename='global.css') }}" />
-=======
->>>>>>> 5dbfe22 (Minor stylestic changes)
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -23,11 +15,15 @@
         />
         <link
             rel="stylesheet"
-            href="{{ url_for('static', filename='palette.css') }}"
+            href="{{ url_for('static', filename='css/palette.css') }}"
         />
         <link
             rel="stylesheet"
-            href="{{ url_for('static', filename='global.css') }}"
+            href="{{ url_for('static', filename='css/global.css') }}"
+        />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='css/navbar.css') }}"
         />
         {% block pagestyles %}{% endblock %}
     </head>

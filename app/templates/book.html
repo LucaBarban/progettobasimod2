@@ -1,8 +1,9 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='book.css') }}">
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='navbar.css') }}">
+          href="{{ url_for('static', filename='css/stars.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/book.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% from 'components/book.html' import display_book %}
@@ -10,32 +11,8 @@
     <h1>{{ book.title }}</h1>
     <hr>
     {{ display_book(book, link=False, label=True, title=False) }}
-    <hr>
-    <div class="container">
-        <div>
-            {% for insertion in insertions %}
-                <br />
-                <div>Insertion</div>
-                <div>From: {{ insertion.user.username }}</div>
-                <div>Price: {{ insertion.price }}</div>
-                <div>Quantity: {{ insertion.quantity }}</div>
-                <div>State: {{ insertion.state }}</div>
-                <div></div>
-                {% if user %}
-                    <form action="/cart/add/{{ insertion.id }}" method="POST">
-                        <input type="number" name="quantity" min="1" value="1" />
-                        <input type="submit" value="Add to cart" />
-                    </form>
-                {% else %}
-                    <div>Login before buying</div>
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% for review in reviews %}
-            <br />
-            <div>From: {{ review.buyer.username }}</div>
-            <div>To: {{ review.seller.username }}</div>
-            <div>Review: {{ review.recensione }}</div>
+    <form action="" method="get">
+        <select name="sort">
             <option value="average" {% if sort != "total" %}selected{% endif %}>Average</option>
             <option value="total" {% if sort == "total" %}selected{% endif %}>Total Reviews</option>
         </select>
@@ -80,16 +57,4 @@
             {% endfor %}
         </div>
     {% endfor %}
-    <table>
-        <tr>
-            <td>Emil</td>
-        </tr>
-        <tr>
-            <td>Tobias</td>
-        </tr>
-        <tr>
-            <td>Linus</td>
-        </tr>
-    </table>
-    </div>
 {% endblock content %}

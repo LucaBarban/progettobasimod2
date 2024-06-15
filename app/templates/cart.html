@@ -2,8 +2,6 @@
 {% block pagestyles %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/library.css') }}">
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% if error %}<h2>{{ error }}</h2>{% endif %}
