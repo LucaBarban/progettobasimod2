@@ -74,7 +74,7 @@ def profile() -> str | Response:
         usr.last_name = lsname
         usr.password = pwd  # type:ignore
         usr.balance = int(balance) if balance is not None else usr.balance
-        usr.seller = True if usr.seller or seller == "on" else False
+        usr.seller = usr.seller or seller == "on"
         db.session.commit()
 
     return render_template("profile.html", user=usr)
