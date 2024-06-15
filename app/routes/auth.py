@@ -1,3 +1,5 @@
+import re
+from re import Pattern
 import secrets
 from datetime import datetime
 
@@ -18,6 +20,9 @@ from ..safety import bcrypt, csrf
 minPwdLen: int = 8
 bcryptRounds: int = 10
 tokenSize: int = 32
+
+whitelistnum = re.compile(r"^[a-zA-Z0-9]+$")
+whitelist = re.compile(r"^[a-zA-Z]+$")
 
 
 @app.route("/login/", methods=["GET", "POST"])
@@ -101,17 +106,14 @@ def register() -> str | Response:
     lsname = request.form.get("frname") or None
     pwd = request.form.get("pwd") or None
     checkpwd = request.form.get("checkpwd") or None
-    seller = request.form.get("seller") or None
+    seller = request.form.get("seller") or ""
 
-    if None in [usr, frname, lsname, pwd, checkpwd, seller]:
+    if None in [usr, frname, lsname, pwd, checkpwd]:
         return render_template(
             "register.html",
             regform=regform,
             error="You have to compile all the fields",
         )
-
-    whitelistnum = ["^a-zA-Z0-9"]
-    whitelist = ["^a-zA-Z"]
 
     usr = str(usr)  # prevent mypy from complaining
     frname = str(frname)
@@ -119,14 +121,14 @@ def register() -> str | Response:
     pwd = str(pwd)
     checkpwd = str(checkpwd)
 
-    if not any(c not in whitelistnum for c in usr) and len(usr) > 0:
+    if not whitelistnum.match(usr) and len(usr) > 0:
         return render_template(
             "register.html",
             regform=regform,
             error="Username can only contain letters and numbers",
         )
     for field in [frname, lsname]:
-        if not any(c not in whitelist for c in str(field)) and len(field) > 0:
+        if not whitelist.match(field) and len(field) > 0:
             return render_template(
                 "register.html",
                 regform=regform,
@@ -136,14 +138,15 @@ def register() -> str | Response:
     if len(pwd) < 8 or len(checkpwd) < 8:
         return render_template(
             "register.html",
+            regform=regform,
             error=f"Password/s fields must be at least {minPwdLen} characters long",
         )
     if pwd != checkpwd:
-        return render_template("register.html", error="Passwords must be the same")
+        return render_template("register.html", regform=regform, error="Passwords must be the same")
 
     dbUsers = db.session.scalars(sq.select(User).where(User.username == usr)).fetchall()
     if len(dbUsers) != 0:
-        return render_template("register.html", error="Username already taken")
+        return render_template("register.html", regform=regform, error="Username already taken")
 
     newUsersToken: str = getNewToken()
     db.session.add(
