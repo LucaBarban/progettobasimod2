@@ -1,13 +1,12 @@
 :root {
-  --page-background: #242424;
-  --main-foreground: #ffffff;
-  --secondary-background: #2a2a2a;
+  --page-background: #f7f5f2;
+  --main-foreground: #0e0d0b;
+  --secondary-background: #e1cc9d;
   --normal-button-background: #5e5c64;
   --navbar-background: var(--secondary-background);
-  --input-background: #77767b;
+  --input-background: var(--page-background);
   --input-foreground: var(--main-foreground);
-  --accent-color: #c061cb;
-  --wood: #63452c;
+  --accent-color: #e0b861;
   --warning: #f8e45c;
   --error: #ed333b;
 }
