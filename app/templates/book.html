@@ -1,75 +1,73 @@
 {% extends "layout.html" %}
-
 {% block pagestyles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='book.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='navbar.css') }}">
 {% endblock pagestyles %}
-
 {% block content %}
-    {% include 'components/navbar.html' %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <h1>Book {{ book.name }}</h1>
-    <div>
-        <img width="200"
-             src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-             onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
-        <div>id: {{ book.id }}</div>
-        <div>title: {{ book.title }}</div>
-        <div>author: {{ book.author }}</div>
-        <div>publisher: {{ book.publisher }}</div>
-        <div>genres:
-            {% for genre in book.genres %}
-                {{ genre.name }}
+    {% from 'components/book.html' import display_book %}
+    <!-- TODO: metti banner -->
+    <h1>{{ book.title }}</h1>
+    <hr>
+    {{ display_book(book, link=False, label=True, title=False) }}
+    <hr>
+    <div class="container">
+        <div>
+            {% for insertion in insertions %}
+                <br />
+                <div>Insertion</div>
+                <div>From: {{ insertion.user.username }}</div>
+                <div>Price: {{ insertion.price }}</div>
+                <div>Quantity: {{ insertion.quantity }}</div>
+                <div>State: {{ insertion.state }}</div>
+                <div></div>
+                {% if user %}
+                    <form action="/cart/add/{{ insertion.id }}" method="POST">
+                        <input type="number" name="quantity" min="1" value="1" />
+                        <input type="submit" value="Add to cart" />
+                    </form>
+                {% else %}
+                    <div>Login before buying</div>
+                {% endif %}
             {% endfor %}
         </div>
-    </div>
-
-    <br />
-
-    <form action="" method="get">
-        <select name="sort">
-            <option value="average" {% if sort != "total" %} selected {% endif %}> Average </option>
-            <option value="total" {% if sort == "total" %} selected {% endif %}> Total Reviews </option>
+        {% for review in reviews %}
+            <br />
+            <div>From: {{ review.buyer.username }}</div>
+            <div>To: {{ review.seller.username }}</div>
+            <div>Review: {{ review.recensione }}</div>
+            <option value="average" {% if sort != "total" %}selected{% endif %}>Average</option>
+            <option value="total" {% if sort == "total" %}selected{% endif %}>Total Reviews</option>
         </select>
-
         <select name="order">
-            <option value="desc" {% if order != "asc" %} selected {% endif %}> High to Low </option>
-            <option value="asc"{% if order == "asc" %} selected {% endif %}> Low to High </option>
+            <option value="desc" {% if order != "asc" %}selected{% endif %}>High to Low</option>
+            <option value="asc"{% if order == "asc" %} selected {% endif %}>Low to High</option>
         </select>
         <input type="submit" value="Sort" />
     </form>
-
-
     {% for (seller, star, owns) in insertions %}
         <div>
-            <div> seller: <a href="/seller/{{ seller.username }}">{{ seller.username }} </a>
+            <div>
+                seller: <a href="/seller/{{ seller.username }}">{{ seller.username }}</a>
                 {% if star %}
                     <span class="star-rating">
                         {% for value in range(5, 0, -1) %}
-                            <input type="radio" id="rate-{{ seller.username }}-{{ value }}" value="{{ value }}"
-                                {% if star.vote >= value %} checked {% endif %}
-                            disabled>
+                            <input type="radio"
+                                   id="rate-{{ seller.username }}-{{ value }}"
+                                   value="{{ value }}"
+                                   {% if star.vote >= value %}checked{% endif %}
+                                   disabled>
                             <label for="rate-{{ seller.username }}-{{ value }}">&#9734;</label>
                         {% endfor %}
                     </span>
                     ( {{ star.total }} )
                 {% endif %}
             </div>
-
             {% for own in owns %}
                 <div>
                     <div>Price: {{ own.price }}</div>
                     <div>Avaiable: {{ own.quantity }}</div>
                     <div>State: {{ own.state }}</div>
-
                     {% if user %}
                         <form action="/cart/add/{{ own.id }}" method="POST">
                             <input type="number" name="quantity" min="1" value="1" />

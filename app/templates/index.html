@@ -19,6 +19,7 @@
     {% endwith %}
     {% include 'components/navbar.html' %}
     <div class="home__greeter">
+    {% from 'components/book.html' import display_book %}
         {% if user is none %}
             <h1>WELCOME TO BOOKWORM</h1>
             <h2>The best place for your books</h2>
@@ -32,19 +33,14 @@
             </div>
         {% endif %}
     </div>
-    <div class="home__library">
+    <div class="display">
         {% for genre in books %}
-            <div class="home__library--box">
-                <h1 class="home__library--box__title">{{ genre[0] }}</h1>
-                <div class="home__library--box__books">
-                    {% for book in genre[1] %}
-                        <img class="home__library--box__book"
-                             width="200"
-                             src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-                             onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
-                    {% endfor %}
+            <div class="display__category">
+                <h1 class="display__category__title">{{ genre[0] }}</h1>
+                <hr>
+                <div class="display__category__books">
+                    {% for book in genre[1] %}{{ display_book(book, publisher=False, generes=False) }}{% endfor %}
                 </div>
-                <div class="home__library--box__footer"></div>
             </div>
         {% endfor %}
     </div>

@@ -31,23 +31,8 @@ class Book(Base):
         Genre, secondary="booksgenres", back_populates="books"
     )
 
-    def __init__(
-        self,
-        title: str,
-        published: date,
-        pages: int,
-        isbn: str,
-        author: Author,
-        publisher: Publisher,
-        genres: List[Genre],
-    ):
-        self.title = title
-        self.published = published
-        self.pages = pages
-        self.isbn = isbn
-        self.author = author
-        self.publisher = publisher
-        self.genres = genres
+    def display_generes(self) -> str:
+        return ", ".join(tuple(x.name for x in self.genres))
 
     def __repr__(self) -> str:
         return f"Book {{{self.id}, {self.title}, {self.published}, {self.pages}, {self.isbn}, {self.fk_author}, {self.fk_publisher}}}"

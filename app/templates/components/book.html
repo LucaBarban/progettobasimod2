@@ -1,0 +1,38 @@
+{% macro display_book(book, link=True, metadata=True, label=False, title=True, author=True, publisher=True, generes=True) %}
+    <div class="book__container">
+        {% if link %}<a href="/book/{{ book.id }}">{% endif %}
+            <img class="book__cover"
+                 src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
+                 onerror="this.src='{{ url_for('static', filename='404.png') }}'" />
+            {% if link %}</a>{% endif %}
+        {% if metadata %}
+            <table class="book__meta">
+                {% if title %}
+                    <tr>
+                        {% if label %}<td class="book__meta--title__label">Title</td>{% endif %}
+                        <td class="book__meta--title">{{ book.title }}</td>
+                    </tr>
+                {% endif %}
+                {% if author %}
+                    <tr>
+                        {% if label %}<td class="book__meta--title__label">Author</td>{% endif %}
+                        <td class="book__meta--author">{{ book.author.get_full_name() }}</td>
+                    </tr>
+                {% endif %}
+                {% if publisher %}
+                    <tr>
+                        {% if label %}<td class="book__meta--title__label">Publisher</td>{% endif %}
+                        <td class="book__meta--publisher">{{ book.publisher.name }}</td>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if generes %}
+                <tr>
+                    {% if label %}<td class="book__meta--title__label">Generes</td>{% endif %}
+                    <td class="book__meta--generes">{{ book.display_generes() }}</td>
+                </tr>
+            {% endif %}
+        </table>
+    {% endif %}
+</div>
+{% endmacro %}

@@ -6,13 +6,14 @@
           href="{{ url_for('static', filename='css/search.css') }}" />
 {% endblock pagestyles %}
 {% block content %}
-    {% include 'components/navbar.html' %}
-    <div class="search__books">
-        {% for book in books %}
-            <img class="search__book"
-                 width="200"
-                 src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-                 onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
-        {% endfor %}
+    {% from 'components/book.html' import display_book %}
+    <div class="library">
+        <h1>You searched for: {{ query }}</h1>
+        <hr class="library__category__title__underline" />
+        <div class="search__books">
+            {% for book in books %}
+                {{ display_book(book) }}
+            {% endfor %}
+        </div>
     </div>
 {% endblock content %}
