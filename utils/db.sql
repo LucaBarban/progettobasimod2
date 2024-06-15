@@ -107,7 +107,7 @@ AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP 
 
 CREATE MATERIALIZED VIEW star_count
 AS
-SELECT fk_seller, CAST(SUM(stars) AS DECIMAL)/COUNT(*) AS vote FROM history
+SELECT fk_seller, CAST(SUM(stars) AS DECIMAL)/COUNT(*) AS vote, COUNT(*) AS total FROM history
 WHERE review IS NOT NULL
 GROUP BY fk_seller
 WITH NO DATA;

@@ -1,6 +1,8 @@
+import itertools
+import math
 import os
 from datetime import date, datetime
-from typing import List
+from typing import List, Optional, Tuple
 
 import sqlalchemy as sq
 from flask import current_app as app
@@ -13,9 +15,9 @@ from app.database import db
 from app.models.author import Author
 from app.models.book import Book
 from app.models.genre import Genre
-from app.models.history import History
 from app.models.own import Own
 from app.models.publisher import Publisher
+from app.models.star import Star
 from app.models.user import User
 from app.routes.auth import getLoggedInUser
 
@@ -25,7 +27,49 @@ def products() -> Response:
     return redirect("/library/")
 
 
-@app.route("/book/<int:id>/")
+def star_sort(star: Optional[Star], sort: str, order: str) -> float:
+    if star is None:
+        value = math.inf
+    elif sort == "total":
+        value = star.total
+    else:
+        # defaults to average
+        value = star.vote
+
+    if order == "desc" and value != math.inf:
+        value = -value
+
+    return value
+
+
+def get_insertions(
+    id: int, username: Optional[str], sort: Optional[str], order: Optional[str]
+) -> List[Tuple[User, Optional[Star], List[Own]]]:
+    sort = sort or ""
+    order = order or "asc"
+
+    insertions = (
+        db.session.query(Own)
+        .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
+        .order_by(Own.fk_username)
+        .all()
+    )
+
+    insertions_grouped = itertools.groupby(insertions, lambda ins: ins.user)
+
+    insertions_list = (
+        (user, user.stars(), list(owns)) for user, owns in insertions_grouped
+    )
+
+    insertions_sorted = sorted(
+        insertions_list,
+        key=lambda item: star_sort(item[1], sort, order),
+    )
+
+    return insertions_sorted
+
+
+@app.route("/book/<int:id>/", methods=["GET"])
 def get(id: int) -> str:
     user = getLoggedInUser()
 
@@ -36,16 +80,13 @@ def get(id: int) -> str:
 
     book = db.get_or_404(Book, id)
 
-    insertions = db.session.query(Own).filter(
-        Own.fk_book == id, Own.price != None, Own.fk_username != username
-    )
+    sort = request.args.get("sort")
+    order = request.args.get("order")
 
-    reviews = db.session.query(History).filter(
-        History.fk_book == id, History.review != None
-    )
+    insertions = get_insertions(book.id, username, sort, order)
 
     return render_template(
-        "book.html", book=book, insertions=insertions, user=user, reviews=reviews
+        "book.html", book=book, insertions=insertions, user=user, sort=sort, order=order
     )
 
 
@@ -160,7 +201,7 @@ def add() -> str | Response:
         bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
         db.session.commit()
         flash("Book added correctly")
-    except exc.SQLAlchemyError as e:
+    except exc.SQLAlchemyError:
         db.session.rollback()
         flash("An error occured while adding the new book")
     except:
@@ -188,7 +229,7 @@ def addgenre() -> str | Response:
                 db.session.add(genre)
                 db.session.commit()
                 flash("Genre added correctly")
-            except exc.SQLAlchemyError as e:
+            except exc.SQLAlchemyError:
                 db.session.rollback()
                 flash("An error occured while adding the new genre")
 
@@ -213,7 +254,7 @@ def addpublisher() -> str | Response:
                 db.session.add(publisher)
                 db.session.commit()
                 flash("Publisher added correctly")
-            except exc.SQLAlchemyError as e:
+            except exc.SQLAlchemyError:
                 db.session.rollback()
                 flash("An error occured while adding the new publisher")
 
@@ -254,7 +295,7 @@ def addauthor() -> str | Response:
                 db.session.add(author)
                 db.session.commit()
                 flash("Author added correctly")
-            except exc.SQLAlchemyError as e:
+            except exc.SQLAlchemyError:
                 db.session.rollback()
                 flash("An error occured while adding the new author")
 
