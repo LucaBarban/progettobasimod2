@@ -6,30 +6,17 @@
           href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="messages">
-                {% for msg in messages %}
-                    {{ msg }}
-                    <br>
-                {% endfor %}
-                <a class="close" href="/">&times;</a>
-            </div>
-        {% endif %}
-    {% endwith %}
-    {% include 'components/navbar.html' %}
-    <div class="home__greeter">
     {% from 'components/book.html' import display_book %}
+    <!-- TODO: metti banner component -->
+    <div class="greeter">
         {% if user is none %}
-            <h1>WELCOME TO BOOKWORM</h1>
+            <h1>Welcome to BookWorm</h1>
             <h2>The best place for your books</h2>
         {% else %}
-            <h1>WELCOME BACK {{ user.username }}</h1>
-            <div class="home__greeter--shortcuts">
-                <a href="/library"
-                   class="home__greeter--shortcut home__greeter--shortcut--primary">Library</a>
-                <a href="/history"
-                   class="home__greeter--shortcut home__greeter--shortcut--secondary">History</a>
+            <h1>Welcome Back {{ user.username }}</h1>
+            <div class="shortcuts">
+                <a href="/library" class="button button--primary">Library</a>
+                <a href="/history" class="button button--secondary">History</a>
             </div>
         {% endif %}
     </div>

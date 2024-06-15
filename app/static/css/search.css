@@ -1,7 +1,10 @@
+:root {
+    --cover-width: 200px;
+}
+
 .search__books {
     display: flex;
     justify-content: center;
-    align-items: center;
     flex-wrap: wrap;
 }
 
