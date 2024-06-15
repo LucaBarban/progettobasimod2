@@ -1,2 +1,14 @@
-from . import (auth, book, cart, history, index, insertionmanager, library,
-               notifications, orders, search, seller)
+from . import (
+    auth,
+    book,
+    cart,
+    history,
+    index,
+    insertionmanager,
+    library,
+    notifications,
+    orders,
+    search,
+    seller,
+    profile,
+)
