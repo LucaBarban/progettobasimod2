@@ -36,6 +36,14 @@
         <label for="balance">Balance ;):</label>
         <input type="number" id="balance" name="balance" min="0" value="{{ user.balance }}">
         <br>
+        <label for="seller">Seller Account:</label>
+        {% if user.seller %}
+            <input type="checkbox" id="seller" name="seller" disabled checked>
+        {% else %}
+            <input type="checkbox" id="seller" name="seller">
+        {% endif %}
+
+        <br>
         <input type="submit" value="Update">
     </form>
 

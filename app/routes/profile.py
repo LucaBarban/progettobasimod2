@@ -1,10 +1,11 @@
+import re
 from flask import current_app as app
 from flask import flash, redirect, render_template, request
 from werkzeug.wrappers.response import Response
 
 from app.database import db
 from app.models.user import User
-from app.routes.auth import getLoggedInUser, bcryptRounds, minPwdLen
+from app.routes.auth import getLoggedInUser, bcryptRounds, minPwdLen, whitelist
 
 from ..safety import bcrypt
 
@@ -19,19 +20,13 @@ def profile() -> str | Response:
         return render_template("profile.html", user=usr)
 
     err: bool = False
-    whitelist = ["^a-zA-Z"]
 
     frname: str | None = request.form.get("frname")
     lsname: str | None = request.form.get("lsname")
     pwd: str | None = request.form.get("pwd")
     rpwd: str | None = request.form.get("rpwd")
     balance: str | None = request.form.get("balance")
-
-    print(f"frname: {frname}")
-    print(f"lsname: {lsname}")
-    print(f"pwd: {pwd}")
-    print(f"rpwd: {rpwd}")
-    print(f"balance: {balance}")
+    seller: str | None = request.form.get("seller")
 
     if pwd is not None and rpwd is not None and len(pwd) > 0 and len(rpwd) > 0:
         if pwd != rpwd or len(pwd) < minPwdLen:
@@ -55,11 +50,13 @@ def profile() -> str | Response:
     if (
         len(frname) == 0
         or len(lsname) == 0
-        or not any(c not in whitelist for c in str(frname))
-        or not any(c not in whitelist for c in str(lsname))
+        or not whitelist.match(str(frname))
+        or not whitelist.match(str(lsname))
     ):
         err = True
-        flash("You must have a name with at leas a character")
+        flash(
+            "You must have a name with at least a character (so, no numbers, symbols...)"
+        )
 
     try:
         if balance is not None and int(balance) < 0:
@@ -69,11 +66,15 @@ def profile() -> str | Response:
         err = True
         flash("The balance must be a number")
 
+    if (seller is not None and seller != "on") or seller is None:
+        seller = "off"
+
     if not err:
         usr.first_name = frname
         usr.last_name = lsname
         usr.password = pwd  # type:ignore
         usr.balance = int(balance) if balance is not None else usr.balance
+        usr.seller = True if usr.seller or seller == "on" else False
         db.session.commit()
 
     return render_template("profile.html", user=usr)
