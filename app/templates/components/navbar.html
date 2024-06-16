@@ -4,9 +4,9 @@
             <h3>LOGO</h3>
         </a>
     </div>
-    <div class="navbar__box">{% include 'components/searchbar.html' %}</div>
+    <div class="navbar__searchbar">{% include 'components/searchbar.html' %}</div>
     <div class="navbar__box">
-        {% if user is not none %}
+        {% if user %}
             {% include 'components/notifications_badge.html' %}
             <span class="navbar__user">hi {{ user.username }}</span>
             <a href="/logout" class="navbar__button">Logout</a>

@@ -3,37 +3,30 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/library.css') }}">
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/navbar.css') }}">
+          href="{{ url_for('static', filename='css/book.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-
-{% include 'components/navbar.html' %}
-
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for msg in messages %}
-            {{ msg }}<br>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
-<div class="lib__container">
-    <div class="lib__item">
-        <h1 class="lib__title"> {{ user.username }}'s library </h1>
-        <div class="lib__library">
-            {% for own in owns %}
-                <div class="own__item">
-                    {% with book = own.book %}
-                       <img
-                            width=200
-                            src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
-                            onerror="this.src='{{ url_for('static', filename='images/404.png') }}'"
-                        />
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                {{ msg }}
+                <br>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% from 'components/book.html' import display_book %}
+    <div class="lib__container">
+        <div class="lib__item">
+            <h1 class="lib__title">{{ user.username }}'s library</h1>
+            <div class="lib__library">
+                {% for own in owns %}
+                    <div class="own__item">
+                        {{ display_book(own.book, publisher=False, generes=False) }}
                         <div class="own__details">
                             <div class="detail__box">
-                                <span> {{ own.state }} </span>
-                                <br/>
-                                <span> x{{ own.quantity }} </span>
+                                <span>{{ own.state }}</span>
+                                <br />
+                                <span>x{{ own.quantity }}</span>
                             </div>
                         </div>
                         {% if own.price %}
@@ -46,15 +39,14 @@
                                href="/insertion/list/?book={{ own.fk_book }}&bookstate={{ own.state }}">create</a>
                         {% endif %}
                     </div>
-                {% endwith %}
-            {% endfor %}
-            {% if page == last_page %}
-                <div class="lib__add">
-                    <a href="/book/add" class="add__btn">+</a>
-                </div>
-            {% endif %}
+                {% endfor %}
+                {% if page == last_page %}
+                    <div class="lib__add">
+                        <a href="/book/add" class="add__btn">+</a>
+                    </div>
+                {% endif %}
+            </div>
+            {% include "components/pagination.html" %}
         </div>
-        {% include "components/pagination.html" %}
     </div>
-</div>
 {% endblock content %}

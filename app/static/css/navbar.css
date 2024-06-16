@@ -1,7 +1,7 @@
 .navbar,
 .navbar__box,
 .search-bar {
-    background: var(--navbar-background);
+    background: var(--page-background);
 }
 
 .navbar {
@@ -9,7 +9,10 @@
     grid-template-columns: 25% 50% 25%;
     grid-template-rows: 1;
     align-items: center;
+    width: 100%;
     padding: 30px 10%;
+    border: 2px;
+    border-color: #000;
 }
 
 .navbar__box {
@@ -42,31 +45,29 @@
 .search-bar__input::placeholder,
 .search-bar__icon {
     color: var(--input-foreground);
-    color: rgba(0, 0, 0, 0.25);
-}
-
-.search-bar__box:focus-within {
-    filter: brightness(95%);
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.75);
+    color: rgba(0, 0, 0, 0.50);
 }
 
 .search-bar__box {
     --padding: 10px;
-
+    filter: brightness(110%);
     width: max-content;
     align-items: center;
     display: flex;
     border-radius: 28px;
     padding: var(--padding);
     background: var(--input-background);
-    width: 600px;
+    border: 1px;
+    border-color: var(--main-foreground);
+    border-style: solid;
+    width: 100%;
     transition: background 1s;
 }
 
 .search-bar__input {
     border: none;
     font-family: var(--font);
-    color: #fff;
+    color: var(--input-foreground);
     margin-left: var(--padding);
     outline: none;
     border: none;
@@ -79,4 +80,3 @@
     background: var(--input-background);
     margin-left: var(--padding);
 }
-

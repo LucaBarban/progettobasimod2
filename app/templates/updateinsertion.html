@@ -2,11 +2,8 @@
 {% block pagestyles %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/library.css') }}">
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% include 'components/navbar.html' %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
