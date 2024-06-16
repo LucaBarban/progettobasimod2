@@ -24,7 +24,7 @@
                 <h1 class="display__category__title">{{ genre[0] }}</h1>
                 <hr>
                 <div class="display__category__books">
-                    {% for book in genre[1] %}{{ display_book(book, publisher=False, generes=False) }}{% endfor %}
+                    {% for book in genre[1] %}{{ display_book(book, isbn=False) }}{% endfor %}
                 </div>
             </div>
         {% endfor %}

@@ -1,4 +1,4 @@
-{% macro display_book(book, link=True, metadata=True, label=False, title=True, author=True, publisher=True, generes=True) %}
+{% macro display_book(book, link=True, metadata=True, label=False, title=True, author=True, publisher=False, generes=False, isbn=True) %}
     <div class="book__container">
         {% if link %}<a href="/book/{{ book.id }}">{% endif %}
             <img class="book__cover"
@@ -30,6 +30,12 @@
                 <tr>
                     {% if label %}<td class="book__meta--generes__label">Generes</td>{% endif %}
                     <td class="book__meta--generes">{{ book.display_generes() }}</td>
+                </tr>
+            {% endif %}
+            {% if isbn %}
+                <tr>
+                    {% if label %}<td class="book__meta--isbn__label">isbn</td>{% endif %}
+                    <td class="book__meta--isbn">{{ book.isbn }}</td>
                 </tr>
             {% endif %}
         </table>
