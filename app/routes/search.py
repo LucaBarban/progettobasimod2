@@ -33,4 +33,4 @@ def search() -> str | Response:
         return redirect("#")
 
     books = generate_book_list(user_input)
-    return render_template("search.html", user=None, books=books)
+    return render_template("search.html", user=None, books=books, query=user_input)

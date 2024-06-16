@@ -2,11 +2,8 @@
 {% block pagestyles %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/library.css') }}">
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/navbar.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% include 'components/navbar.html' %}
     {% if error %}<h2>{{ error }}</h2>{% endif %}
     {% if items|length == 0 %}
         <h2>Your cart is empty</h2>

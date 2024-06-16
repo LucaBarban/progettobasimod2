@@ -3,14 +3,10 @@
 {% block pagestyles %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
 
 {% endblock pagestyles %}
 
 {% block content %}
-
-{% include 'components/navbar.html' %}
-
 <div>
 
     <h2> Processing </h2>
@@ -38,5 +34,6 @@
     {% else %}
         Nothing here...
     {% endfor %}
+</div>
 
 {% endblock content %}

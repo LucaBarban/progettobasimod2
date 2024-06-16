@@ -1,0 +1,47 @@
+{% macro display_book_image(book, link=True) %}
+    {% if link %}<a href="/book/{{ book.id }}">{% endif %}
+        <img class="book__cover"
+             src="{{ url_for('static', filename='covers/' ~ book.id ~ ".png") }}"
+             onerror="if (!this.src.endsWith('{{ url_for('static', filename='images/404.png') }}')) this.src='{{ url_for('static', filename='images/404.png') }}'" />
+        {% if link %}</a>{% endif %}
+{% endmacro %}
+{% macro display_book_metadata(book, label=True, title=True, author=True, publisher=True, generes=True, isbn=True) %}
+    {% if title %}
+        <tr>
+            {% if label %}<td class="label book__meta--title__label">Title</td>{% endif %}
+            <td class="book__meta--title">{{ book.title }}</td>
+        </tr>
+    {% endif %}
+    {% if author %}
+        <tr>
+            {% if label %}<td class="label book__meta--author__label">Author</td>{% endif %}
+            <td class="book__meta--author">{{ book.author.get_full_name() }}</td>
+        </tr>
+    {% endif %}
+    {% if publisher %}
+        <tr>
+            {% if label %}<td class="label book__meta--publisher__label">Publisher</td>{% endif %}
+            <td class="book__meta--publisher">{{ book.publisher.name }}</td>
+        </tr>
+    {% endif %}
+    {% if generes %}
+        <tr>
+            {% if label %}<td class="label book__meta--generes__label">Generes</td>{% endif %}
+            <td class="book__meta--generes">{{ book.display_generes() }}</td>
+        </tr>
+    {% endif %}
+    {% if isbn %}
+        <tr>
+            {% if label %}<td class="label book__meta--isbn__label">isbn</td>{% endif %}
+            <td class="book__meta--isbn">{{ book.isbn }}</td>
+        </tr>
+    {% endif %}
+{% endmacro %}
+{% macro display_book(book, link=True, label=False, title=True, author=True, publisher=True, generes=True, isbn=True) %}
+    <div class="book__container">
+        {{ display_book_image(book) }}
+        <table class="book__meta">
+            {{ display_book_metadata(book, label, title, author, publisher, generes, isbn) }}
+        </table>
+    </div>
+{% endmacro %}

@@ -49,5 +49,8 @@ class Book(Base):
         self.publisher = publisher
         self.genres = genres
 
+    def display_generes(self) -> str:
+        return ", ".join(tuple(x.name for x in self.genres))
+
     def __repr__(self) -> str:
         return f"Book {{{self.id}, {self.title}, {self.published}, {self.pages}, {self.isbn}, {self.fk_author}, {self.fk_publisher}}}"
