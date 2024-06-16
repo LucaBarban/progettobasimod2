@@ -12,7 +12,7 @@
         <hr class="library__category__title__underline" />
         <div class="search__books">
             {% for book in books %}
-                {{ display_book(book) }}
+                {{ display_book(book, generes=False) }}
             {% endfor %}
         </div>
     </div>
