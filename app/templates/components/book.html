@@ -15,20 +15,20 @@
                 {% endif %}
                 {% if author %}
                     <tr>
-                        {% if label %}<td class="book__meta--title__label">Author</td>{% endif %}
+                        {% if label %}<td class="book__meta--author__label">Author</td>{% endif %}
                         <td class="book__meta--author">{{ book.author.get_full_name() }}</td>
                     </tr>
                 {% endif %}
                 {% if publisher %}
                     <tr>
-                        {% if label %}<td class="book__meta--title__label">Publisher</td>{% endif %}
+                        {% if label %}<td class="book__meta--publisher__label">Publisher</td>{% endif %}
                         <td class="book__meta--publisher">{{ book.publisher.name }}</td>
                     </td>
                 </tr>
             {% endif %}
             {% if generes %}
                 <tr>
-                    {% if label %}<td class="book__meta--title__label">Generes</td>{% endif %}
+                    {% if label %}<td class="book__meta--generes__label">Generes</td>{% endif %}
                     <td class="book__meta--generes">{{ book.display_generes() }}</td>
                 </tr>
             {% endif %}
