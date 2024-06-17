@@ -2,7 +2,7 @@
 
 {% block addform %}
 
-<h1>Bookadd</h1>
+
 
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -13,7 +13,11 @@
 {% endwith %}
 
 
-<form action="/book/add/" method="post" enctype=multipart/form-data>
+<form action="/book/add/" method="post" enctype=multipart/form-data class="form">
+    <div class="form__title">
+        <h1>Add a new Book to the System</h1>
+    </div>
+
     <label for="title">Title:</label>
     <input type="text" id="title" name="title" required><br><br>
 
@@ -21,7 +25,7 @@
     <input type="date" id="published" name="published" required><br><br>
 
     <label for="pages">Pages:</label>
-    <input type="number" id="pages" name="pages" required><br><br>
+    <input type="number" id="pages" name="pages" min="0" required><br><br>
 
     <label for="isbn">ISBN:</label>
     <input type="text" id="isbn" name="isbn" required><br><br>
@@ -51,7 +55,8 @@
     <label for="file">Book's Cover:</label>
     <input type="file" name="file" id="file"><br><br>
 
-    <button type="submit">Add</button>
+
+    <input type="submit" value="Add Book">
 </form>
 
 {% endblock %}

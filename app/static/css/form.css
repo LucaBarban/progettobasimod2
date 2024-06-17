@@ -21,12 +21,16 @@
 
 .form input[type="text"],
         input[type="number"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="date"],
+        select,
+        input[type="file"] {
     width: 100%;
     padding: 10px;
     border: 1px solid var(--accent-color);
     border-radius: 4px;
     box-sizing: border-box;
+    background-color: var(--input-background);
 }
 
 .form .checkbox__container input[type="checkbox"] {
@@ -48,3 +52,4 @@
     padding: 8px 10px;
     cursor: pointer;
 }
+

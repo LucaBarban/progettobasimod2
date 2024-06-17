@@ -2,8 +2,6 @@
 
 {% block addform %}
 
-<h1>AuthorAdd</h1>
-
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         {% for msg in messages %}
@@ -13,14 +11,18 @@
 {% endwith %}
 
 
-<form action="/book/add/author/" method="post">
+<form action="/book/add/author/" method="post" class="form">
+    <div class="form__title">
+        <h1>Add a new Author to the System</h1>
+    </div>
+
     <label for="first_name">First Name:</label>
     <input type="text" id="first_name" name="first_name" required><br><br>
 
     <label for="last_name">Last Name:</label>
     <input type="text" id="last_name" name="last_name" required><br><br>
 
-    <button type="submit">Add</button>
+    <input type="submit" value="Add Author"/>
 </form>
 
 {% endblock %}
