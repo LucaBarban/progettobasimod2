@@ -6,13 +6,13 @@
 {% block content %}
     <form action="/login/" method="POST" class="form">
         <div class="form__title">
-            <h1>Login Form</h1>
+            <h1>Login into BookWorm</h1>
         </div>
         <input type="hidden" id="link", name="link" value="{{ link }}">
-        <label for="usr">Username:</label>
+        <label for="usr">Username</label>
         <input type="text" id="usr" name="usr">
         <br>
-        <label for="pwd">Password:</label>
+        <label for="pwd">Password</label>
         <input type="password" id="pwd" name="pwd">
         <br>
         <input type="submit" value="Login">
