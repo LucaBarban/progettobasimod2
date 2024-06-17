@@ -1,8 +1,13 @@
 {% extends "layout.html" %}
+{% block pagestyles %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/form.css') }}"/>
+{% endblock pagestyles %}
 {% block content %}
-    <h1>LoginPage!</h1>
-    <h2>Login Form</h2>
-    <form action="/login/" method="POST">
+    <form action="/login/" method="POST" class="form">
+        <div class="form__title">
+            <h1>Login Form</h1>
+        </div>
         <input type="hidden" id="link", name="link" value="{{ link }}">
         <label for="usr">Username:</label>
         <input type="text" id="usr" name="usr">

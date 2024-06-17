@@ -41,7 +41,6 @@
     position: relative;
     background: var(--accent-color);
     color: var(--main-foreground);
-
 }
 
 .button--secondary {

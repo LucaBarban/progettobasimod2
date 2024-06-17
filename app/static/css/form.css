@@ -1,0 +1,50 @@
+.form {
+    margin: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form .form__title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px;
+}
+
+.form .form__title h1 {
+    font-family: var(--font-serif)
+}
+
+.form br {
+    margin-bottom: 10px;
+}
+
+.form input[type="text"],
+        input[type="number"],
+        input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form .checkbox__container input[type="checkbox"] {
+    margin: 5px;
+    transform: scale(1.4);
+}
+
+.form input[type="submit"] {
+    width: 100%;
+    position: relative;
+    font-size: var(--font-size);
+    font-weight: 500;
+    background: var(--accent-color);
+    color: #000;
+    text-decoration: none;
+    overflow: hidden;
+    border-radius: 5px;
+    border: none;
+    padding: 8px 10px;
+    cursor: pointer;
+}
