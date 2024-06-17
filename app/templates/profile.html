@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
 {% endblock pagestyles %}
 
 {% block content %}
@@ -20,7 +21,10 @@
         {% endif %}
     {% endwith %}
 
-    <form action="/profile" method="POST">
+    <form action="/profile" method="POST" class="form">
+        <div class="form__title">
+            Profile's Data
+        </div>
         <label for="frname">First Name:</label>
         <input type="text" id="frname" name="frname" value="{{ user.first_name }}">
         <br>
@@ -36,12 +40,14 @@
         <label for="balance">Balance ;):</label>
         <input type="number" id="balance" name="balance" min="0" value="{{ user.balance }}">
         <br>
-        <label for="seller">Seller Account:</label>
-        {% if user.seller %}
-            <input type="checkbox" id="seller" name="seller" disabled checked>
-        {% else %}
-            <input type="checkbox" id="seller" name="seller">
-        {% endif %}
+        <div class="checkbox__container">
+            <label for="seller">Seller Account:</label>
+            {% if user.seller %}
+                <input type="checkbox" id="seller" name="seller" disabled checked>
+            {% else %}
+                <input type="checkbox" id="seller" name="seller">
+            {% endif %}
+        </div>
 
         <br>
         <input type="submit" value="Update">
