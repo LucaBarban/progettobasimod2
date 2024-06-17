@@ -2,6 +2,8 @@
 {% block pagestyles %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/library.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/form.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% with messages = get_flashed_messages() %}
@@ -12,8 +14,10 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <h1>Update Book</h1>
-    <form action="/insertion/update/" method="POST">
+    <form action="/insertion/update/" method="POST" class="form">
+        <div class="form__title">
+            <h1>Update Book</h1>
+        </div>
         <input type="hidden" id="book" name="book" value="{{ book }}">
         <br>
         <input type="hidden" id="bookstate" name="bookstate" value="{{ bookstate }}">

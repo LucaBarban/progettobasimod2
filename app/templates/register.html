@@ -1,7 +1,13 @@
 {% extends "layout.html" %}
+{% block pagestyles %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/form.css') }}"/>
+{% endblock pagestyles %}
 {% block content %}
-    <h2>Reg Form</h2>
-    <form action="/register/" method="POST">
+    <form action="/register/" method="POST" class="form">
+        <div class="form__title">
+            <h1>Create your BookWorm Account</h1>
+        </div>
         {{ regform.csrf_token }}
         {{ regform.usr.label }} {{ regform.usr }}
         <br>
@@ -13,7 +19,9 @@
         <br>
         {{ regform.checkpwd.label }} {{ regform.checkpwd }}
         <br>
-        {{ regform.seller.label }} {{ regform.seller }}
+        <div class="checkbox__container">
+            {{ regform.seller.label }} {{ regform.seller }}
+        </div>
         <br>
         {{ regform.sub }}
     </form>

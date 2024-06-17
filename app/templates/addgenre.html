@@ -2,8 +2,6 @@
 
 {% block addform %}
 
-<h1>GenreAdd</h1>
-
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         {% for msg in messages %}
@@ -13,11 +11,14 @@
 {% endwith %}
 
 
-<form action="/book/add/genre/" method="post">
+<form action="/book/add/genre/" method="post" class="form">
+    <div class="form__title">
+        <h1>Add a new Genre to the System</h1>
+    </div>
     <label for="name">Genre:</label>
     <input type="text" id="name" name="name" required><br><br>
 
-    <button type="submit">Add</button>
+    <input type="submit" value="Add Genre"/>
 </form>
 
 {% endblock %}

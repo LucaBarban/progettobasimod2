@@ -42,6 +42,9 @@ def getInsertionUpdateForm() -> str | Response:
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
+    if not usr.seller:
+        flash("Your account is not a seller account, so you can't update insertions")
+        return redirect("/library")
     book: str | None = request.args.get("book")
     bookstate: str | None = request.args.get("bookstate")
     quantity: str | None = request.args.get("quantity")
@@ -63,6 +66,9 @@ def getInsertionListForm() -> str | Response:
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
+    if not usr.seller:
+        flash("Your account is not a seller account, so you can't list books for sale")
+        return redirect("/library")
     book: str | None = request.args.get("book")
     bookstate: str | None = request.args.get("bookstate")
     if book is None or bookstate is None:
@@ -77,6 +83,9 @@ def getInsertionUnListForm() -> str | Response:
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
+    if not usr.seller:
+        flash("Your account is not a seller account, so you can't unlist an insertion")
+        return redirect("/library")
     book: str | None = request.args.get("book")
     bookstate: str | None = request.args.get("bookstate")
     if book is None or bookstate is None:
@@ -91,6 +100,10 @@ def updatebook() -> str | Response:
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
+
+    if not usr.seller:
+        flash("Your account is not a seller account, so you cant update an insertion")
+        return redirect("/library")
 
     (oldPriceBooks, newPriceBooks, quantity, oldprice, newprice) = retriveExistingBooks(
         usr
@@ -148,6 +161,10 @@ def listbook() -> str | Response:
     if usr is None:
         return redirect("/login/")
 
+    if not usr.seller:
+        flash("Your account is not a seller account, so you cant list and insertion")
+        return redirect("/library")
+
     (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
     if quantity is None or price is None:
         flash("Missing parameters, be sure to compile them all")
@@ -178,6 +195,10 @@ def unlistbook() -> str | Response:
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
+
+    if not usr.seller:
+        flash("Your account is not a seller account, so you can't unlist an insertion")
+        return redirect("/library")
 
     (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
     if quantity is None or price is None:
