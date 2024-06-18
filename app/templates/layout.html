@@ -18,20 +18,11 @@
         {% block pagestyles %}{% endblock %}
     </head>
     <body class="{{ template }}">
-<<<<<<< HEAD
-
-        <form action="/search/" method="POST" class="search-bar">
-            {% include 'components/navbar.html' %}
-            {% block filters %}{% endblock %}
-        </form>
-        <div class="content">{% block content %}{% endblock %}</div>
-=======
         {% include 'components/messages.html' %}
         {% include 'components/navbar.html' %}
         <div class="content">
             {% block content %}{% endblock %}
         </div>
->>>>>>> 48d5376 (Add new global component to display flash messages)
     </body>
     {% block scripts %}{% endblock %}
 </html>
