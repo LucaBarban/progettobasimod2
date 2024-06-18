@@ -1,0 +1,11 @@
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for type, msg in messages %}
+            <div class="message-box {{ type }}">
+                <br>
+                <div class="message {{ type }}">{{ msg }}</div>
+                <a class="message close-button {{ type }}" href="">&#x2715</a>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}

@@ -20,6 +20,32 @@ body {
     font-family: var(--font-sans-serif);
 }
 
+.message-box {
+    display: grid;
+    grid-template-columns: 5% 90% 5%;
+}
+
+.close-button {
+    text-decoration: none;
+}
+
+.message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.success {
+    background: var(--green4);
+    color: var(--green9);
+}
+
+.error {
+    background: var(--red4);
+    color: var(--red9);
+}
+
 .content {
     padding-left: 15%;
     padding-right: 15%;
