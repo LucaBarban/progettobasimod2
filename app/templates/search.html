@@ -10,24 +10,48 @@
 {% block content %}
     {% from 'components/book.html' import display_book %}
 
-    {% if query %}
-        <h1>You searched for: {{ query }}</h1>
-    {% endif %}
-
-    <hr class="library__category__title__underline" />
+    <hr />
 
     <div class="search__books">
         {% for book in books %}
             {{ display_book(book, generes=False) }}
+        {% else %}
+            No books found
         {% endfor %}
     </div>
 {% endblock content %}
 
 {% block filters %}
+    <input type="submit" hidden />
+
     <div class="search__filters">
-        <div class="search__item" style="padding:10px">
-            <label for="available"> Available: </label>
-            <input type="checkbox" name="available" id="available">
+        <div class="search__item">
+            <label for="available"> Available </label>
+            <input
+                type="checkbox"
+                name="available"
+                {% if input.available %} checked {% endif %}
+            />
+        </div>
+
+        <div class="search__item">
+            <input
+                type="number"
+                name="price_min"
+                size="6"
+                min="0"
+                placeholder="min"
+                value="{{ input.min }}"
+            >
+            -
+            <input
+                type="number"
+                name="price_max"
+                size="6"
+                min="0"
+                placeholder="max"
+                value="{{ input.max }}"
+            >
         </div>
 
         <div class="search__item">
@@ -36,7 +60,9 @@
                 <ul class="dropdown__items">
                     {% for genre in genres %}
                         <li>
-                            <input type="checkbox" name="genre" value="{{ genre.name }}" id="{{ genre.name }}">
+                            <input type="checkbox" name="genre" value="{{ genre.name }}" id="{{ genre.name }}"
+                                {% if genre.name in input.genres %} checked {% endif %}
+                            >
                             <label for="{{ genre.name }}"> {{ genre.name }} </label>
                         </li>
                     {% endfor %}
@@ -50,7 +76,9 @@
                 <ul class="dropdown__items">
                     {% for publisher in publishers %}
                         <li>
-                            <input type="checkbox" name="publisher" id="{{ publisher.name }}" value="{{ publisher.name }}">
+                            <input type="checkbox" name="publisher" id="{{ publisher.name }}" value="{{ publisher.name }}"
+                                {% if publisher.name in input.publishers %} checked {% endif %}
+                            >
                             <label for="{{ publisher.name }}"> {{ publisher.name }} </label>
                         </li>
                     {% endfor %}
