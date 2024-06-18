@@ -9,52 +9,54 @@
     {% from 'components/book.html' import display_book %}
     <!-- TODO: metti banner -->
     <h1>{{ book.title }}</h1>
-    <hr>
+    <br>
     {{ display_book(book, link=False, label=True, title=False) }}
-    <form action="" method="get">
-        <select name="sort">
-            <option value="average" {% if sort != "total" %}selected{% endif %}>Average</option>
-            <option value="total" {% if sort == "total" %}selected{% endif %}>Total Reviews</option>
-        </select>
-        <select name="order">
-            <option value="desc" {% if order != "asc" %}selected{% endif %}>High to Low</option>
-            <option value="asc"{% if order == "asc" %} selected {% endif %}>Low to High</option>
-        </select>
-        <input type="submit" value="Sort" />
-    </form>
-    {% for (seller, star, owns) in insertions %}
-        <div>
-            <div>
-                seller: <a href="/seller/{{ seller.username }}">{{ seller.username }}</a>
-                {% if star %}
-                    <span class="star-rating">
-                        {% for value in range(5, 0, -1) %}
-                            <input type="radio"
-                                   id="rate-{{ seller.username }}-{{ value }}"
-                                   value="{{ value }}"
-                                   {% if star.vote >= value %}checked{% endif %}
-                                   disabled>
-                            <label for="rate-{{ seller.username }}-{{ value }}">&#9734;</label>
-                        {% endfor %}
-                    </span>
-                    ( {{ star.total }} )
-                {% endif %}
-            </div>
-            {% for own in owns %}
-                <div>
-                    <div>Price: {{ own.price }}</div>
-                    <div>Avaiable: {{ own.quantity }}</div>
-                    <div>State: {{ own.state }}</div>
-                    {% if user %}
-                        <form action="/cart/add/{{ own.id }}" method="POST">
-                            <input type="number" name="quantity" min="1" value="1" />
-                            <input type="submit" value="Add to cart" />
-                        </form>
-                    {% else %}
-                        <div>Login before buying</div>
+    <br>
+    <div class="footer">
+        <form class="sort-button" action="" method="get">
+            <select name="sort">
+                <option value="average" {% if sort != "total" %}selected{% endif %}>Average</option>
+                <option value="total" {% if sort == "total" %}selected{% endif %}>Total Reviews</option>
+            </select>
+            <select name="order">
+                <option value="desc" {% if order != "asc" %}selected{% endif %}>High to Low</option>
+                <option value="asc"{% if order == "asc" %} selected {% endif %}>Low to High</option>
+            </select>
+            <input type="submit" value="Sort" />
+        </form>
+        <br>
+        <div class="insertions">
+            {% for (seller, star, owns) in insertions %}
+                <div class="insertion">
+                    seller: <a href="/seller/{{ seller.username }}">{{ seller.username }}</a>
+                    {% if star %}
+                        <span class="star-rating">
+                            {% for value in range(5, 0, -1) %}
+                                <input type="radio"
+                                       id="rate-{{ seller.username }}-{{ value }}"
+                                       value="{{ value }}"
+                                       {% if star.vote >= value %}checked{% endif %}
+                                       disabled>
+                                <label for="rate-{{ seller.username }}-{{ value }}">&#9734;</label>
+                            {% endfor %}
+                        </span>
+                        ( {{ star.total }} )
                     {% endif %}
+                    {% for own in owns %}
+                        <div>Price: {{ own.price }}</div>
+                        <div>Avaiable: {{ own.quantity }}</div>
+                        <div>State: {{ own.state }}</div>
+                        {% if user %}
+                            <form action="/cart/add/{{ own.id }}" method="POST">
+                                <input type="number" name="quantity" min="1" value="1" />
+                                <input type="submit" value="Add to cart" />
+                            </form>
+                        {% else %}
+                            <div>Login before buying</div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             {% endfor %}
         </div>
-    {% endfor %}
+    </div>
 {% endblock content %}

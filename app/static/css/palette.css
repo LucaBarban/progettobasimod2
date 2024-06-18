@@ -1,12 +1,59 @@
 :root {
-  --page-background: #f7f5f2;
-  --main-foreground: #0e0d0b;
-  --secondary-background: #e1cc9d;
-  --normal-button-background: #5e5c64;
-  --navbar-background: var(--secondary-background);
-  --input-background: var(--page-background);
-  --input-foreground: var(--main-foreground);
-  --accent-color: #e0b861;
-  --warning: #f8e45c;
-  --error: #ed333b;
+    --blue1: #f2f6ff;
+    --blue2: #c1d2ff;
+    --blue3: #adc2fb;
+    --blue4: #89a8fc;
+    --blue5: #6183e0;
+    --blue6: #3c64d0;
+    --blue7: #193da1;
+    --blue8: #061f61;
+    --blue9: #000e33;
+
+    --green1: #f5fff2;
+    --green2: #d3ffc7;
+    --green3: #b6f0a6;
+    --green4: #9ce488;
+    --green5: #81d16b;
+    --green6: #5cc041;
+    --green7: #3ea621;
+    --green8: #1d6f06;
+    --green9: #0b3300;
+
+    --yellow1: #fffbf2;
+    --yellow2: #ffecc3;
+    --yellow3: #fde2a7;
+    --yellow4: #f4d081;
+    --yellow5: #e0b861;
+    --yellow6: #cfa13e;
+    --yellow7: #ab7e1e;
+    --yellow8: #714e02;
+    --yellow9: #332300;
+
+    --red1: #fff2f2;
+    --red2: #ffd0d0;
+    --red3: #fdb2b2;
+    --red4: #ff8c8c;
+    --red5: #e06565;
+    --red6: #cf3c3c;
+    --red7: #a61818;
+    --red8: #5f0404;
+    --red9: #330000;
+
+    --gray1: #f7f5f2;
+    --gray2: #e5e3e0;
+    --gray3: #cccac8;
+    --gray4: #ab9f8e;
+    --gray5: #878076;
+
+    --black: #0e0d0b;
+
+    --page-background: var(--gray1);
+    --main-foreground: var(--black);
+    --secondary-background: var(--gray2);
+    --normal-button-background: #5e5c64;
+    --navbar-background: var(--page-background);
+    --input-background: var(--page-background);
+    --input-foreground: var(--main-foreground);
+    --accent-color: var(--yellow5);
+    --error: var(--red5);
 }
