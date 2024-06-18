@@ -31,13 +31,13 @@ def update(id: int) -> Response:
     status = request.form.get("status")
 
     if user is None or status not in Statuses:
-        flash("An error occoured")
+        flash("An error occoured", "error")
         return redirect("/")
 
     item = db.session.get(History, id)
 
     if item is None or item.seller.username != user.username:
-        flash("Cannot find the right insertion")
+        flash("Cannot find the right insertion", "error")
         return redirect("/")
 
     item.status = status

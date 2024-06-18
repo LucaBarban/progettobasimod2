@@ -154,16 +154,16 @@ def cart_add(id: int) -> Response:
     insertion = db.session.get(Own, id)
 
     if insertion is None:
-        flash("An error occoured")
+        flash("An error occoured", "error")
         return redirect("/")
     elif quantity is None or int(quantity) <= 0:
-        flash("Wrong value for quantity")
+        flash("Wrong value for quantity", "error")
         return redirect(f"/book/{insertion.book.id}")
     elif int(quantity) > insertion.quantity:
-        flash("Maximum quantity exceeded")
+        flash("Maximum quantity exceeded", "error")
         return redirect(f"/book/{insertion.book.id}")
     elif user is None:
-        flash("User not logged in")
+        flash("User not logged in", "error")
         return redirect(f"/book/{insertion.book.id}")
 
     cart = (
@@ -180,7 +180,7 @@ def cart_add(id: int) -> Response:
     try:
         db.session.commit()
     except:
-        flash("An error occoured")
+        flash("An error occoured", "error")
         db.session.rollback()
 
     return redirect(f"/book/{insertion.book.id}")
