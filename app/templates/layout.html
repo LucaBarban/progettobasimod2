@@ -28,7 +28,12 @@
         {% block pagestyles %}{% endblock %}
     </head>
     <body class="{{ template }}">
-        {% include 'components/navbar.html' %}
+
+        <form action="/search/" method="POST" class="search-bar">
+            {% include 'components/navbar.html' %}
+            {% block filters %}{% endblock %}
+        </form>
         <div class="content">{% block content %}{% endblock %}</div>
     </body>
+    {% block scripts %}{% endblock %}
 </html>
