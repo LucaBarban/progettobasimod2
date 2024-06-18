@@ -74,7 +74,7 @@ def login() -> str | Response:
     ):  # if a new lin has been provided, redirect to that
         return redirect(rlink)
     else:
-        flash("You have successfully logged in")
+        flash("You have successfully logged in", "success")
         return redirect("/")
 
 
@@ -182,7 +182,7 @@ def register() -> str | Response:
     session["token"] = newUsersToken  # save the token (user's side)
     db.session.commit()  # save the changes into the database
 
-    flash("You have successfully registered")
+    flash("You have successfully registered", "success")
     return redirect("/")
 
 
@@ -202,7 +202,7 @@ def logout() -> str | Response:
             loggedOut = True
     session.clear()  # clear the token client side
     if loggedOut:
-        flash("You have beem logged out successfully")
+        flash("You have beem logged out successfully", "success")
     return redirect("/")
 
 

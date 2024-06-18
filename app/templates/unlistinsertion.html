@@ -6,14 +6,6 @@
           href="{{ url_for('static', filename='css/form.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     <form action="/insertion/unlist/" method="POST" class="form">
         <div class="form__title">
             <h1>UnList Book</h1>

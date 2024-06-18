@@ -37,7 +37,8 @@ def profile() -> str | Response:
         if pwd != rpwd or len(pwd) < minPwdLen:
             err = True
             flash(
-                f"Password fields must be the same and at least {minPwdLen} characters long"
+                f"Password fields must be the same and at least {minPwdLen} characters long",
+                "error",
             )
         else:  # save the new salted and hashed password
             pwd = str(bcrypt.generate_password_hash(pwd, bcryptRounds).decode("utf-8"))
@@ -47,7 +48,7 @@ def profile() -> str | Response:
         pwd = usr.password
     else:
         err = True
-        flash("Both password fields must be compiled to change the password")
+        flash("Both password fields must be compiled to change the password", "error")
 
     # if the name has not changed, keep the old one
     frname = str(frname if frname is not None else usr.first_name)
@@ -61,16 +62,17 @@ def profile() -> str | Response:
     ):
         err = True
         flash(
-            "You must have a name with at least a character (so, no numbers, symbols...)"
+            "You must have a name with at least a character (so, no numbers, symbols...)",
+            "error",
         )
 
     try:
         if balance is not None and int(balance) < 0:  # check the new balance
             err = True
-            flash("The balance must be positive")
+            flash("The balance must be positive", "error")
     except:
         err = True
-        flash("The balance must be a number")
+        flash("The balance must be a number", "error")
 
     if (seller is not None and seller != "on") or seller is None:
         flash("You cannot downgrade your account's status")

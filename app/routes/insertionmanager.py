@@ -132,16 +132,17 @@ def updatebook() -> str | Response:
     if quantity is None or oldprice is None:
         flash(
             "Missing parameters, be sure to compile them (if the new price is not compiled, "
-            + "the operation will be threated like an insertion removal)"
+            + "the operation will be threated like an insertion removal)",
+            "error",
         )
         return redirect("/insertion")
 
     if oldPriceBooks is None:
-        flash("You don't own the selected book or it's not being sold")
+        flash("You don't own the selected book or it's not being sold", "error")
         return redirect("/insertion")
 
     if quantity <= 0:
-        flash("Invalid quantity")
+        flash("Invalid quantity", "error")
         return redirect("/insertion")
 
     if newprice is None:  # if the price is None, remove the book
@@ -149,7 +150,7 @@ def updatebook() -> str | Response:
             usr, newPriceBooks, oldPriceBooks, quantity, oldprice, False
         )
         if not insState[1]:
-            flash("An error occured during insertion's deletion/update: " + insState[0])
+            flash("An error occured during insertion's deletion/update: " + insState[0], "error")
             return redirect("/insertion")
     else:
         try:
@@ -169,7 +170,7 @@ def updatebook() -> str | Response:
             db.session.delete(oldPriceBooks)
         except exc.SQLAlchemyError:
             db.session.rollback()
-            flash("An unexpected error occured while interacting with the database")
+            flash("An unexpected error occured while interacting with the database", "error")
             return redirect("/insertion")
 
     db.session.commit()
@@ -190,18 +191,19 @@ def listbook() -> str | Response:
         usr
     )  # get the books owned by the user (including the ones that are being sold)
     if quantity is None or price is None:
-        flash("Missing parameters, be sure to compile them all")
+        flash("Missing parameters, be sure to compile them all", "error")
         return redirect("/insertion")
 
     if ownedBook is None:
-        flash("You don't own the selected book")
+        flash("You don't own the selected book", "error")
         return redirect("/insertion")
 
     if (
         ownedBook.quantity < quantity or quantity <= 0
     ):  # check if the quantity is right and sufficient
         flash(
-            f"You dont have enough books to sell ('{quantity}' when {ownedBook.quantity} are avaiable )"
+            f"You dont have enough books to sell ('{quantity}' when {ownedBook.quantity} are avaiable )",
+            "error",
         )
         return redirect("/insertion")
 
@@ -209,7 +211,7 @@ def listbook() -> str | Response:
         usr, ownedBook, ownedBookOnSale, quantity, price, True
     )  # try to add the insertion
     if not insState[1]:
-        flash("An error occured during insertion's creation/update: " + insState[0])
+        flash("An error occured during insertion's creation/update: " + insState[0], "error")
         return redirect("/insertion")
 
     return redirect("/insertion")
@@ -229,11 +231,11 @@ def unlistbook() -> str | Response:
         usr
     )  # get the currently existing insertions and books
     if quantity is None or price is None:
-        flash("Missing parameters, be sure to compile them all")
+        flash("Missing parameters, be sure to compile them all", "error")
         return redirect("/insertion")
 
     if ownedBookOnSale is None:
-        flash("You aren't selling the selected book")
+        flash("You aren't selling the selected book", "error")
         return redirect("/insertion")
 
     if (
@@ -248,7 +250,7 @@ def unlistbook() -> str | Response:
         usr, ownedBook, ownedBookOnSale, quantity, price, False
     )  # try to remove the insertion
     if not insState[1]:
-        flash(f"An error occured during insertion's deletion/update: {insState[0]}")
+        flash(f"An error occured during insertion's deletion/update: {insState[0]}", "error")
         return redirect("/insertion")
 
     return redirect("/insertion")

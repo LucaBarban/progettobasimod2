@@ -32,9 +32,9 @@ def history() -> str | Response:
                 ).one()
 
                 if hsToUpd is None:
-                    flash("Invalid book selectet for review")
+                    flash("Invalid book selectet for review", "error")
                 elif hsToUpd.review is not None:
-                    flash("You have already reviewed this book")
+                    flash("You have already reviewed this book", "error")
                 else:
                     hsToUpd.review = rew # apply the provided review and stars
                     hsToUpd.stars = int(rating)
@@ -42,12 +42,12 @@ def history() -> str | Response:
             except exc.SQLAlchemyError:
                 db.session.rollback() # explicit rollback (users reviews are one of the most delicate
                                       # parts of the project)
-                flash("An unexpected error occured while interacting with the database")
+                flash("An unexpected error occured while interacting with the database", "error")
             except:
                 db.session.rollback()
-                flash("An unexpected error occured")
+                flash("An unexpected error occured", "error")
         else:
-            flash("Be sure to give a rating and a review")
+            flash("Be sure to give a rating and a review", "success")
 
     hsts = db.session.scalars(
         sq.select(History)

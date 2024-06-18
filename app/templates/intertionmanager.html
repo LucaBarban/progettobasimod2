@@ -67,14 +67,6 @@
         <input type="submit" value="Update">
     </form>
     Error: {{ error }}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     <h1>Insertion Manager</h1>
     <h2>Owned</h2>
     {% for book in ownedbooks %}
