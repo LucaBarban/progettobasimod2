@@ -24,6 +24,11 @@ CREATE TABLE books (
     FOREIGN KEY (fk_publisher) REFERENCES publishers(name)
 );
 
+CREATE INDEX idx_title_books ON books(title);
+CREATE INDEX idx_isbn_books ON books(isbn);
+CREATE INDEX idx_author_books ON books(fk_author);
+CREATE INDEX idx_publisher_books ON books(fk_publisher);
+
 CREATE TABLE booksgenres(
     fk_idB INTEGER,
     fk_genre TEXT,
@@ -38,11 +43,13 @@ CREATE TABLE users(
     last_name VARCHAR(255) NOT NULL,
     password TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    balance INTEGER NOT NULl CONSTRAINT balance_ge CHECK (balance >= 0),
+    balance INTEGER NOT NULL CONSTRAINT balance_ge CHECK (balance >= 0),
     seller BOOLEAN NOT NULL,
     last_logged_in_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     token CHARACTER(64)[]
 );
+
+CREATE INDEX idx_token_users ON users(token);
 
 CREATE TYPE state AS ENUM ('new', 'as new', 'used');
 
@@ -54,16 +61,18 @@ CREATE TABLE owns(
     fk_book INTEGER NOT NULL,
     quantity INTEGER NOT NULL,
     state state NOT NULL,
-    price INTEGER,
+    price INTEGER CONSTRAINT price_ge_owns CHECK (price >= 0),
     UNIQUE (fk_username, fk_book, state, price),
     FOREIGN KEY (fk_username) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
 
+CREATE INDEX idx_own ON owns(fk_book, fk_username, state);
+
 CREATE TABLE carts(
     fk_buyer VARCHAR(100),
     fk_own INTEGER NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity INTEGER NOT NULL CONSTRAINT quantity_gt_carts CHECK (quantity > 0),
     PRIMARY KEY (fk_buyer, fk_own),
     FOREIGN KEY (fk_buyer) REFERENCES users(username),
     FOREIGN KEY(fk_own) REFERENCES owns(id) ON DELETE CASCADE
@@ -72,11 +81,11 @@ CREATE TABLE carts(
 CREATE TABLE history(
     id SERIAL PRIMARY KEY,
     date TIMESTAMP NOT NULL,
-    quantity INTEGER NOT NULL,
+    quantity INTEGER NOT NULL CONSTRAINT quantity_gt_history CHECK (quantity > 0),
     status status NOT NULL,
-    price INTEGER NOT NULL,
+    price INTEGER NOT NULL CONSTRAINT price_ge_history CHECK (price >= 0),
     review TEXT,
-    stars INTEGER,
+    stars INTEGER CONSTRAINT stars_btw CHECK (stars IS NULL OR stars BETWEEN 0 AND 5),
     fk_buyer VARCHAR(100),
     fk_seller VARCHAR(100),
     fk_book INTEGER,
@@ -85,6 +94,10 @@ CREATE TABLE history(
     FOREIGN KEY (fk_seller) REFERENCES users(username),
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
+
+CREATE INDEX idx_history ON owns(fk_username, fk_book, state, price);
+CREATE INDEX idx_seller_history ON history(fk_seller);
+CREATE INDEX idx_buyer_history ON history(fk_buyer);
 
 CREATE TYPE disc_notif AS ENUM ('order updated');
 
@@ -102,8 +115,13 @@ CREATE TABLE notifications(
     FOREIGN KEY (fk_history) REFERENCES history(id)
 );
 
+CREATE INDEX idx_username_notifications ON notifications(fk_username);
+
 CREATE MATERIALIZED VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
+
+CREATE INDEX idx_username_notifications_count ON notifications_count(fk_username);
+
 
 CREATE MATERIALIZED VIEW star_count
 AS
@@ -112,10 +130,11 @@ WHERE review IS NOT NULL
 GROUP BY fk_seller
 WITH NO DATA;
 
-CREATE INDEX idx_fk_seller ON history(fk_seller);
+CREATE INDEX idx_seller_star_count ON star_count(fk_seller);
+
 
 -- Trigger for Own.quantity
-
+-- It's used to make some complex transactions fail, so do NOT substitute it with a CHECK constraint
 CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -130,7 +149,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER check_quantity_zero_trigger
-AFTER UPDATE OF quantity ON owns
+AFTER INSERT OR UPDATE OF quantity ON owns
 FOR EACH ROW
 EXECUTE FUNCTION remove_if_quantity_zero();
 
