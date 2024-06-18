@@ -59,7 +59,7 @@ CREATE TABLE owns(
     id SERIAL PRIMARY KEY,
     fk_username VARCHAR(100),
     fk_book INTEGER NOT NULL,
-    quantity INTEGER NOT NULL CONSTRAINT quantity_ge_owns CHECK (quantity >= 0),
+    quantity INTEGER NOT NULL,
     state state NOT NULL,
     price INTEGER CONSTRAINT price_ge_owns CHECK (price >= 0),
     UNIQUE (fk_username, fk_book, state, price),
