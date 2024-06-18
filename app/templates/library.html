@@ -6,14 +6,6 @@
           href="{{ url_for('static', filename='css/book.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     {% from 'components/book.html' import display_book %}
     <div class="lib__container">
         <div class="lib__item">

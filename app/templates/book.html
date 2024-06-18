@@ -7,7 +7,6 @@
 {% endblock pagestyles %}
 {% block content %}
     {% from 'components/book.html' import display_book %}
-    <!-- TODO: metti banner -->
     <h1>{{ book.title }}</h1>
     <br>
     {{ display_book(book, link=False, label=True, title=False) }}

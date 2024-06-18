@@ -8,19 +8,6 @@
 {% endblock pagestyles %}
 
 {% block content %}
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div class="messages">
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-            <a class="close" href="/">&times;</a>
-        </div>
-        {% endif %}
-    {% endwith %}
-
     <form action="/profile" method="POST" class="form">
         <div class="form__title">
             Profile's Data
