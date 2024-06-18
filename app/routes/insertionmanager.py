@@ -12,8 +12,12 @@ from app.models.user import User
 from app.routes.auth import getLoggedInUser
 
 
-@app.route("/insertion/", methods=['GET', 'POST'])
+@app.route("/insertion/", methods=["GET", "POST"])
 def insertion() -> str | Response:
+    """
+    Debug function, now its here just to redirect traffic
+    if its needed
+    """
     return redirect("/library")
     usr: User | None = getLoggedInUser()
     if usr is None:
@@ -39,6 +43,9 @@ def insertion() -> str | Response:
 
 @app.route("/insertion/update/", methods=["GET"])
 def getInsertionUpdateForm() -> str | Response:
+    """
+    Provide the update form prepopulated with the exisitng values
+    """
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
@@ -50,7 +57,9 @@ def getInsertionUpdateForm() -> str | Response:
     quantity: str | None = request.args.get("quantity")
     oldprice: str | None = request.args.get("oldprice")
     if book is None or bookstate is None or quantity is None or oldprice is None:
-        return redirect("/insertion")
+        return redirect(
+            "/insertion"
+        )  # if some parameters are missing return the insertion page
     return render_template(
         "updateinsertion.html",
         user=usr,
@@ -63,6 +72,9 @@ def getInsertionUpdateForm() -> str | Response:
 
 @app.route("/insertion/list/", methods=["GET"])
 def getInsertionListForm() -> str | Response:
+    """
+    Provide the list form
+    """
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
@@ -72,7 +84,9 @@ def getInsertionListForm() -> str | Response:
     book: str | None = request.args.get("book")
     bookstate: str | None = request.args.get("bookstate")
     if book is None or bookstate is None:
-        return redirect("/insertion")
+        return redirect(
+            "/insertion"
+        )  # if some parameters are missing return the insertion page
     return render_template(
         "listinsertion.html", user=usr, book=book, bookstate=bookstate
     )
@@ -80,6 +94,7 @@ def getInsertionListForm() -> str | Response:
 
 @app.route("/insertion/unlist/", methods=["GET"])
 def getInsertionUnListForm() -> str | Response:
+    """Provide the unlisting form"""
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
@@ -89,7 +104,9 @@ def getInsertionUnListForm() -> str | Response:
     book: str | None = request.args.get("book")
     bookstate: str | None = request.args.get("bookstate")
     if book is None or bookstate is None:
-        return redirect("/insertion")
+        return redirect(
+            "/insertion"
+        )  # if some parameters are missing return the insertion page
     return render_template(
         "unlistinsertion.html", user=usr, book=book, bookstate=bookstate
     )
@@ -97,17 +114,21 @@ def getInsertionUnListForm() -> str | Response:
 
 @app.route("/insertion/update/", methods=["POST"])
 def updatebook() -> str | Response:
+    """
+    Once all the updated information are provided, update the corresponding
+    insertion on the database
+    """
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/")
 
     if not usr.seller:
-        flash("Your account is not a seller account, so you cant update an insertion")
+        flash("Your account is not a seller account, so you can't update an insertion")
         return redirect("/library")
 
     (oldPriceBooks, newPriceBooks, quantity, oldprice, newprice) = retriveExistingBooks(
         usr
-    )
+    )  # get the currently existing insertions and books
     if quantity is None or oldprice is None:
         flash(
             "Missing parameters, be sure to compile them (if the new price is not compiled, "
@@ -123,7 +144,7 @@ def updatebook() -> str | Response:
         flash("Invalid quantity")
         return redirect("/insertion")
 
-    if newprice is None:
+    if newprice is None:  # if the price is None, remove the book
         insState: Tuple[str, bool] = manageInsertion(
             usr, newPriceBooks, oldPriceBooks, quantity, oldprice, False
         )
@@ -132,11 +153,11 @@ def updatebook() -> str | Response:
             return redirect("/insertion")
     else:
         try:
-            # if an insertion with the same price exists already
+            # if an insertion with the same price already exists
             if newPriceBooks is not None:
-                newPriceBooks.quantity += quantity
+                newPriceBooks.quantity += quantity  # add the new quantity
             else:
-                db.session.add(
+                db.session.add(  # create a new insertion if there wasn't an existing one
                     Own(
                         usr.username,
                         oldPriceBooks.fk_book,
@@ -162,10 +183,12 @@ def listbook() -> str | Response:
         return redirect("/login/")
 
     if not usr.seller:
-        flash("Your account is not a seller account, so you cant list and insertion")
+        flash("Your account is not a seller account, so you can't list an insertion")
         return redirect("/library")
 
-    (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
+    (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(
+        usr
+    )  # get the books owned by the user (including the ones that are being sold)
     if quantity is None or price is None:
         flash("Missing parameters, be sure to compile them all")
         return redirect("/insertion")
@@ -174,7 +197,9 @@ def listbook() -> str | Response:
         flash("You don't own the selected book")
         return redirect("/insertion")
 
-    if ownedBook.quantity < quantity or quantity <= 0:
+    if (
+        ownedBook.quantity < quantity or quantity <= 0
+    ):  # check if the quantity is right and sufficient
         flash(
             f"You dont have enough books to sell ('{quantity}' when {ownedBook.quantity} are avaiable )"
         )
@@ -182,7 +207,7 @@ def listbook() -> str | Response:
 
     insState: Tuple[str, bool] = manageInsertion(
         usr, ownedBook, ownedBookOnSale, quantity, price, True
-    )
+    )  # try to add the insertion
     if not insState[1]:
         flash("An error occured during insertion's creation/update: " + insState[0])
         return redirect("/insertion")
@@ -200,7 +225,9 @@ def unlistbook() -> str | Response:
         flash("Your account is not a seller account, so you can't unlist an insertion")
         return redirect("/library")
 
-    (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(usr)
+    (ownedBook, ownedBookOnSale, quantity, price) = retriveBooks(
+        usr
+    )  # get the currently existing insertions and books
     if quantity is None or price is None:
         flash("Missing parameters, be sure to compile them all")
         return redirect("/insertion")
@@ -209,7 +236,9 @@ def unlistbook() -> str | Response:
         flash("You aren't selling the selected book")
         return redirect("/insertion")
 
-    if ownedBookOnSale.quantity < quantity or quantity <= 0:
+    if (
+        ownedBookOnSale.quantity < quantity or quantity <= 0
+    ):  # check if the quantity is right and sufficient
         flash(
             f"You dont have enough books to unlist ('{quantity}' when {ownedBookOnSale.quantity} are avaiable )"
         )
@@ -217,7 +246,7 @@ def unlistbook() -> str | Response:
 
     insState: Tuple[str, bool] = manageInsertion(
         usr, ownedBook, ownedBookOnSale, quantity, price, False
-    )
+    )  # try to remove the insertion
     if not insState[1]:
         flash(f"An error occured during insertion's deletion/update: {insState[0]}")
         return redirect("/insertion")
@@ -227,7 +256,7 @@ def unlistbook() -> str | Response:
 
 def retriveBooks(usr: User) -> tuple[Own | None, Own | None, int | None, int | None]:
     """
-    Returns the books owned by the user divided in not selling and slelling ones,
+    Returns the books owned by the user divided in not selling and selling ones,
     the quantity requested by the user and the specified price
     """
     book: str | None = request.form.get("book") or None
@@ -236,21 +265,16 @@ def retriveBooks(usr: User) -> tuple[Own | None, Own | None, int | None, int | N
     price: int | None = request.form.get("price", type=int) or None
 
     if book is None or bookstate is None or quantity is None or price is None:
-        return (None, None, None, None)
+        return (None, None, None, None)  # if not all the parameters are populated
 
-    book = str(book)
-    bookstate = str(bookstate)
-    quantity = int(quantity)
-    price = int(price)
-
-    ownedBook: Own | None = db.session.scalar(
+    ownedBook: Own | None = db.session.scalar(  # books that are not being sold
         sq.select(Own)
         .where(Own.fk_username == usr.username)
         .where(Own.fk_book == book)
         .where(Own.state == bookstate)
         .where(Own.price == None)
     )
-    ownedBookOnSale: Own | None = db.session.scalar(
+    ownedBookOnSale: Own | None = db.session.scalar(  # books that are being sold
         sq.select(Own)
         .where(Own.fk_username == usr.username)
         .where(Own.fk_book == book)
@@ -264,7 +288,7 @@ def retriveExistingBooks(
     usr: User,
 ) -> tuple[Own | None, Own | None, int | None, int | None, int | None]:
     """
-    Returns the books owned by the user divided in not selling and slelling ones,
+    Returns the books owned by the user divided in not selling and selling ones,
     the quantity requested by the user and the specified old and new prices
     """
     book: str | None = request.form.get("book") or None
@@ -276,14 +300,14 @@ def retriveExistingBooks(
     if book is None or bookstate is None or quantity is None or oldprice is None:
         return (None, None, None, None, None)
 
-    oldPriceBooks: Own | None = db.session.scalar(
+    oldPriceBooks: Own | None = db.session.scalar(  # books with old price
         sq.select(Own)
         .where(Own.fk_username == usr.username)
         .where(Own.fk_book == book)
         .where(Own.state == bookstate)
         .where(Own.price == oldprice)
     )
-    newPriceBooks: Own | None = db.session.scalar(
+    newPriceBooks: Own | None = db.session.scalar(  # books with new price
         sq.select(Own)
         .where(Own.fk_username == usr.username)
         .where(Own.fk_book == book)
@@ -315,13 +339,13 @@ def manageInsertion(
 
     opreatinMsg: str
     try:
-        if add and ownedBook is not None:  # selling books
-            if ownedBook.quantity == quantity:
-                if ownedBookOnSale is not None:
+        if add and ownedBook is not None:  # creates/updates an insertion
+            if ownedBook.quantity == quantity:  # if all the books have to be sold
+                if ownedBookOnSale is not None:  # if an insertion already exists
                     ownedBookOnSale.quantity += quantity
                     opreatinMsg = f"Existing insertion has been updated with {{{quantity}}} more books, none remaining"
                 else:
-                    db.session.add(
+                    db.session.add(  # create a new insertion
                         Own(
                             usr.username,
                             ownedBook.fk_book,
@@ -331,13 +355,13 @@ def manageInsertion(
                         )
                     )
                     opreatinMsg = f"New insertion has been created with {{{quantity}}} books, none remaining"
-                db.session.delete(ownedBook)
-            else:
-                if ownedBookOnSale is not None:
+                db.session.delete(ownedBook)  # delete books that are't being sold
+            else:  # if some books won't be sold
+                if ownedBookOnSale is not None:  # if an insertion already exists
                     ownedBookOnSale.quantity += quantity
                     opreatinMsg = f"Existing insertion has been updated with {{{quantity}}} more books, some remain to sell"
                 else:
-                    db.session.add(
+                    db.session.add(  # create a new insertion
                         Own(
                             usr.username,
                             ownedBook.fk_book,
@@ -347,14 +371,14 @@ def manageInsertion(
                         )
                     )
                     opreatinMsg = f"New insertion has been created with {{{quantity}}} books, some remain to sell"
-                ownedBook.quantity -= quantity
-        elif not add and ownedBookOnSale is not None:  # removing books from insertion
-            if ownedBookOnSale.quantity == quantity:
-                if ownedBook is not None:
+                ownedBook.quantity -= quantity  # remove books that were not being sold
+        elif not add and ownedBookOnSale is not None:  # deletes/updates an insertion
+            if ownedBookOnSale.quantity == quantity:  # if all books won't be on sale
+                if ownedBook is not None:  # if books not on sale exist
                     ownedBook.quantity += quantity
                     opreatinMsg = f"Insertion has been deleted, {{{quantity}}} existing books added to library"
                 else:
-                    db.session.add(
+                    db.session.add(  # create record for books not on sale
                         Own(
                             usr.username,
                             ownedBookOnSale.fk_book,
@@ -364,14 +388,14 @@ def manageInsertion(
                         )
                     )
                     opreatinMsg = f"Insertion has been deleted, {{{quantity}}} new books added to library"
-                db.session.delete(ownedBookOnSale)
+                db.session.delete(ownedBookOnSale)  # remove all books on sale
 
-            else:
-                if ownedBook is not None:
+            else:  # if some books won't be removed
+                if ownedBook is not None:  # if books not on sale exist
                     ownedBook.quantity += quantity
                     opreatinMsg = f"{{{quantity}}} existing books moved to the library, some remain listed"
                 else:
-                    db.session.add(
+                    db.session.add(  # create record for books not on sale
                         Own(
                             usr.username,
                             ownedBookOnSale.fk_book,
@@ -381,7 +405,7 @@ def manageInsertion(
                         )
                     )
                     opreatinMsg = f"{{{quantity}}} new books moved to the library, some remain listed"
-                ownedBookOnSale.quantity -= quantity
+                ownedBookOnSale.quantity -= quantity  # remove books that are being sold
         else:
             db.session.rollback()
             return "Invalid state of owned/insertioned books passed to function", False
