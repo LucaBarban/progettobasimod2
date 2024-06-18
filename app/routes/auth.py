@@ -37,7 +37,7 @@ def login() -> str | Response:
     Example:
         return redirect("/login?link=/mylink")
     """
-    if request.method == "GET":
+    if request.method != "POST":
         link: str | None = request.args.get("link")
         link = "" if link is None else link
         return render_template("login.html", error="", link=link)
@@ -55,19 +55,23 @@ def login() -> str | Response:
 
     if len(dbUsers) == 0:
         # TODO: merge this check with the following one (security risk, debug only)
-        return render_template("login.html", error="I can't find you...")
+        return render_template("login.html", error="Specified user doesn't exist")
 
     if not bcrypt.check_password_hash(dbUsers[0].password, pwd):
-        return render_template("login.html", error="Wrong guess afaik")
+        return render_template("login.html", error="The password is wrong")
 
-    dbUsers[0].token = getNewToken()
+    dbUsers[0].token = (
+        getNewToken()
+    )  # create a new session token and save it on the database
     session["token"] = dbUsers[0].token
 
-    db.session.commit()
+    db.session.commit()  # commit the new token to the db
 
     rlink: str | None = request.form.get("link")
 
-    if rlink is not None and rlink != "":
+    if (
+        rlink is not None and rlink != ""
+    ):  # if a new lin has been provided, redirect to that
         return redirect(rlink)
     else:
         flash("You have successfully logged in")
@@ -95,10 +99,14 @@ class RegForm(FlaskForm):  # type: ignore
 
 @app.route("/register/", methods=["GET", "POST"])
 def register() -> str | Response:
-    if request.method == "GET":
+    """
+    Function used to provide the registration form to the user and
+    to validate his registration requests
+    """
+    if request.method != "POST":  # provide the normal registration page
         return render_template("register.html", regform=RegForm(), error="")
 
-    regform = RegForm(request.form)
+    regform = RegForm(request.form)  # load the form from its template
     regform.validate_on_submit()
 
     usr = request.form.get("usr") or None
@@ -115,18 +123,20 @@ def register() -> str | Response:
             error="You have to compile all the fields",
         )
 
-    usr = str(usr)  # prevent mypy from complaining
+    usr = str(usr)  # prevent mypy from complaining abount None values
     frname = str(frname)
     lsname = str(lsname)
     pwd = str(pwd)
     checkpwd = str(checkpwd)
 
+    # checking the username
     if not whitelistnum.match(usr) and len(usr) > 0:
         return render_template(
             "register.html",
             regform=regform,
             error="Username can only contain letters and numbers",
         )
+    # checking the name and surname
     for field in [frname, lsname]:
         if not whitelist.match(field) and len(field) > 0:
             return render_template(
@@ -134,7 +144,7 @@ def register() -> str | Response:
                 regform=regform,
                 error="The Name and the Surname must contain only letter",
             )
-
+    # checking password length and equality
     if len(pwd) < 8 or len(checkpwd) < 8:
         return render_template(
             "register.html",
@@ -142,28 +152,35 @@ def register() -> str | Response:
             error=f"Password/s fields must be at least {minPwdLen} characters long",
         )
     if pwd != checkpwd:
-        return render_template("register.html", regform=regform, error="Passwords must be the same")
+        return render_template(
+            "register.html", regform=regform, error="Passwords must be the same"
+        )
 
+    # check wether the username already exists
     dbUsers = db.session.scalars(sq.select(User).where(User.username == usr)).fetchall()
     if len(dbUsers) != 0:
-        return render_template("register.html", regform=regform, error="Username already taken")
+        return render_template(
+            "register.html", regform=regform, error="Username already taken"
+        )
 
-    newUsersToken: str = getNewToken()
-    db.session.add(
+    newUsersToken: str = getNewToken()  # generate a new session token
+    db.session.add(  # save the user to the database
         User(
             usr,
             frname,
             lsname,
-            str(bcrypt.generate_password_hash(pwd, bcryptRounds).decode("utf-8")),
+            str(
+                bcrypt.generate_password_hash(pwd, bcryptRounds).decode("utf-8")
+            ),  # generate salted password
             datetime.now(),
             datetime.now(),
             0,
-            seller == "y",
+            seller == "y",  # if the user has ticked the checkbox, make him a seller
             newUsersToken,
         )
     )
-    session["token"] = newUsersToken
-    db.session.commit()
+    session["token"] = newUsersToken  # save the token (user's side)
+    db.session.commit()  # save the changes into the database
 
     flash("You have successfully registered")
     return redirect("/")
@@ -171,16 +188,19 @@ def register() -> str | Response:
 
 @app.route("/logout/")
 def logout() -> str | Response:
+    """
+    Function used to delete the session token both client and server side
+    """
     loggedOut: bool = False
-    if session.get("token"):
-        users = db.session.scalars(
+    if session.get("token"):  # check if the users has already been logged out
+        users = db.session.scalars(  # find the user with the provided token
             sq.select(User).filter_by(token=session["token"])
         ).fetchall()
-        if len(users) == 1:
-            users[0].token = None
+        if len(users) == 1:  # if a user is found
+            users[0].token = None  # clear the token database side
             db.session.commit()
             loggedOut = True
-    session.clear()
+    session.clear()  # clear the token client side
     if loggedOut:
         flash("You have beem logged out successfully")
     return redirect("/")
@@ -188,6 +208,10 @@ def logout() -> str | Response:
 
 @app.errorhandler(CSRFError)
 def handle_csrf_error(e: CSRFError) -> tuple[str, int]:
+    """
+    If an error with the csrf token happends, be sure to display it with
+    a meaningful webpage
+    """
     return (
         render_template("error.html", errorName="CSRF Error", errorMsg=e.description),
         400,
@@ -195,6 +219,9 @@ def handle_csrf_error(e: CSRFError) -> tuple[str, int]:
 
 
 def getNewToken() -> str:
+    """
+    Helper function to generate a new token
+    """
     return "{" + secrets.token_hex(tokenSize) + "}"
 
 
@@ -214,14 +241,14 @@ def checkLoggedIn() -> bool:
         else:
             return render_template("index.html")
     """
-    if not session.get("token"):  # if a token already exists
+    if not session.get("token"):  # if the token doesn't exists
         return False
-    users = db.session.scalars(
+    users = db.session.scalars(  # get the user with the corresponding token
         sq.select(User).filter_by(token=session["token"])
     ).fetchall()
     if (
         len(users) != 1
-        or (
+        or (  # check if the token is still valid (1 day)
             datetime.combine(users[0].last_logged_in_at, datetime.min.time())
             - datetime.now()
         ).days
@@ -249,14 +276,14 @@ def getLoggedInUser() -> User | None:
             return render_template("index.html")
 
     """
-    if not session.get("token"):  # if a token already exists
+    if not session.get("token"):  # if the token doesn't exists
         return None
-    users = db.session.scalars(
+    users = db.session.scalars(  # get the user with the corresponding token
         sq.select(User).filter_by(token=session["token"])
     ).fetchall()
     if (
         len(users) != 1
-        or (
+        or (  # check if the token is still valid (1 day)
             datetime.combine(users[0].last_logged_in_at, datetime.min.time())
             - datetime.now()
         ).days

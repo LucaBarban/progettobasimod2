@@ -12,6 +12,9 @@ from ..safety import bcrypt
 
 @app.route("/profile/", methods=["GET", "POST"])
 def profile() -> str | Response:
+    """
+    Provide and process the user's information update form
+    """
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/?link=/profile/")
@@ -21,33 +24,36 @@ def profile() -> str | Response:
 
     err: bool = False
 
-    frname: str | None = request.form.get("frname")
+    frname: str | None = request.form.get("frname")  # get all the data
     lsname: str | None = request.form.get("lsname")
     pwd: str | None = request.form.get("pwd")
     rpwd: str | None = request.form.get("rpwd")
     balance: str | None = request.form.get("balance")
     seller: str | None = request.form.get("seller")
 
-    if pwd is not None and rpwd is not None and len(pwd) > 0 and len(rpwd) > 0:
+    if (
+        pwd is not None and rpwd is not None and len(pwd) > 0 and len(rpwd) > 0
+    ):  # check the password's presence and correctness
         if pwd != rpwd or len(pwd) < minPwdLen:
             err = True
             flash(
                 f"Password fields must be the same and at least {minPwdLen} characters long"
             )
-        else:
+        else:  # save the new salted and hashed password
             pwd = str(bcrypt.generate_password_hash(pwd, bcryptRounds).decode("utf-8"))
     elif (pwd is None or (pwd is not None and len(pwd) == 0)) and (
         pwd is None or (rpwd is not None and len(rpwd) == 0)
-    ):
+    ):  # if the fields are None or empty keep the current password
         pwd = usr.password
     else:
         err = True
         flash("Both password fields must be compiled to change the password")
 
+    # if the name has not changed, keep the old one
     frname = str(frname if frname is not None else usr.first_name)
     lsname = str(lsname if lsname is not None else usr.last_name)
 
-    if (
+    if (  # check if the name is a valid one
         len(frname) == 0
         or len(lsname) == 0
         or not whitelist.match(str(frname))
@@ -59,7 +65,7 @@ def profile() -> str | Response:
         )
 
     try:
-        if balance is not None and int(balance) < 0:
+        if balance is not None and int(balance) < 0:  # check the new balance
             err = True
             flash("The balance must be positive")
     except:
@@ -67,7 +73,8 @@ def profile() -> str | Response:
         flash("The balance must be a number")
 
     if (seller is not None and seller != "on") or seller is None:
-        seller = "off"
+        flash("You cannot downgrade your account's status")
+        seller = "off" # prevent the user from removing his seller's status
 
     if not err:
         usr.first_name = frname
