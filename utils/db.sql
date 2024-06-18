@@ -134,7 +134,7 @@ CREATE INDEX idx_seller_star_count ON star_count(fk_seller);
 
 
 -- Trigger for Own.quantity
-
+-- It's used to make some complex transactions fail, so do NOT substitute it with a CHECK constraint
 CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -149,7 +149,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER check_quantity_zero_trigger
-AFTER UPDATE OF quantity ON owns
+AFTER INSERT OR UPDATE OF quantity ON owns
 FOR EACH ROW
 EXECUTE FUNCTION remove_if_quantity_zero();
 
