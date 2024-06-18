@@ -67,8 +67,7 @@ CREATE TABLE owns(
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
 
-CREATE INDEX idx_book_own ON owns(fk_book);
-CREATE INDEX idx_own ON owns(fk_username, fk_book, state, price);
+CREATE INDEX idx_own ON owns(fk_book, fk_username, state);
 
 CREATE TABLE carts(
     fk_buyer VARCHAR(100),
