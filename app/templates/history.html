@@ -17,7 +17,7 @@
                 <div class="history__left">
                     <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }}) <br>
                     Status: {{ hst.status }} <br>
-                    Payed Price: {{ hst.price }} <br>
+                    Payed Price: {{ '%0.2f'|format(hst.price / 100) }} <br>
                     <img width=200 src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
                          onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
                 </div>

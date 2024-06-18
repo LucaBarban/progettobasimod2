@@ -37,7 +37,7 @@ def history() -> str | Response:
                     flash("You have already reviewed this book", "error")
                 else:
                     hsToUpd.review = rew # apply the provided review and stars
-                    hsToUpd.stars = int(rating)
+                    hsToUpd.stars = max(0, min(5, int(rating)))
                     db.session.commit()
             except exc.SQLAlchemyError:
                 db.session.rollback() # explicit rollback (users reviews are one of the most delicate

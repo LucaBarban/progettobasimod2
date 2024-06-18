@@ -66,7 +66,7 @@ def getInsertionUpdateForm() -> str | Response:
         book=book,
         bookstate=bookstate,
         quantity=quantity,
-        oldprice=oldprice,
+        oldprice=int(oldprice)/100,
     )
 
 
@@ -264,7 +264,8 @@ def retriveBooks(usr: User) -> tuple[Own | None, Own | None, int | None, int | N
     book: str | None = request.form.get("book") or None
     bookstate: str | None = request.form.get("bookstate") or None
     quantity: int | None = request.form.get("quantity", type=int) or None
-    price: int | None = request.form.get("price", type=int) or None
+    fprice: float | None  = request.form.get("price", type=float)
+    price: int | None = int(fprice*100) if fprice else None
 
     if book is None or bookstate is None or quantity is None or price is None:
         return (None, None, None, None)  # if not all the parameters are populated
@@ -296,8 +297,10 @@ def retriveExistingBooks(
     book: str | None = request.form.get("book") or None
     bookstate: str | None = request.form.get("bookstate") or None
     quantity: int | None = request.form.get("quantity", type=int) or None
-    oldprice: int | None = request.form.get("oldprice", type=int) or None
-    newprice: int | None = request.form.get("newprice", type=int) or None
+    foldprice: float | None = request.form.get("oldprice", type=float)
+    oldprice: int | None = int(foldprice*100) if foldprice else None
+    fnewprice: float | None = request.form.get("newprice", type=float) or None
+    newprice: int | None = int(fnewprice*100) if fnewprice else None
 
     if book is None or bookstate is None or quantity is None or oldprice is None:
         return (None, None, None, None, None)
