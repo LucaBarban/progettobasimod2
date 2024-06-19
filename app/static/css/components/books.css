@@ -16,6 +16,7 @@
 
 .book__meta {
     width: var(--cover-width);
+    color: rgba(0, 0, 0, 0.5);
 }
 
 .book__meta--author,
@@ -26,8 +27,5 @@
 
 .book__meta--title {
     font-weight: 500;
-}
-
-.book__meta--author {
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--main-foreground);
 }

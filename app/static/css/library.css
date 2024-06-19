@@ -1,71 +1,44 @@
-:root {
-    --library-border: #8B4513;
-    --library-separator: #6F4E37;
-    --detail-border: #0000ff;
-    --detail-background: #0000ff80;
-}
-
 .lib__container {
     display: flex;
     justify-content: center;
+    flex-direction: column;
 }
 
-.lib__item {
-    display: flex;
-    flex-direction: column;
-    min-width: 50%;
+.icon {
+    text-decoration: none;
+    color: var(--main-foreground);
+}
+
+.library__item {
+    font-size: var(--font-size);
+    font-weight: 500;
+    background: var(--accent-color);
+    color: var(--main-foreground);
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    margin: 5px;
+    background: #dddbd9;
+    display: grid;
+    padding-right: 20px;
+    padding-left: 20px;
 }
 
 .lib__library {
     padding: 20px;
-    border-radius: 30px;
     display: flex;
     justify-content: center;
-    flex-direction: row;
     flex-wrap: wrap;
 }
 
-.own__item {
-    text-align: center;
-    flex: 0 1 auto;
-}
-
-.own__details {
-    width: 100px;
-    position: absolute;
-}
-
-.detail__box {
-    border-radius: 10px;
-    border: 2px solid var(--detail-border);
-    background-color: var(--detail-background);
-    position: relative;
-    top: -65px;
-    left: 85px;
-}
-
-.lib__btn {
-    border-radius: 10px;
-    padding: 5px 10px;
-    margin: 5px;
-    color: #000;
+.button--current {
     background: var(--accent-color);
-    text-decoration: none;
 }
 
-.lib__disabled {
-    color: var(--accent-color);
+.button--noncurrent {
+    color: var(--yellow6);
+    border: 2px solid var(--yellow6);
     background: transparent;
-    border: 2px solid var(--accent-color);
     text-decoration: none;
-}
-
-.own__title {
-    margin: 10px;
-}
-
-.own__separator {
-    border: 10px solid var(--library-separator);
 }
 
 .lib__pagination {
@@ -73,22 +46,19 @@
     justify-content: center;
 }
 
-.lib__title {
-    text-align: center;
-}
-
-.lib__add {
+.centered-div {
     display: flex;
-    flex-direction: column;
     justify-content: center;
+    align-items: center;
+    padding: 10px;
 }
 
-.add__btn {
+.button--add {
     text-decoration: none;
     font-weight: bold;
     color: var(--main-foreground);
-    font-size: 50px;
+    font-size: 25px;
     padding: 0px 20px;
-    border: 5px solid var(--library-separator);
-    border-radius: 1000px;
+    background: var(--accent-color);
+    border-radius: var(--border-radius);
 }

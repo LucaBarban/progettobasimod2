@@ -66,3 +66,7 @@ body {
     margin: 5px;
     background: #dddbd9;
 }
+
+.page-title {
+    text-align: center;
+}
