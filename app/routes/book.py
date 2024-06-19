@@ -63,7 +63,7 @@ def get_insertions(
 
     insertions_sorted = sorted(
         insertions_list,
-        key=lambda item: star_sort(item[1], sort, order),
+        key=lambda item: star_sort(item[1], sort, order), # type: ignore
     )
 
     return insertions_sorted
@@ -179,7 +179,6 @@ def add() -> str | Response:
             publishers=publishers,
         )
 
-    isbn = str(isbnval.validate(isbn))
     state = str(state)
     book: Book
     author: Author | None = next(
@@ -206,9 +205,15 @@ def add() -> str | Response:
         )
 
     try:
-        selectedBook = db.session.scalars(sq.select(Book).where(Book.isbn == isbn)).fetchall()
+        selectedBook = db.session.scalars(sq.select(Book).where(
+            (Book.title == title) &
+            (Book.published == published) &
+            (Book.pages == pages) &
+            (Book.fk_author == authorid) &
+            (Book.fk_publisher == publishername)
+        )).fetchall()
         if len(selectedBook) == 0:
-            book = Book(title, published, pages, isbn, author, publisher, bookgenres)
+            book = Book(title, published, pages, str(isbnval.validate(isbn)) if isbn is not None else None, author, publisher, bookgenres)
             db.session.add(book)
             bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
         else:
