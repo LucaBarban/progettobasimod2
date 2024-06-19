@@ -1,34 +1,49 @@
 <div>
+    {% from 'components/book.html' import display_book_image %}
 
-    <div> Book: {{ order.book.title }} </div>
-    <div> To: {{ order.buyer.username }} </div>
-    <div> State: {{ order.state }} </div>
-    <div> Quantity: {{ order.quantity }} </div>
+    <h3 class="order__title"> {{ order.book.title }} </h3>
 
-    {% set statuses = ['processing', 'packing', 'shipped', 'on delivery', 'delivered'] %}
+    <div class="order">
+        <div class="order__book">
+            {{ display_book_image(order.book, link=False) }}
+        </div>
 
-    {% if delivered %}
-        {% if order.review %}
-            {{ order.buyer.username }} says: "{{ order.review }}"
-        {% else %}
-            Awaiting review...
-        {% endif %}
-    {% else %}
-        <form action="/orders/{{ order.id }}" method="POST">
-            <select name="status">
-                {% for status in statuses %}
-                    <option
-                        value="{{ status }}"
-                        {% if order.status == status %}
-                            selected
+        <div class="order__extra">
+            <div> To: {{ order.buyer.username }} </div>
+            <div> State: {{ order.state }} </div>
+            <div> Quantity: {{ order.quantity }} </div>
+
+            {% set statuses = ['processing', 'packing', 'shipped', 'on delivery', 'delivered'] %}
+
+            <div>
+                {% if delivered %}
+                    <div class="order__review">
+                        {% if order.review %}
+                            Review:
+                            <br/>
+                            <textarea disabled>"{{ order.review }}"</textarea>
+                        {% else %}
+                            Awaiting review...
                         {% endif %}
-                    >
-                        {{ status }}
-                    </option>
-                {% endfor %}
-            </select>
-            <input type="submit" value="Update" />
-        </form>
-    {% endif %}
-
+                    </div>
+                {% else %}
+                    <form action="/orders/{{ order.id }}" method="POST">
+                        <select name="status">
+                            {% for status in statuses %}
+                                <option
+                                    value="{{ status }}"
+                                    {% if order.status == status %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ status }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input class="order__submit" type="submit" value="Update" />
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>

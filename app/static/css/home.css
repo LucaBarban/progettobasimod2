@@ -22,29 +22,12 @@
     display: flex;
 }
 
-.button {
-    position: relative;
-    font-size: var(--font-size);
-    text-decoration: none;
-    overflow: hidden;
-    border-radius: 5px;
-    border: none;
-    padding: 8px 10px;
-    margin: 5px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .button--primary {
-    position: relative;
     background: var(--accent-color);
     color: var(--main-foreground);
 }
 
 .button--secondary {
-    position: relative;
     background: none;
     color: var(--accent-color);
     border-style: solid;

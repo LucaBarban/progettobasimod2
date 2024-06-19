@@ -3,31 +3,85 @@
 {% block pagestyles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seller.css') }}">
 {% endblock pagestyles %}
 
 {% block content %}
-    <div> Seller: {{ seller }} </div>
-    <div> Star: {{ seller.stars() }} </div>
-
-    <br/>
-
-    <div>
-    Insertions:
-    {% for insertion in insertions %}
-        <div> {{ insertion }} </div>
-        <a href="/book/{{ insertion.fk_book }}">
-            <img width="200"
-                 src="{{ url_for('static', filename='covers/' ~ insertion.fk_book ~ ".png") }}"
-                 onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
-        </a>
-    {% endfor %}
+    <div class="seller__title">
+        <h1> Seller {{ seller.username }} </h1>
+        {% with star = seller.stars() %}
+            {% if star %}
+                <span class="star-rating">
+                    {% for value in range(5, 0, -1) %}
+                        <input type="radio"
+                               id="rate-{{ seller.username }}-{{ value }}"
+                               value="{{ value }}"
+                               {% if star.vote >= value %}checked{% endif %}
+                               disabled>
+                        <label for="rate-{{ seller.username }}-{{ value }}">&#9734;</label>
+                    {% endfor %}
+                </span>
+                ( {{ star.total }} )
+            {% endif %}
+        {% endwith %}
     </div>
 
-    <div>
-    Reviews:
-    {% for review in reviews %}
-        <div> {{ review }} </div>
-    {% endfor %}
+    <div class="seller__books">
+        <h1> Books: </h1>
+        <hr>
+        <div class="seller__insertions">
+            {% for insertion in insertions %}
+                <div class="seller__info">
+                    <h3> {{ insertion.book.title }} </h3>
+                    <a href="/book/{{ insertion.fk_book }}">
+                        <img width="200"
+                             src="{{ url_for('static', filename='covers/' ~ insertion.fk_book ~ ".png") }}"
+                             onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
+                    </a>
+                    <div> {{ insertion.state }} x{{ insertion.quantity }} </div>
+                </div>
+            {% else %}
+                Nothing on sale for now
+            {% endfor %}
+        </div>
     </div>
+
+    {% if reviews|length != 0 %}
+        <div>
+            <h1> Reviews: </h1>
+            <hr>
+            <table class="seller__review">
+            {% for review in reviews %}
+                <tr>
+                    <td style="width: 40%">
+                        <div class="seller__review__left">
+                            {{ review.buyer.username }}
+                            {% with star = review.stars %}
+                                {% if star %}
+                                    <span class="star-rating">
+                                        {% for value in range(5, 0, -1) %}
+                                            <input type="radio"
+                                                   id="rate-{{ review.buyer.username }}-{{ value }}"
+                                                   value="{{ value }}"
+                                                   {% if star >= value %}checked{% endif %}
+                                                   disabled>
+                                            <label for="rate-{{ review.buyer.username }}-{{ value }}">&#9734;</label>
+                                        {% endfor %}
+                                    </span>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                        <div>
+                            Bought "{{ review.book.title }}" ({{ review.state }})
+                        </div>
+                    </td>
+                    <td>
+                        <textarea disabled> {{ review.review }} </textarea>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    {% endif %}
 
 {% endblock content %}

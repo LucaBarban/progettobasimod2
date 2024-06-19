@@ -7,12 +7,13 @@
     <div class="navbar__searchbar">{% include 'components/searchbar.html' %}</div>
     <div class="navbar__box">
         {% if user %}
+            {% include 'components/cart_badge.html' %}
             {% include 'components/notifications_badge.html' %}
-            <span class="navbar__user">hi {{ user.username }}</span>
-            <a href="/logout" class="navbar__button">Logout</a>
+            <a class="navbar__user" href="/profile">{{ user.username }}</a>
+            <a href="/logout" class="button">Logout</a>
         {% else %}
-            <a href="/login" class="navbar__button">SignIn</a>
-            <a href="/register" class="navbar__button">SignUp</a>
+            <a href="/login" class="button">SignIn</a>
+            <a href="/register" class="button">SignUp</a>
         {% endif %}
     </div>
 </header>

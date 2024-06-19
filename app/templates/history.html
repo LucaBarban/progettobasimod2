@@ -17,6 +17,7 @@
                 <div class="history__left">
                     <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }}) <br>
                     Status: {{ hst.status }} <br>
+                    State: {{ hst.state }} <br>
                     Payed Price: {{ '%0.2f'|format(hst.price / 100) }} <br>
                     <img width=200 src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
                          onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
@@ -35,7 +36,7 @@
 
                             <label for="review">Review:</label><br>
                             <textarea id="review" name="review"></textarea><br>
-                            <input type="submit" class="history__button" value="Send Review">
+                            <input type="submit" class="button" value="Send Review">
                         </form>
                     {% else %}
                         <p>Rating: <span class="star-rating">

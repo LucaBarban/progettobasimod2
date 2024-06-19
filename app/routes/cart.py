@@ -22,12 +22,14 @@ def cart_get(user: User, err: str | None = None) -> str:
 
     total = sum([item.own.price * item.quantity for item in items])  # type: ignore
 
+    if err is not None:
+        flash(err, "error")
+
     return render_template(
         "cart.html",
         items=items,
         user=user,
         total=total,
-        error=err,
     )
 
 
@@ -74,7 +76,7 @@ def add_library(own: Own, user: User, quantity: int) -> None:
     db.session.commit()
 
 
-def cart_post(user: User) -> str:
+def cart_post(user: User) -> str | Response:
     own_ids = request.form.getlist("own")
 
     price_total = 0
@@ -130,7 +132,8 @@ def cart_post(user: User) -> str:
         db.session.rollback()
         return cart_get(user, "An error occoured")
 
-    return "<h1>All Good</h1>"
+    flash("Your order has been confirmed", "success")
+    return redirect("/history")
 
 
 @app.route("/cart/", methods=["GET", "POST"])
