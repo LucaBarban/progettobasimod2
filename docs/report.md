@@ -219,13 +219,63 @@ Per quanto rispecchi in parte la sua [entità](#entità-books), questa tabella v
 - `fk_publisher`: chiave esterna, come richiesto dalla relazione [`pubblicato da`](#relazione-pubblicato-da), quindi diventa `REFERENCES publishers(name)` e ne mantiene il tipo `TEXT`
 
 ### Tabella `booksgenres`
-### Tabella `users`
-### Tabella `owns`
-### Tabella `carts`
-### Tabella `history`
-### Tabella `notifications`
+Questa tabella rappresenta la relazione [`appartiene`](#relazione-appartiene), che è una `n-n`. Ne consegue che abbia come attributi:
+- `fk_idB`: chiave esterna di `books(id)` con tipo `INTEGER` e anche parte della chiave primaria
+- `fk_genre`: chiave esterna di `genres(name)` con tipo `TEXT` e anche parte della chiave primaria
 
-Progettazione Concettuale e Logica della basi di dati opportunamente spiegate e motivate La presentazione deve seguire la notazione grafica introdotta nel Modulo 1 del corso.
+### Tabella `users`
+La seguente tabella rispecchia fedelmente la struttura di [`Users`](#entità-users), per cui ha i seguenti attributi:
+- `username`: nome utente identificativo, ha quindi tipo `VARCHAR(100)` ed è `PRIMARY KEY`
+- `first_name`: nome dell'utente, ha tipo `VARCHAR(255)` e non può essere vuoto (`NOT NULL`)
+- `last_name`: cognome dell'utente, ha tipo `VARCHAR(255)` e non può essere vuoto (`NOT NULL`)
+- `password`: ha tipo `TEXT`, in modo da poter supportare cambiamenti dell'algoritmo di hashing e salting con dimensioni dell'hash differenti. Ovviamente è `NOT NULL`
+- `created_at`: `TIMESTAMP` della creazione, deve essere `NOT NULL`
+- `balance`: centesimi presenti all'interno dell'account, per cui è `INTEGER` ed è `NOT NULL`. Essendo che deve essere rispettata l'invariante, viene aggiunto il seguente controllo: `CONSTRAINT balance_ge CHECK (balance >= 0)`
+- `seller`: flag che sta ad indicare se l'account è abilitato a vendere prodotti, quindi ha tipo `BOOLEAN` ed è `NOT NULL`
+- `last_logged_in_at`: orario in cui è stato fatto l'ultimo login, ha tipo `TIMESTAMP WITHOUT TIME ZONE` in modo da avere un oriario consistente tra tutti gli utenti, per quanto ci sia il server flask di mezzo, ed è `NOT NULL`
+- `token`: token di autenticazione generato a tempo di login, ha tipo `CHARACTER(64)[]` e può essere `NULL` (in tal caso non esite un token valido)
+
+### Tabella `owns`
+La tabella segue la struttura della realzione [`own`](#relazione-own), collegandosi a [`Users`](#entità-users) e a [`Books`](#entità-books). Per questo ha i seguenti attributi:
+- `id`: identificativo dell'oggetto posseduto (rappresenta il libro/i fisico, non il "modello" astratto presente in [`Books`](#entità-books)). Per questo è `SERIAL` ed è anche `PRIMARY KEY`
+- `fk_username`: chiave esterna che si riferisce al possessore del libro/i, per questo è un `VARCHAR(100)`, è `NOT NULL` e si riferisce a `users(username)`
+- `fk_book`: chiave esterna del "modello" del libro, per questo ha tipo `INTEGER`, è `NOT NULL` e si riferisce a `books(id)`
+- `quantity`: indica la quantità di libri posseduta, è quindi `INTEGER NOT NULL`. Non è presente un `CHECK` in quanto il controllo è eseguito da un [trigger](#trigger-remove_if_quantity_zero) che offre anche altre funzionalità.
+- `state`: stato fisico di "usura" dell'oggetto, ha un tipo custom `state` e deve essere `NOT NULL`
+- `price`: prezzo in centesimi che l'utente può decidere nel caso volesse vendere il libro, altrimenti è impostato a `NULL`. È quindi `INTEGER` e ha il constraint `price_ge_owns CHECK (price >= 0)`, al fine di evitare di poter mettere prezzi negativi
+
+È presente anche un ulteriore vincolo `UNIQUE(fk_username, fk_book, state, price)`, in modo da prevenire la presenza di più record di libri posseduti dallo stesso utente con lo stesso stato e prezzo
+
+### Tabella `carts`
+La tabella `carts` ricalca l'entità [`Carts`](#entità-carts), aggiungendo le relazioni [`possiede`](#relazione-possiede) e [`ha prodotti in`](#relazione-ha-prodotti-in). Per cui ha i seguenti attributi:
+- `fk_buyer`: chiave esterna che si riferisce all'utente compratore, ha quindi tipo `VARCHAR(100)` e fa parte della chiave primaria e referenzia `users(username)`
+- `fk_own`: chiave esterna del libro posseduto che l'utente è intenzionato a comprare, ha quindi tipo `INTEGER` e fa parte della chiave primaria e referenzia `owns(id)` andando a specificare `ON DELETE CASCADE`, in modo da rimuovere autoamticamente dal carrello un oggetto che viene esaurito
+- `quantity`: quantità di prodotto che l'utente è interessato a comprare, ha tipo `INTEGER`, è `NOT NULL` e ha il constraint `quantity_gt_carts CHECK (quantity > 0)`
+
+### Tabella `history`
+La tabella `history` segue la struttura dell'entità [`History`](#entità-history), aggiungendo le 
+- `id`: identificativo artificiale autoincrement, pre cui è `SERIAL` e `PRIMARY KEY` 
+- `date`: data di acquisto, quindi è `TIMESTAMP` ed anche `NOT NULL`
+- `quantity`: quantità di prodotti acquistata, quindi è `INTEGER`, `NOT NULL` e possiede il constraint `quantity_gt_history CHECK (quantity > 0)` che fa si che la quantità acquistabile non sia nulla o negativa
+- `status`: stato dell'ordine/spedizione, ha tipo custom `status` ed è `NOT NULL`
+- `price`: prezzo di acquisto in centesimi, è quindi `INTEGER`, `NOT NULL` e ha il constraint `price_ge_history CHECK (price >= 0)` che fa si che il prezzo sia positivo
+- `review`: recensione che l'utente può lasciare (non obligatoriamente e successivamente all'acquisto), ha tipo `TEXT`
+- `stars`: valutazione in stelle, ha tipo `INTEGER` e ha `CONSTRAINT stars_btw CHECK (stars IS NULL OR stars BETWEEN 0 AND 5)` che fa si che il numero di stelle sia compreso tra $1$ e $5$
+- `fk_buyer`: chiave esterna dell'utente che ha comprato, ha quindi tipo `VARCHAR(100)` e si riferisce a `users(username)`
+- `fk_seller`: chiave esterna che si riferisce all'utente venditore, ha quindi tipo `VARCHAR(100)` e si riferisce a `users(username)`
+- `fk_book`: chiave esterna che si riferisce al "modello" del libro comprato, ha quindi tipo `INTEGER` e si riferisce a `books(id)`
+- `state`: stato di usura del prodotto comprato, ha tipo custom `state`
+
+### Tabella `notifications`
+Questa tabella è frutto dell'unione di due entità: [`Notifications`](#entità-notifications) e [`Orders`](#entità-orders). Ha i seguenti attributi:
+- `id`: identificativo della notifica autoincrement, ha tipo `SERIAL` ed è `PRIMARY KEY`
+- `context`: tipo di notifica, ha tipo custom `disc_notif` ed è `NOT NULL`
+- `fk_username`: chiave esterna dell'utente a cui è destina ta la notifica, ha quindi tipo `VARCHAR(100)`, è `NOT NULL` e si riferisce a `users(username)`
+- `message`: messaggio della notifica, ha tipo `TEXT`
+- `archived`: flag usato a seguito della visualizzazione del messaggio, ha tipo `BOOLEAN` ed è `NOT NULL`
+- `fk_history`: riferimento all'eventuale ordine che ha subito un aggiornamento, ha tipo `INTEGER` e si riferisce a `history(id)`
+- `order_status_old`: ha tipo custom `status` ed indica il vecchio stato dell'ordine nel caso fosse stato aggiornato
+- `order_status_new`: ha tipo custom `status` ed indica il nuovo stato dell'ordine nel caso fosse stato aggiornato
 
 # Query Principali
 una descrizione di una selezione delle query più interessanti che sono state implementate all’interno dell’applicazione, utilizzando una sintassi SQL opportuna.
