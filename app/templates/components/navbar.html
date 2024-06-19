@@ -1,7 +1,7 @@
 <header class="navbar">
     <div class="navbar__box">
         <a class="navbar__logo" href="/">
-            <h3>LOGO</h3>
+            <img src="{{ url_for('static', filename='images/logo.svg') }}">
         </a>
     </div>
     <div class="navbar__searchbar">{% include 'components/searchbar.html' %}</div>
