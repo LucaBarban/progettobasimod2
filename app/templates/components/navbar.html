@@ -8,7 +8,7 @@
     <div class="navbar__box">
         {% if user %}
             {% include 'components/notifications_badge.html' %}
-            <span class="navbar__user">hi {{ user.username }}</span>
+            <a class="navbar__user" href="/profile">{{ user.username }}</a>
             <a href="/logout" class="navbar__button">Logout</a>
         {% else %}
             <a href="/login" class="navbar__button">SignIn</a>
