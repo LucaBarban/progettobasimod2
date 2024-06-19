@@ -20,20 +20,6 @@
     color: var(--main-foreground);
 }
 
-.navbar__button {
-    position: relative;
-    font-size: var(--font-size);
-    font-weight: 500;
-    background: var(--accent-color);
-    color: var(--main-foreground);
-    text-decoration: none;
-    overflow: hidden;
-    border-radius: var(--border-radius);
-    border: none;
-    padding: 8px 10px;
-    margin: 5px;
-}
-
 /* SEARCH BAR */
 
 .search-bar__input::placeholder,
