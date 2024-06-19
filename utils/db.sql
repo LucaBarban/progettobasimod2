@@ -191,7 +191,7 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
-     REFRESH MATERIALIZED VIEW star_count;
+    REFRESH MATERIALIZED VIEW star_count;
     RETURN NULL;
 END;
 $$;
@@ -200,3 +200,47 @@ CREATE TRIGGER trigger_user_rating
 AFTER INSERT OR UPDATE ON history
 FOR EACH STATEMENT
 EXECUTE PROCEDURE refresh_star_count();
+
+-- Trigger for seller
+
+CREATE OR REPLACE FUNCTION if_seller_is_seller()
+RETURNS TRIGGER
+AS $$
+BEGIN
+    IF EXISTS(SELECT 1 FROM users
+                WHERE users.username = NEW.fk_own
+                    AND users.seller) THEN
+        RETURN NEW;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_carts_owner
+BEFORE INSERT OR UPDATE ON carts
+FOR EACH ROW
+EXECUTE PROCEDURE if_seller_is_seller();
+
+-- Trigger for history notifications
+
+CREATE OR REPLACE FUNCTION check_notification()
+RETURNS TRIGGER
+AS $$
+BEGIN
+    IF NEW.fk_history IS NOT NULL AND NOT EXISTS(
+        SELECT 1 FROM history AS h
+            WHERE h.id = NEW.fk_history AND
+            NEW.fk_username = h.fk_buyer
+            ) THEN
+        RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_history_notifications
+BEFORE INSERT OR UPDATE ON notifications
+FOR EACH ROW
+EXECUTE FUNCTION check_notification();
+
