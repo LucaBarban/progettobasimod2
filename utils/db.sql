@@ -21,7 +21,8 @@ CREATE TABLE books (
     fk_author INTEGER,
     fk_publisher TEXT,
     FOREIGN KEY (fk_author) REFERENCES authors(id),
-    FOREIGN KEY (fk_publisher) REFERENCES publishers(name)
+    FOREIGN KEY (fk_publisher) REFERENCES publishers(name),
+    UNIQUE(isbn)
 );
 
 CREATE INDEX idx_title_books ON books(title);

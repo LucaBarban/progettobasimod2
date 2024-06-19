@@ -11,7 +11,7 @@ class Own(Base):
 
     id: Mapped[int] = mapped_column(Integer, Sequence("owns_id_seq"), primary_key=True)
     fk_username: Mapped[str] = mapped_column(ForeignKey(User.username))
-    fk_book: Mapped[str] = mapped_column(ForeignKey(Book.id))
+    fk_book: Mapped[int] = mapped_column(ForeignKey(Book.id))
     state: Mapped[str] = mapped_column(String)
     price: Mapped[int | None] = mapped_column(Integer, nullable=True)
     quantity: Mapped[int]
@@ -24,7 +24,7 @@ class Own(Base):
     def __init__(
         self,
         fk_username: str,
-        fk_book: str,
+        fk_book: int,
         state: str,
         price: int | None,
         quantity: int,
