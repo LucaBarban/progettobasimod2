@@ -39,7 +39,7 @@
 {% endmacro %}
 {% macro display_book(book, link=True, label=False, title=True, author=True, publisher=True, generes=True, isbn=True) %}
     <div class="book__container">
-        {{ display_book_image(book) }}
+        {{ display_book_image(book, link) }}
         <table class="book__meta">
             {{ display_book_metadata(book, label, title, author, publisher, generes, isbn) }}
         </table>

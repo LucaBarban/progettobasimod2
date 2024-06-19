@@ -122,11 +122,11 @@ def add() -> str | Response:
     selectedGenres: list[str] = request.form.getlist("genres")
 
     if title is None:
-        flash("The title has been found to be empty")
+        flash("The title has been found to be empty", "error")
     if published is None:
-        flash("The date of pubblication is invalid")
+        flash("The date of pubblication is invalid", "error")
     if pages <= 0:
-        flash("The number of pages is invalid")
+        flash("The number of pages is invalid", "error")
     isbres: bool = False
     if isbn is not None:
         try:
@@ -134,22 +134,22 @@ def add() -> str | Response:
         except:
             pass
     if not isbres:
-        flash("Provide a valid ISBN code (" + str(isbn) + ")")
+        flash("Provide a valid ISBN code (" + str(isbn) + ")", "error")
     if authorid is None:
-        flash("An author has to be set")
+        flash("An author has to be set", "error")
     if publishername is None:
-        flash("A publisher has to be set")
+        flash("A publisher has to be set", "error")
     if len(selectedGenres) == 0:
-        flash("Select at least one genre")
+        flash("Select at least one genre", "error")
     tmpfilename: str = ""
     if "file" not in request.files:
-        flash("Book's cover is missing")
+        flash("Book's cover is missing", "error")
     elif request.files["file"].filename == "":
-        flash("Select a file to upload as the book's cover")
+        flash("Select a file to upload as the book's cover", "error")
     else:
         tmpfilename = str(request.files["file"].filename)
         if "." in tmpfilename or tmpfilename.rsplit(".", 1)[-1].lower() != "png":
-            flash("Invalid file extension (it must be a png file)")
+            flash("Invalid file extension (it must be a png file)", "error")
             tmpfilename = ""
     if (
         title is None
@@ -185,7 +185,7 @@ def add() -> str | Response:
     bookcover = request.files["file"]
 
     if author is None or publisher is None:
-        flash("An unforeseen error occurred")
+        flash("An unforeseen error occurred", "error")
         return render_template(
             "addbook.html",
             user=usr,
@@ -200,13 +200,13 @@ def add() -> str | Response:
         db.session.flush()
         bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
         db.session.commit()
-        flash("Book added correctly")
+        flash("Book added correctly", "error")
     except exc.SQLAlchemyError:
         db.session.rollback()
-        flash("An error occured while adding the new book")
+        flash("An error occured while adding the new book", "error")
     except:
         db.session.rollback()
-        flash("An unhandled error occured while adding the new book")
+        flash("An unhandled error occured while adding the new book", "error")
 
     return render_template(
         "addbook.html", user=usr, genres=genres, authors=authors, publishers=publishers
@@ -222,16 +222,16 @@ def addgenre() -> str | Response:
     if request.method == "POST":
         genrename: str | None = request.form.get("name") or None
         if genrename is None:
-            flash("You must compile the genre field")
+            flash("You must compile the genre field", "error")
         else:
             try:
                 genre = Genre(genrename)
                 db.session.add(genre)
                 db.session.commit()
-                flash("Genre added correctly")
+                flash("Genre added correctly", "success")
             except exc.SQLAlchemyError:
                 db.session.rollback()
-                flash("An error occured while adding the new genre")
+                flash("An error occured while adding the new genre", "error")
 
             return redirect("/book/add/")
 
@@ -247,16 +247,16 @@ def addpublisher() -> str | Response:
     if request.method == "POST":
         publishername: str | None = request.form.get("name") or None
         if publishername is None:
-            flash("You must compile the publisher field")
+            flash("You must compile the publisher field", "error")
         else:
             try:
                 publisher = Publisher(publishername)
                 db.session.add(publisher)
                 db.session.commit()
-                flash("Publisher added correctly")
+                flash("Publisher added correctly", "success")
             except exc.SQLAlchemyError:
                 db.session.rollback()
-                flash("An error occured while adding the new publisher")
+                flash("An error occured while adding the new publisher", "error")
 
             return redirect("/book/add/")
 
@@ -274,7 +274,7 @@ def addauthor() -> str | Response:
         last_name: str | None = request.form.get("last_name") or None
 
         if first_name is None or last_name is None:
-            flash("You must compile all the fields")
+            flash("You must compile all the fields", "error")
         else:
             try:
                 if (
@@ -288,16 +288,16 @@ def addauthor() -> str | Response:
                     ).one_or_none()
                     is not None
                 ):
-                    flash("Author already exists")
+                    flash("Author already exists", "error")
                     return redirect("/book/add/author/")
 
                 author = Author(first_name, last_name)
                 db.session.add(author)
                 db.session.commit()
-                flash("Author added correctly")
+                flash("Author added correctly", "success")
             except exc.SQLAlchemyError:
                 db.session.rollback()
-                flash("An error occured while adding the new author")
+                flash("An error occured while adding the new author", "error")
 
             return redirect("/book/add/")
 

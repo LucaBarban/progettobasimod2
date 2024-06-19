@@ -2,20 +2,10 @@
 
 {% block addform %}
 
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for msg in messages %}
-            {{ msg }}<br>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
-
 <form action="/book/add/author/" method="post" class="form">
     <div class="form__title">
         <h1>Add a new Author to the System</h1>
     </div>
-
     <label for="first_name">First Name:</label>
     <input type="text" id="first_name" name="first_name" required><br><br>
 

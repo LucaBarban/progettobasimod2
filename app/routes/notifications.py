@@ -38,7 +38,7 @@ def read_notification(id: int) -> Response:
     if user is None:
         return redirect("/login?link=/notifications")
     elif notif is None or notif.fk_username != user.username:
-        flash("Notification not found")
+        flash("Notification not found", "error")
     else:
         notif.archived = True
         db.session.commit()

@@ -2,22 +2,10 @@
 
 {% block addform %}
 
-
-
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for msg in messages %}
-            {{ msg }}<br>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
-
 <form action="/book/add/" method="post" enctype=multipart/form-data class="form">
     <div class="form__title">
         <h1>Add a new Book to the System</h1>
     </div>
-
     <label for="title">Title:</label>
     <input type="text" id="title" name="title" required><br><br>
 

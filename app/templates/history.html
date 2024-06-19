@@ -7,15 +7,6 @@
 
 {% block content %}
     <h1>History</h1>
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}<br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     <div class="history__border">
         {% if hsts|length == 0 %}
             You havent bought any books, you can find them here :D

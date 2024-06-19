@@ -2,8 +2,7 @@ h1 {
     text-align: center;
 }
 
-hr {
-    border: 0;
+br {
     height: 20px;
 }
 
@@ -19,6 +18,22 @@ hr {
     margin-bottom: 10px;
 }
 
-.container {
-    background: #EDEBE8;
+.footer {
+    padding: 25px;
+    border-radius: var(--border-radius);
+    /*background: #cfcac4;*/
+    background: var(--secondary-background);
+}
+
+.insertions {
+    display: flex;
+    overflow: auto;
+}
+
+.insertion {
+    padding: 50px;
+    margin: 10px;
+    border-radius: var(--border-radius);
+    border: 5px;
+    /*background: #cccac8;*/
 }
