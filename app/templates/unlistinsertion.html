@@ -6,14 +6,6 @@
           href="{{ url_for('static', filename='css/form.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     <form action="/insertion/unlist/" method="POST" class="form">
         <div class="form__title">
             <h1>UnList Book</h1>
@@ -22,11 +14,10 @@
         <br>
         <input type="hidden" id="bookstate" name="bookstate" value="{{ bookstate }}">
         <br>
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity", min="0", value="0">
+        <input type="hidden" id="price" name="price" value="{{ price }}" step=".01">
         <br>
-        <label for="price">Price:</label>
-        <input type="number" id="price" name="price", min="0", value="0">
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="0" value="{{ quantity }}">
         <br>
         <input type="submit" value="Unlist">
     </form>

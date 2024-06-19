@@ -6,14 +6,6 @@
           href="{{ url_for('static', filename='css/book.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     {% from 'components/book.html' import display_book %}
     <div class="lib__container">
         <div class="lib__item">
@@ -33,7 +25,7 @@
                             <a class="lib__btn"
                                href="/insertion/update/?book={{ own.fk_book }}&bookstate={{ own.state }}&quantity={{ own.quantity }}&oldprice={{ own.price }}"> edit </a>
                             <a class="lib__btn"
-                               href="/insertion/unlist/?book={{ own.fk_book }}&bookstate={{ own.state }}">remove</a>
+                               href="/insertion/unlist/?book={{ own.fk_book }}&bookstate={{ own.state }}&quantity={{ own.quantity }}&price={{ own.price }}">remove</a>
                         {% elif own.user.seller %}
                             <a class="lib__btn"
                                href="/insertion/list/?book={{ own.fk_book }}&bookstate={{ own.state }}">create</a>

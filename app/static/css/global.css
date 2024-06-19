@@ -4,16 +4,46 @@
     box-sizing: border-box;
 }
 
-html {
-    background: var(--page-background);
-    color: var(--main-foreground);
+:root {
     --font-size: 16px;
     --font-sans-serif: "Roboto", sans-serif;
     --font-serif: "Roboto Slab", serif;
+    --border-radius: 5px;
+}
+
+html {
+    background: var(--page-background);
+    color: var(--main-foreground);
 }
 
 body {
     font-family: var(--font-sans-serif);
+}
+
+.message-box {
+    display: grid;
+    grid-template-columns: 5% 90% 5%;
+}
+
+.close-button {
+    text-decoration: none;
+}
+
+.message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.success {
+    background: var(--green4);
+    color: var(--green9);
+}
+
+.error {
+    background: var(--red4);
+    color: var(--red9);
 }
 
 .content {

@@ -6,14 +6,6 @@
           href="{{ url_for('static', filename='css/form.css') }}">
 {% endblock pagestyles %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     <form action="/insertion/update/" method="POST" class="form">
         <div class="form__title">
             <h1>Update Book</h1>
@@ -22,12 +14,12 @@
         <br>
         <input type="hidden" id="bookstate" name="bookstate" value="{{ bookstate }}">
         <br>
-        <input type="hidden" id="quantity" name="quantity", value="{{ quantity }}">
+        <input type="hidden" id="quantity" name="quantity" value="{{ quantity }}">
         <br>
-        <input type="hidden" id="oldprice" name="oldprice", value="{{ oldprice }}">
+        <input type="hidden" id="oldprice" name="oldprice" value="{{ oldprice }}", step=".01">
         <br>
         <label for="newprice">New Price:</label>
-        <input type="number" id="newprice" name="newprice", min="0", value="0">
+        <input type="number" id="newprice" name="newprice" min="0" value="0" step=".01">
         <br>
         <input type="submit" value="Update">
     </form>

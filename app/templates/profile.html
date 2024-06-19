@@ -8,19 +8,6 @@
 {% endblock pagestyles %}
 
 {% block content %}
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <div class="messages">
-            {% for msg in messages %}
-                {{ msg }}
-                <br>
-            {% endfor %}
-            <a class="close" href="/">&times;</a>
-        </div>
-        {% endif %}
-    {% endwith %}
-
     <form action="/profile" method="POST" class="form">
         <div class="form__title">
             Profile's Data
@@ -38,7 +25,7 @@
         <input type="password" id="rpwd" name="rpwd">
         <br>
         <label for="balance">Balance ;):</label>
-        <input type="number" id="balance" name="balance" min="0" value="{{ user.balance }}">
+        <input type="number" id="balance" name="balance" min="0" step="0.01" value="{{ user.balance / 100 }}">
         <br>
         <div class="checkbox__container">
             <label for="seller">Seller Account:</label>
