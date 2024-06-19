@@ -103,12 +103,15 @@ def getInsertionUnListForm() -> str | Response:
         return redirect("/library")
     book: str | None = request.args.get("book")
     bookstate: str | None = request.args.get("bookstate")
-    if book is None or bookstate is None:
+    price: str | None = request.args.get("price")
+    quantity: str | None = request.args.get("quantity")
+    if None in [book, bookstate, price, quantity]:
         return redirect(
             "/insertion"
         )  # if some parameters are missing return the insertion page
+    price = str(price) # prevent mypy from complaining
     return render_template(
-        "unlistinsertion.html", user=usr, book=book, bookstate=bookstate
+        "unlistinsertion.html", user=usr, book=book, bookstate=bookstate, price=int(price)/100, quantity=quantity
     )
 
 
