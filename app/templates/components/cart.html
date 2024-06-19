@@ -1,3 +1,50 @@
-<a href="/cart/">
-    <img src="{{ url_for('static', filename='images/cart.svg') }}" />
-</a>
+<table>
+    {% for item in items %}
+        <tr>
+            <td>
+                <img width="200"
+                     src="{{ url_for('static', filename='covers/' ~ item.own.book.id ~ ".png") }}"
+                     onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
+            </td>
+            <td>
+                <table class="cart__info">
+                    <tr>
+                        <td colspan="2" >
+                            <div class="cart__title">
+                                <h2>{{ item.own.book.title }}</h2>
+                                <a href="/cart/remove/{{ item.own.id }}">&#x2715</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Seller</td>
+                        <td>{{ item.own.user.username }}</td>
+                    </tr>
+                    <tr>
+                        <td>State</td>
+                        <td>{{ item.own.state }}</td>
+                    </tr>
+                    <tr>
+                        <td>Quantity:</td>
+                        <td>
+                            <input type="number"
+                               name="quantity-{{ item.own.id }}"
+                               value="{{ item.quantity }}"
+                               min="1"
+                               max="10" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Available</td>
+                        <td>{{ item.own.quantity }}</td>
+                    </tr>
+                    <tr>
+                        <td>Price</td>
+                        <td>{{ '%0.2f'|format(item.own.price / 100) }}</td>
+                    </tr>
+                </table>
+                <input type="hidden" name="own" value="{{ item.own.id }}" />
+            </td>
+        </tr>
+    {% endfor %}
+</table>

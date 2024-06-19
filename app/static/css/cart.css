@@ -1,0 +1,36 @@
+.cart__info {
+    margin: 0px 20px;
+}
+
+.cart__title {
+    display:flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.cart__title a {
+    text-decoration: none;
+    color: #000;
+    font-size: 24px;
+}
+
+.cart__info td {
+    padding: 5px;
+}
+
+.cart__buy {
+    width: 30%;
+    vertical-align: top;
+    padding: 50px;
+}
+
+.cart__buy div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.cart__total {
+    font-size: 24px;
+    font-weight: 500;
+}
