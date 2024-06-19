@@ -7,6 +7,7 @@
     <div class="navbar__searchbar">{% include 'components/searchbar.html' %}</div>
     <div class="navbar__box">
         {% if user %}
+            {% include 'components/cart.html' %}
             {% include 'components/notifications_badge.html' %}
             <a class="navbar__user" href="/profile">{{ user.username }}</a>
             <a href="/logout" class="navbar__button">Logout</a>
