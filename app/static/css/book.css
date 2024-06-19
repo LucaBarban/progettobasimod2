@@ -21,7 +21,6 @@ br {
 .footer {
     padding: 25px;
     border-radius: var(--border-radius);
-    /*background: #cfcac4;*/
     background: var(--secondary-background);
 }
 
@@ -31,9 +30,37 @@ br {
 }
 
 .insertion {
-    padding: 50px;
+    padding: 20px;
     margin: 10px;
     border-radius: var(--border-radius);
     border: 5px;
-    /*background: #cccac8;*/
+}
+
+.insertion__header {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.book__insertion {
+    margin: 20px;
+}
+
+.insertion__quantity {
+    font-size: var(--font-size);
+    padding: 4px 0px;
+}
+
+.insertion__add {
+    font-size: var(--font-size);
+    font-weight: 500;
+    background: var(--accent-color);
+    color: #000;
+    text-decoration: none;
+    overflow: hidden;
+    border-radius: 5px;
+    border: none;
+    padding: 8px 10px;
+    margin: 5px;
+    cursor: pointer;
 }
