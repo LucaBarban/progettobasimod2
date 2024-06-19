@@ -1,6 +1,7 @@
 # Tabella dei Contenuti
 1. [Introduzione](#introduzione)
 2. [Funzionalità Principali](#funzionalità-principali)
+3. [Progettazione Concettuale e Logica](#progettazione-concettuale-e-logica)
     1. [Entità](#entità)
         1. [Sistema di Autenticazione](#sistema-di-autenticazione)
         2. [Visualizzazione singolo Libro e relative Inserzioni](#visualizzazione-singolo-libro-e-relative-inserzioni)
@@ -15,9 +16,19 @@
         11. [Gestione della Ricerca](#gestione-della-ricerca)
         12. [Visualizzazione Venditore](#visualizzazione-venditore)
     2. [Relazioni](#relazioni)
+        1. [afferisce](#afferisce)
+        2. [own](#own)
+        3. [appartiene](#appartiene)
+        4. [scritto da](#scritto-da)
+        5. [pubblicato da](#pubblicato-da)
+        6. [contiene](#contiene)
+        7. [possiede](#possiede)
+        8. [riguarda](#riguarda)
+        9. [ha prodotti in](#ha-prodotti-in)
+        10. [é riferito in](#é-riferito-in)
+        111. [si riferisce a](#si-riferisce-a)
     3. [Schema ER Risultante](#schema-er-risultante)
     4. [Rappresentazione Logica](#rappresentazione-logica)
-3. [Progettazione Concettuale e Logica](#progettazione-concettuale-e-logica)
 4. [Query Principali](#query-principali)
 5. [Scelte Progettuali](#scelte-progettuali)
 6. [Ulteriori informazioni](#ulteriori-informazioni)
@@ -118,7 +129,17 @@ Enità che specializza `Notifications` al fine di contenere maggiori informazion
 - `status_new`: nuovo stato della spedizione
 
 ## Relazioni
-###
+### afferisce
+### own
+### appartiene
+### scritto da
+### pubblicato da
+### contiene
+### possiede
+### riguarda
+### ha prodotti in
+### é riferito in
+### si riferisce a
 
 ## Schema ER Risultante
 ![Schema ER](./database_ER.png)
