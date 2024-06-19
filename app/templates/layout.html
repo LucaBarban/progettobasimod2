@@ -19,10 +19,11 @@
     </head>
     <body class="{{ template }}">
         {% include 'components/messages.html' %}
-        {% include 'components/navbar.html' %}
-        <div class="content">
-            {% block content %}{% endblock %}
-        </div>
+        <form action="/search/" method="POST" class="search-bar">
+            {% include 'components/navbar.html' %}
+            {% block filters %}{% endblock %}
+        </form>
+        <div class="content">{% block content %}{% endblock %}</div>
     </body>
     {% block scripts %}{% endblock %}
 </html>
