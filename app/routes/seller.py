@@ -17,8 +17,10 @@ def seller(username: str) -> str:
         sq.select(User).filter(User.username == username, User.seller == True)
     )
 
-    reviews = db.session.query(History).filter(
-        History.fk_seller == username, History.review != None
+    reviews = (
+        db.session.query(History)
+        .filter(History.fk_seller == username, History.review != None)
+        .all()
     )
 
     insertions = (
