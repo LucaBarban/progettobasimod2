@@ -49,7 +49,12 @@
         8. [Tabella `carts`](#tabella-carts)
         9. [Tabella `history`](#tabella-history)
         10. [Tabella `notifications`](#tabella-notifications)
-4. [Query Principali](#query-principali)
+4. [Query Interessanti](#query-interessanti)
+    1. [Query 1](#query-1)
+    2. [Query 2](#query-2)
+    3. [Query 3](#query-3)
+    4. [Query 4](#query-4)
+    5. [Query 5](#query-5)
 5. [Scelte Progettuali](#scelte-progettuali)
 6. [Ulteriori informazioni](#ulteriori-informazioni)
 7. [Contributo al Progetto](#contributo-al-progetto)
@@ -277,8 +282,112 @@ Questa tabella è frutto dell'unione di due entità: [`Notifications`](#entità-
 - `order_status_old`: ha tipo custom `status` ed indica il vecchio stato dell'ordine nel caso fosse stato aggiornato
 - `order_status_new`: ha tipo custom `status` ed indica il nuovo stato dell'ordine nel caso fosse stato aggiornato
 
-# Query Principali
-una descrizione di una selezione delle query più interessanti che sono state implementate all’interno dell’applicazione, utilizzando una sintassi SQL opportuna.
+# Query Interessanti
+Avendo utilizzato il più possibile le features di SQLALchemy, come l'ORM, non abbiamo alcuna query scritta direttamente in SQL, se non per lo script di inizializzazione del database (`db.sql`) e lo script di inserzione dei dati di prova (`insert.sql`). Per questo motivo alcune query verranno convertite da python a SQL.
+
+## Query 1 
+La seguente query l'abbiamo usata per creare un tipo di dato custom, al fine di facilitare la scrittura delle tabelle, oltre ad avere anceh il vantaggio della presenza di un controllo automatico dei dati da noi inseriti
+```postgresql
+CREATE TYPE state AS ENUM ('new', 'as new', 'used');
+```
+
+## Query 2
+La seguente query è stata presa da `library.py`, e ha il compito di recuperare del database i libri posseduti dall'utente andando limitare il numero di risultati con lo scopo di averne solo un certo numero per pagina, il quale numero determinerà anche l'offset
+```python
+db.session.scalars(
+        sq.select(Own)
+        .filter(Own.fk_username == user.username)
+        .limit(limit)
+        .offset((page - 1) * limit)
+    ).all()
+```
+e può essere tradotta come segue (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
+```postgresql
+SELECT owns.id, owns.fk_username, owns.fk_book, owns.state, owns.price, owns.quantity 
+FROM owns 
+WHERE owns.fk_username = _user.username_
+LIMIT _limit_ OFFSET _(page-1)*limit_
+```
+
+## Query 3
+Questa query è stata presa da `book.py`, e ha lo scopo di recuperare le inserzioni (lo capiamo da `Own.price != None`) per un determinato libro (`Own.fk_book == id`) che non appartengono all'utente (`Own.fk_username != username`)
+```python
+db.session.query(Own)
+        .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
+        .order_by(Own.fk_username)
+        .all()
+```
+In SQL la query sarebbe stata (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
+```postgresql
+SELECT owns.id, owns.fk_username, owns.fk_book, owns.state, owns.price, owns.quantity 
+FROM owns 
+WHERE owns.fk_book = _book.id_ AND owns.price IS NOT NULL AND owns.fk_username != _username_ ORDER BY owns.fk_username
+```
+
+## Query 4
+La seguente query è stata estratta da `history.py`, e ha lo scopo di caricare tutti gli acquisti che sono stati effettuati dall'utente loggato (motivo di `History.fk_buyer == usr.username`), andandoli ad ordinare in ordine cronologico decrescente (questo lo si fa tramite l'id facendo `.order_by(History.id.desc()`)
+```python
+db.session.scalars(
+        sq.select(History)
+        .where(History.fk_buyer == usr.username)
+        .order_by(History.id.desc())
+```
+La query in linguaggio SQL sarebbe stata (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
+```postgresql
+SELECT history.id, history.date, history.quantity, history.status, history.price, history.review, history.stars, history.fk_buyer, history.fk_seller, history.fk_book, history.state 
+FROM history 
+WHERE history.fk_buyer = _user.username_ ORDER BY _History.id_ DESC
+```
+
+## Query 5
+La seguente query ha lo scopo di recuperare i libri filtrati secondo diversi criteri:
+- titolo (`Book.title.icontains(input.search)`)
+- nome dell'autore (`Book.author.has(Author.first_name.icontains(input.search))`)
+- cognome dell'autore (`Book.author.has(Author.last_name.icontains(input.search))`)
+- casa pubblicatrice (`Book.publisher.has(Publisher.name.icontains(input.search))`)
+L'utilizzo dell'`or_` permette il funzionamento simultaneo di tutti i filtri. Il risultato della query verrà, in realtà, successivamente rifinito in base ai filtri ulteriori richiesti dall'utente tramite l'aggiunta di ulteriori `WHERE`. Di seguito un esempio
+```python
+query = db.session.query(Book).filter(
+        or_(
+            Book.title.icontains(input.search),
+            Book.author.has(Author.first_name.icontains(input.search)),
+            Book.author.has(Author.last_name.icontains(input.search)),
+            Book.publisher.has(Publisher.name.icontains(input.search)),
+        )
+    )
+
+    if len(input.genres):
+        query = query.filter(Book.genres.any(Genre.name.in_(input.genres)))
+
+    if len(input.publishers):
+        query = query.filter(Book.publisher.has(Publisher.name.in_(input.publishers)))
+
+    if input.available or input.min or input.max:
+        query = query.join(Own)
+
+        if input.available:
+            query = query.filter(Own.price != None)
+        if input.min:
+            query = query.filter(Own.price >= input.min * 100.0)
+        if input.max:
+            query = query.filter(Own.price <= input.max * 100.0)
+
+    return query.all()
+```
+La query in linguaggio SQL sarebbe stata indicativamente (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
+```postgresql
+SELECT books.id, books.title, books.published, books.pages, books.isbn, books.fk_author, books.fk_publisher 
+FROM books 
+JOIN owns ON books.id = owns.fk_book 
+WHERE ((books.title ILIKE '%%' || _title_ || '%%') 
+OR (EXISTS (SELECT 1 FROM authors WHERE authors.id = books.fk_author AND authors.first_name ILIKE '%%' || _first_name_ || '%%')) 
+OR (EXISTS (SELECT 1 FROM authors WHERE authors.id = books.fk_author AND authors.last_name ILIKE '%%' || _last_name_ || '%%')) 
+OR (EXISTS (SELECT 1 FROM publishers WHERE publishers.name = books.fk_publisher AND publishers.name ILIKE '%%' || _name_ || '%%'))) 
+AND (EXISTS (SELECT 1 FROM genres, booksgenres WHERE books.id = booksgenres.fk_idb AND genres.name = booksgenres.fk_genre AND genres.name IN _('genre1', 'genre2')_)) 
+AND (EXISTS (SELECT 1 FROM publishers WHERE publishers.name = books.fk_publisher AND publishers.name IN _('publisher1', 'publisher2')_)) 
+AND owns.price IS NOT NULL 
+AND owns.price <= _price_
+```
 
 
 # Scelte Progettuali
