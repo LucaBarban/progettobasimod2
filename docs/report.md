@@ -139,17 +139,45 @@ Enità che specializza `Notifications` al fine di contenere maggiori informazion
 - `status_new`: nuovo stato della spedizione
 
 ## Relazioni
+Di seguito sono riportate le relazioni che abbiamo deciso di implementare nel nostro schema ER
+
 ### afferisce
+Collega la singola notifica al singolo utente, non ha attributi
+
 ### own
+Collega l'utente ai libri da esso posseduti e ha i seguenti attributi:
+- `quantity`; indica la quantità dello specifico libro posseduta dall'utente
+- `state`: indica lo stato fisico del libro
+- `price`: se il libro è in vendita, allora il prezzo viene popolato con la quantità di valuta desiderata dall'utente
+
+Vengono aggiunte anche due invarianti che fanno si che la quantità sia sempre maggiore di $0$ e che il prezzo sia positivo o nullo
+
 ### appartiene
+Collega il libro ai suoi generi
+
 ### scritto da
+Collega il libro al suo autore
+
 ### pubblicato da
+Collega il libro alla sua casa pubblicatrice
+
 ### contiene
+Collega il record del carrello al libro a cui esso si riferisce
+
 ### possiede
+Collega l'utente al suo carrello, ovvero ai vari record di prodotti che vuole comprare
+
 ### riguarda
+Collega un record nella cronologia al libro che un'utente ha comprato
+
 ### ha prodotti in
+Collega il venditore ai prodotti che gli utenti hanno nel loro carrello (sempre considerando il fatto che per ogni prodotto distinto nel carrello c'è un record)
+
 ### é riferito in
+Collega ogni record nella cronologia al venditore da cui si è comprato un determinato prodotto
+
 ### si riferisce a
+Collega la notifica specifica notifica di un aggiornamento riguardante un ordine al record presente nello storico degli ordini (es. nel caso il libro venga spedito)
 
 ## Schema ER Risultante
 ![Schema ER](./database_ER.png)
