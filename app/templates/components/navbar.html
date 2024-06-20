@@ -10,10 +10,10 @@
             {% include 'components/cart_badge.html' %}
             {% include 'components/notifications_badge.html' %}
             <a class="navbar__user" href="/profile">{{ user.username }}</a>
-            <a href="/logout" class="button">Logout</a>
+            <a href="/logout" class="button button--current">Logout</a>
         {% else %}
-            <a href="/login" class="button">SignIn</a>
-            <a href="/register" class="button">SignUp</a>
+            <a href="/login" class="button button--current">SignIn</a>
+            <a href="/register" class="button button--current">SignUp</a>
         {% endif %}
     </div>
 </header>
