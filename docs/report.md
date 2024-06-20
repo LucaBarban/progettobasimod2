@@ -67,6 +67,18 @@
         1. [Vista `notifications_count`](#vista-notifications_count)
         2. [Vista `star_count`](#vista-star_count)
     3. [Indici](#indici)
+        1. [Indice `idx_title_books`](#indice-idx_title_books)
+        2. [Indice `idx_isbn_books`](#indice-idx_isbn_books)
+        3. [Indice `idx_author_books`](#indice-idx_author_books)
+        4. [Indice `idx_publisher_books`](#indice-idx_publisher_books)
+        5. [Indice `idx_token_users`](#indice-idx_token_users)
+        6. [Indice `idx_own`](#indice-idx_own)
+        7. [Indice `idx_history`](#indice-idx_history)
+        8. [Indice `idx_seller_history`](#indice-idx_seller_history)
+        9. [Indice `idx_buyer_history`](#indice-idx_buyer_history)
+        10. [Indice `idx_username_notifications`](#indice-idx_username_notifications)
+        11. [Indice `idx_username_notifications_count`](#indice-idx_username_notifications_count)
+        12. [Indice `idx_seller_star_count`](#indice-idx_seller_star_count)
     4. [Controlli Ulteriori](#controlli-ulteriori)
 6. [Ulteriori informazioni](#ulteriori-informazioni)
 7. [Contributo al Progetto](#contributo-al-progetto)
@@ -533,6 +545,7 @@ EXECUTE FUNCTION check_notification();
 Al fine di migliorare le performance, sono state introdotte le seguenti view materializzate
 
 ### Vista `notifications_count`
+La seguente vista salva per ogni utente il suo numero di notifiche da visualizzare nella barra principale, andando ad escludere quelle già viste
 ```postgresql
 CREATE MATERIALIZED VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
@@ -541,6 +554,7 @@ CREATE INDEX idx_username_notifications_count ON notifications_count(fk_username
 ```
 
 ### Vista `star_count`
+La seguente vista conteggia la media delle stelle per ogni utente venditore e il numero totale di recensioni che esso ha
 ```postgresql
 CREATE MATERIALIZED VIEW star_count
 AS
@@ -550,10 +564,45 @@ GROUP BY fk_seller
 WITH NO DATA;
 ```
 
-CREATE INDEX idx_seller_star_count ON star_count(fk_seller);
-
 ## Indici
 Al fine di migliorare le performance, sono stati creati i seguenti indici
+
+
+### Indice `idx_title_books`
+Questo indice serve a ottimizzare la ricerca per titolo dei libri, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `title`
+
+### Indice `idx_isbn_books`
+Questo indice ottimizza la ricerca dei libri per isbn, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `isbn`
+
+### Indice `idx_author_books`
+Questo indice ottimizza la ricerca dei libri tramite la chiave esterna dell'autore salvata per ognuno, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `fk_author`
+
+### Indice `idx_publisher_books`
+Questo indice ottimizza la ricerca dei libri tramite la chiave esterna della casa pubblicatrice salvata per ognuno, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `fk_publisher`
+
+### Indice `idx_token_users`
+Questo indice ottimizza la ricerca degli utenti tramite il token a loro assegnato una volta fatto il login/registreazione, per cui l'indice viene creato su [`users`](#tabella-users) sulla colonna `token`
+
+### Indice `idx_own`
+Questo indice ottimizza la ricerca di un determinato libro posseduto da un certo utente in un dato stato di usura, per cui l'indice è stato creato su [`owns`](#tabella-owns) per gli attributi `fk_book`, `fk_username`, `state`
+
+### Indice `idx_history`
+Questo indice ottimizza la ricerca di un libro comprato da un certo utente in un certo stato ad un dato prezzo, per cui l'indice è stato creato su [`history`](#tabella-history) per gli attributi `fk_buyer`, `fk_book`, `state`, `price`
+
+### Indice `idx_seller_history`
+Questo indice ottimizza la ricerca degli ordini di un determinato venditore, per cui è stato fatto sulla tabella [`Histroy`](#tabella-history) e sull'attributo `fk_seller`
+
+### Indice `idx_buyer_history`
+Questo indice ottimizza la ricerca degli ordini di un determinato acquirente, per cui è stato fatto sulla tabella [`Histroy`](#tabella-history) e sull'attributo `fk_buyer`
+
+### Indice `idx_username_notifications`
+Questo indice ottimizza la ricerca delle notifiche di un determinato utente, per cui è stato fatto sulla tabella [`notifications`](#tabella-notifications) e sull'attributo `fk_username`
+
+### Indice `idx_username_notifications_count`
+Questo indice ottimizza la ricerca del numero di notifiche non lette di un determinato utente, per cui è stato fatto sulla vista [`notifications_count`](#vista-notifications_count) e sull'attributo `fk_username`
+
+### Indice `idx_seller_star_count`
+Questo indice ottimizza la ricerca della media delle valutazioni di un determinato venditore, per cui è stato fatto sulla vista [`star_count`](#vista-star_count) e sull'attributo `fk_seller`
 
 ## Controlli Ulteriori
 dire anche dei controlli fatti su python (la maggior parte actually)
