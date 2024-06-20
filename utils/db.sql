@@ -221,6 +221,26 @@ BEFORE INSERT OR UPDATE ON carts
 FOR EACH ROW
 EXECUTE PROCEDURE if_seller_is_seller();
 
+-- Trigger per carts
+
+CREATE OR REPLACE FUNCTION check_selling()
+RETURNS TRIGGER
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM owns
+                WHERE id = NEW.fk_own AND price IS NOT NONE) THEN
+        RETURN NEW;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_carts_selling
+BEFORE INSERT OR UPDATE ON carts
+FOR EACH ROW
+EXECUTE FUNCTION check_selling();
+
 -- Trigger for history notifications
 
 CREATE OR REPLACE FUNCTION check_notification()
@@ -243,4 +263,3 @@ CREATE TRIGGER trigger_history_notifications
 BEFORE INSERT OR UPDATE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION check_notification();
-

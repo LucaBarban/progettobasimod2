@@ -58,11 +58,12 @@
 5. [Scelte Progettuali](#scelte-progettuali)
     1. [Trigger](#trigger)
         1. [Trigger `check_quantity_zero_trigger`](#trigger-check_quantity_zero_trigger)
-        1. [Trigger `trigger_status_change`](#trigger-trigger_status_change)
-        1. [Trigger `trigger_notifications`](#trigger-trigger_notifications)
-        1. [Trigger `trigger_user_rating`](#trigger-trigger_user_rating)
-        1. [Trigger `trigger_carts_owner`](#trigger-trigger_carts_owner)
-        1. [Trigger `trigger_history_notifications`](#trigger-trigger_notifications)
+        2. [Trigger `trigger_status_change`](#trigger-trigger_status_change)
+        3. [Trigger `trigger_notifications`](#trigger-trigger_notifications)
+        4. [Trigger `trigger_user_rating`](#trigger-trigger_user_rating)
+        5. [Trigger `trigger_carts_owner`](#trigger-trigger_carts_owner)
+        6. [Trigger `trigger_history_notifications`](#trigger-trigger_notifications)
+        7. [Trigger `trigger_carts_selling`](#trigger-trigger_carts_selling)
     2. [View Materializzate](#view-materializzate)
         1. [Vista `notifications_count`](#vista-notifications_count)
         2. [Vista `star_count`](#vista-star_count)
@@ -137,7 +138,7 @@ L'entità specializza utenti, e serve per distinguere quali di essi sono abilita
 Questa entità rappresenta un a serie di libri uguali che l'utente vuole comprare. Collega quindi l'utente al libro e al realtivo venditore, specificando una data quantità. L'attributo dell'entità è:
 - `quantità`: rappresenta la quantità di uno specifico libro che è stato aggiunto al carrello
 
-Viene specificata un'invariante che controlla che la quantità sia positiva e che il libro/i che si vuole comprare faccia parte dei libri appartenenti al venditore
+Vengono specificate tre invarianti: una che controlla che la quantità sia positiva, una che controlla che il libro/i che si vuole comprare faccia parte dei libri appartenenti al venditore e un'ultima che controlla che il libro che si intende acquistare sia effettivamente in vendita
 
 ### Entità `History`
 L'entità rappresenta lo storico degli acquisti effettuati dall'utente, includendo un campo per lasciare una recensione sull'esperienza d'acquisto e relativa valutazione in stelle. Gli attributi sono i seguenti:
@@ -550,6 +551,28 @@ CREATE TRIGGER trigger_history_notifications
 BEFORE INSERT OR UPDATE ON notifications -- in caso di inserzione/aggiornamento nelle notifiche
 FOR EACH ROW
 EXECUTE FUNCTION check_notification();
+```
+
+### Trigger `trigger_carts_selling`
+Questo trigger fa si che un oggetto all'interno del carrello debba obbligatoriamente essere anche un oggetto che è messo in vendita (cotrolla quindi che l'oggetto abbia un prezzo assegnato)
+```postgresql
+CREATE OR REPLACE FUNCTION check_selling()
+RETURNS TRIGGER
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM owns
+                WHERE id = NEW.fk_own AND price IS NOT NONE) THEN -- se esiste l'oggetto 
+        RETURN NEW;                                               -- con il prezzo non 
+    END IF;                                                       -- NULL, quindi che è 
+    RETURN NULL;                                                  -- in vendita
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_carts_selling
+BEFORE INSERT OR UPDATE ON carts
+FOR EACH ROW
+EXECUTE FUNCTION check_selling();
 ```
 
 ## View Materializzate
