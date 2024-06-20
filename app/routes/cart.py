@@ -22,7 +22,7 @@ def cart_get(user: User, err: str | None = None) -> str:
 
     total = sum([item.own.price * item.quantity for item in items])  # type: ignore
 
-    if err is not None:
+    if err:
         flash(err, "error")
 
     return render_template(

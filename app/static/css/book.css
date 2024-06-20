@@ -50,3 +50,7 @@ br {
     font-size: var(--font-size);
     padding: 4px 0px;
 }
+
+.button--current {
+    background: var(--accent-color);
+}
