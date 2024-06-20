@@ -80,7 +80,18 @@
         11. [Indice `idx_username_notifications_count`](#indice-idx_username_notifications_count)
         12. [Indice `idx_seller_star_count`](#indice-idx_seller_star_count)
     4. [Controlli Ulteriori](#controlli-ulteriori)
+        1. [Validazione degli Input](#validazione-degli-input)
+        2. [Utilizzo dell'ORM](#utilizzo-dellorm)
+        3. [Utilizzo di Trigger e Check](#utilizzo-di-trigger-e-check)
+        4. [Autenticazione e Validazione](#autenticazione-e-validazione)
+        5. [Utente e Database dedicati](#utente-e-database-dedicati)
 6. [Ulteriori informazioni](#ulteriori-informazioni)
+    1. [Libreria `MyPy`](#libreria-mypy)
+    2. [Libreria `python-dotenv`](#libreria-python-dotenv)
+    3. [Componenti Riutilizzabili](#componenti-riutilizzabili)
+    4. [Libreria `wtform`](#libreria-wtform)
+    5. [Libreria `bcrypt`](#libreria-bcrypt)
+    6. [Libreria `session`](#libreria-session)
 7. [Contributo al Progetto](#contributo-al-progetto)
 
 
@@ -605,11 +616,68 @@ Questo indice ottimizza la ricerca del numero di notifiche non lette di un deter
 Questo indice ottimizza la ricerca della media delle valutazioni di un determinato venditore, per cui è stato fatto sulla vista [`star_count`](#vista-star_count) e sull'attributo `fk_seller`
 
 ## Controlli Ulteriori
-dire anche dei controlli fatti su python (la maggior parte actually)
 
+### Validazione degli Input
+Ulteriori controlli, di cui la maggior parte sono preventivi, sono stati fatti tramite il codice python. Questa scelta è stata fatta sia per ottenere maggiori performance, potendo considerare una quantità inferiore di dati, sia a causa della complessità algoritmica degli stessi.
+Un esempio banale è il controllo sulla validità del codice `isbn`, il quale viene controllato tramite una libreria esterna.
+Un altro esempio consiste nella validazione degli input, andando a controllare che tutti i dati richiesti siano stati compilati correttamente (es. che siano diversi da `None` e che, ad esempio, il valore sia positivo).
+
+### Utilizzo dell'ORM
+Un'altra tecnica che abbiamo usato al fine di limitare errori nell'inseriemnto/aggiornamento dei dati è stato l'utilizzo esclusivo dell'ORM e i relativi costruttori, permettendoci quindi di evitare typo e l'utilizzo di dati con tipo incompatibile (permesso anche da mypy, come vedremo poi). Un ulteriore vantaggio è stato quello di poter accedere comodamente alle relazioni semplicemente usando il `.` (es. `libro.autore.first_name`) evitando ancora "errori di distrazione" che avrebbero potuto intaccare la consistenza del database.
+
+### Utilizzo di Trigger e Check
+Una buona parte del lavoro atto a mantenere la consistenza viene permessa dalla presenza dei [trigger](#trigger) visti sopra, dai `check` e dalla struttura stessa del database.
+
+### Autenticazione e Validazione
+Un'ulteriore misura di sicurezza è fornita dal sistema di autenticazione, il quale consente di identificare l'utente che vuole eseguire una specifica operazione. Questo processo di autenticazione non solo verifica l'identità dell'utente tramite il token assegnatoli ma, fornendo all'utilizzatore delle chiamate `getLoggedInUser()` un oggetto `User`, permette di estrarre comodamente gli attributi associati al profilo utente. Tra di essi c'è anche lo stato, che viene utilizzato per determinare se l'utente è un venditore, e quindi se può compiere determinate azioni. Questi controlli ulteriori permettono un maggiore controllo sui dati e le azioni degli utenti, garantendo più facilmente la consistenza della base di dati
+
+### Utente e Database dedicati
+Un'ultimo tasello è permesso dall'utilizzo di un utente e un database dedicato per accedere al DBMS (nel nostro specifico caso Postgres), cosa che permette di limitare le azioni che esso può fare in caso di eventi come la compromissione del server Flask. Un permesso banale quanto importante che è stato revocato è la possibilità di creare/modificare/cancellare tabelle, trigger, viste... Il database specifio usato è stato chiamato `library` e l'utente è stato denominato `librarian`
 
 # Ulteriori informazioni
-scelte tecnologiche specifiche (es. librerie usate) e qualsiasi altra informazione sia necessaria per apprezzare il progetto.
+Di seguito alcuni aspetti interessanti del progetto 
+
+## Libreria `MyPy`
+MyPy, insieme alle sue relative estensioni, ci ha permesso di effettuare il controllo statico dei tipi, ed individuare di conseguenza prima ancora di eseuire il codice potenziali problemi, come dei cast errati. Il codice risultante risulta quindi essere più facile da leggere e mantenere.
+
+Nonostante i vantaggi da esso offerti, abbiamo incontrato alcune problematiche, principalmente causate da errori sui tipi scorretti. L'errore più comune è causato a seguito di un controllo per evitare che una serie di variabili non sia `None`, come il seguente:
+```python
+var1: int | None
+var2: int | None
+var3: int | None
+
+if None in [var1, var2, var3]: # problematico, mypy si lamenta che le 
+                               # variabili potrebbero essere None
+    return
+
+if var1 is None or var2 is None or var3 is None:  # nessun problema
+    return
+
+fun(var1) # qui è dove mypy potrebbe dare errori
+
+fun(var: int):
+    print(var)
+```
+Un'altra noia è stata causata se nelle classi rappresentanti le tabelle non è presente il costruttore esplicitamente. In questo caso, ogni volta che abbiamo instanziato un oggetto, mypy ha prodotto un fastidioso errore riguardante l'assenza di esso
+
+## Libreria `python-dotenv`
+Questa libreria ci permette di specificare dei parametri come `SQLALCHEMY_DATABASE_URI` o la chiave segreta `SECRET_KEY` usata per la cifratura in un comodo file `.env`. Questa feature ci ha permesso di evitare di dover cambiare ogni volta il primo parametro, essendo che abbiamo utilizzato database installati diversamente (container docker o baremetal) con credenziali differenti durante lo sviluppo.
+
+## Componenti Riutilizzabili
+L'utilizzo delle macro e delle componenti riutilizzabili è stato permesso da flask, e ci ha permesso di diminuire la duplicazione del codice, aumentando al tempo stesso la sua riusabilità (basti pensare alla navbar). Il codice ottenuto risulta quindi essere estremamente modulare, cosa che ci ha permesso di sviluppare concorrentemente diverse parti dell'interfaccia del progetto, pur mantenendo una certa coerenza grafica.
+
+Le macro si sono rivelate estremamente comode per inserire, e talvolta anche elaborare (ad esempio, bastia guardare come vengono elaborati i libri da visualizzare in `index.html`), i dati processati da python direttamente nella pagina html.
+
+## Libreria `wtform`
+Questa libreria è stata utilizzata nel form di login, al fine di poter utilizzare la feature del token csrf, ovvero un valore randomico che viene inserito per evitare, in questo caso, che un altra pagina possa far regisreare forzatamente l'utente tramite un iframe o usando una richiesta ajax tramite javascript.
+Per il resto dei form si è rivelata leggermente più scomoda rispetto alla creazione diretta in html del form desiderato, quindi non è stata ulteriormente utilizzata.
+
+## Libreria `bcrypt`
+Questa libreria è stata utilizzata per calcolare l'hash della password e, al tempo stesso, effettuare il salting. Ci ha, quindi, permesso di ottenere una maggiore sicurezza pur avendo un singolo campo per la password nel database, oltre alla flessibilità di poter aumentare la complessità del calcolo dell'hash.
+
+## Libreria `session`
+La libreria session ci ha permesso di salvare in maniera cifrata in un cookie il token utilizzato nelle varie pagine per autenticvare l'utente e verificare che sia effettivamente lui
+
 
 # Contributo al progetto
 una spiegazione di come i diversi membri del gruppo hanno contribuito al design ed allo sviluppo.
