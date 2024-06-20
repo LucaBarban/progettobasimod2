@@ -1,3 +1,11 @@
+CREATE DATABASE library;
+
+CREATE USER librarian WITH PASSWORD 'test';
+
+GRANT CONNECT ON DATABASE library TO librarian;
+
+\c library
+
 CREATE TABLE genres (
     name TEXT PRIMARY KEY
 );
@@ -246,3 +254,15 @@ BEFORE INSERT OR UPDATE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION check_notification();
 
+-- Revoke unwanted privileges
+REVOKE CREATE ON SCHEMA public FROM librarian;
+REVOKE ALL PRIVILEGES ON DATABASE library FROM librarian;
+
+-- Explicitly grant required privileges
+GRANT CONNECT ON DATABASE library TO librarian;
+GRANT USAGE ON SCHEMA public TO librarian;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO librarian;
+GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO librarian;
+
+ALTER TABLE notifications_count OWNER TO librarian;
+ALTER TABLE star_count OWNER TO librarian;
