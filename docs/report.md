@@ -35,7 +35,7 @@
         7. [Relazione `possiede`](#relazione-possiede)
         8. [Relazione `riguarda`](#relazione-riguarda)
         9. [Relazione `ha prodotti in`](#relazione-ha-prodotti-in)
-        10. [Relazione `é riferito in](#relazione-é-riferito-in)
+        10. [Relazione `é riferito in`](#relazione-é-riferito-in)
         11. [Relazione `si riferisce a`](#relazione-si-riferisce-a)
     3. [Schema ER Risultante](#schema-er-risultante)
     4. [Rappresentazione Logica](#rappresentazione-logica)
