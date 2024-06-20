@@ -28,6 +28,11 @@ def products() -> Response:
 
 
 def star_sort(star: Optional[Star], sort: str, order: str) -> float:
+    """
+    Returns `star.total` or `star.average` ordered
+    Keeps sellers without a rating at the end
+    """
+
     if star is None:
         value = math.inf
     elif sort == "total":
@@ -45,22 +50,29 @@ def star_sort(star: Optional[Star], sort: str, order: str) -> float:
 def get_insertions(
     id: int, username: Optional[str], sort: Optional[str], order: Optional[str]
 ) -> List[Tuple[User, Optional[Star], List[Own]]]:
+    """
+    Returns all the insertions on sale for a specific book.
+    Removes the ones from the current user
+    """
+
     sort = sort or ""
     order = order or "asc"
 
     insertions = (
         db.session.query(Own)
         .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
-        .order_by(Own.fk_username)
+        .order_by(Own.fk_username)  # Needed for `itertools.groupby`
         .all()
     )
 
+    # Groups insertions by seller
     insertions_grouped = itertools.groupby(insertions, lambda ins: ins.user)
 
     insertions_list = (
         (user, user.stars(), list(owns)) for user, owns in insertions_grouped
     )
 
+    # Sort insertion by seller stars
     insertions_sorted = sorted(
         insertions_list,
         key=lambda item: star_sort(item[1], sort, order), # type: ignore
@@ -71,6 +83,10 @@ def get_insertions(
 
 @app.route("/book/<int:id>/", methods=["GET"])
 def get(id: int) -> str:
+    """
+    Display the book's image and info and all the available insertions
+    """
+
     user = getLoggedInUser()
 
     if user is None:

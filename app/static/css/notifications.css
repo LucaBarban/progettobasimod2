@@ -1,0 +1,40 @@
+.notification__title {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    height: 35px;
+}
+
+.notification__title input {
+    width: 35px;
+}
+
+.notifications__list {
+    margin: 20px;
+}
+
+.notification {
+    width: 100%;
+}
+
+.notification th {
+    text-align: left;
+    font-size: 24px;
+    font-weight: 500;
+    padding: 10px;
+
+    background: var(--gray2);
+}
+
+.notification td {
+    padding: 5px 20px;
+}
+
+.notification td > span {
+    font-weight: 600;
+}
+
+.notification a {
+    color: #000;
+    text-decoration: none;
+}

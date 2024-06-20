@@ -60,3 +60,7 @@
     background: var(--input-background);
     margin-left: var(--padding);
 }
+
+.button--current {
+    background: var(--accent-color);
+}

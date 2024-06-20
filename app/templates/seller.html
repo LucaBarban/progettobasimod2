@@ -8,20 +8,13 @@
 {% endblock pagestyles %}
 
 {% block content %}
+    {% from 'components/stars.html' import stars %}
+
     <div class="seller__title">
         <h1> Seller {{ seller.username }} </h1>
         {% with star = seller.stars() %}
             {% if star %}
-                <span class="star-rating">
-                    {% for value in range(5, 0, -1) %}
-                        <input type="radio"
-                               id="rate-{{ seller.username }}-{{ value }}"
-                               value="{{ value }}"
-                               {% if star.vote >= value %}checked{% endif %}
-                               disabled>
-                        <label for="rate-{{ seller.username }}-{{ value }}">&#9734;</label>
-                    {% endfor %}
-                </span>
+                {{ stars(seller.username, star.vote) }}
                 ( {{ star.total }} )
             {% endif %}
         {% endwith %}
@@ -57,20 +50,7 @@
                     <td style="width: 40%">
                         <div class="seller__review__left">
                             {{ review.buyer.username }}
-                            {% with star = review.stars %}
-                                {% if star %}
-                                    <span class="star-rating">
-                                        {% for value in range(5, 0, -1) %}
-                                            <input type="radio"
-                                                   id="rate-{{ review.buyer.username }}-{{ value }}"
-                                                   value="{{ value }}"
-                                                   {% if star >= value %}checked{% endif %}
-                                                   disabled>
-                                            <label for="rate-{{ review.buyer.username }}-{{ value }}">&#9734;</label>
-                                        {% endfor %}
-                                    </span>
-                                {% endif %}
-                            {% endwith %}
+                            {{ stars(review.buyer.username, review.stars) }}
                         </div>
                         <div>
                             Bought "{{ review.book.title }}" ({{ review.state }})

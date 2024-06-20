@@ -1,0 +1,24 @@
+{% macro stars(id, value, input=False) %}
+    <span class="star-rating">
+        {% for star in range(5, 0, -1) %}
+            <input
+                type="radio"
+                name="rating{{ id }}"
+                id="rate-{{ id }}-{{ star }}"
+
+                {% if value %}
+                    value="{{ star }}"
+                {% endif %}
+
+                {% if not input %}
+                    {% if value - 0.5 <= star and value + 0.5 >= star  %}
+                        checked
+                    {% endif %}
+
+                    disabled
+                {% endif %}
+            >
+            <label for="rate-{{ id }}-{{ star }}">&#9734;</label>
+        {% endfor %}
+    </span>
+{% endmacro %}

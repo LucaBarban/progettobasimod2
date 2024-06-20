@@ -16,6 +16,9 @@
             <div class="shortcuts">
                 <a href="/library" class="button button--primary">Library</a>
                 <a href="/history" class="button button--secondary">History</a>
+                {% if user.seller %}
+                    <a href="/orders" class="button button--secondary">Orders</a>
+                {% endif %}
             </div>
         {% endif %}
     </div>
