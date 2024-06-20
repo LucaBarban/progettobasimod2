@@ -95,7 +95,7 @@ CREATE TABLE history(
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
 
-CREATE INDEX idx_history ON owns(fk_username, fk_book, state, price);
+CREATE INDEX idx_history ON history(fk_buyer, fk_book, state, price);
 CREATE INDEX idx_seller_history ON history(fk_seller);
 CREATE INDEX idx_buyer_history ON history(fk_buyer);
 
