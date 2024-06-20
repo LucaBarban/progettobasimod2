@@ -14,6 +14,11 @@ T = TypeVar("T")
 
 
 def partition(fn: Callable[[T], bool], items: List[T]) -> tuple[List[T], List[T]]:
+    """
+    Split a list into two
+    `fn` returns `true` for all the items in the first list and `false` for all in the second
+    """
+
     a = []
     b = []
     for item in items:
@@ -27,9 +32,14 @@ def partition(fn: Callable[[T], bool], items: List[T]) -> tuple[List[T], List[T]
 
 @app.route("/orders/<int:id>", methods=["POST"])
 def update(id: int) -> Response:
+    """
+    Update the status for an order
+    """
+
     user = getLoggedInUser()
     status = request.form.get("status")
 
+    # Validate form input
     if user is None or status not in Statuses:
         flash("An error occoured", "error")
         return redirect("/")
@@ -40,6 +50,7 @@ def update(id: int) -> Response:
         flash("Cannot find the right insertion", "error")
         return redirect("/")
 
+    # Update status
     item.status = status
 
     db.session.commit()
@@ -49,16 +60,22 @@ def update(id: int) -> Response:
 
 @app.route("/orders/")
 def orders() -> str | Response:
+    """
+    Display all the orders handled by a user
+    """
+
     user = getLoggedInUser()
     if user is None:
         return redirect("/login/?link=/orders")
 
+    # Block users that are not sellers from entering
     if user.seller == False:
         # Mabye custom page?
         abort(404)
 
     orders = db.session.query(History).filter(History.fk_seller == user.username).all()
 
+    # Split orders into [ not shipped, shipped, delivered ]
     (processing, orders) = partition(
         lambda h: h.status in {"processing", "packing"}, orders
     )

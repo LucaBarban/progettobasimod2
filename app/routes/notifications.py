@@ -9,6 +9,10 @@ from app.routes.auth import getLoggedInUser
 
 @app.route("/notifications/read/", methods=["POST"])
 def read_all_notifications() -> Response:
+    """
+    Set all the notifications for `user` as archived
+    """
+
     user = getLoggedInUser()
     if user is None:
         return redirect("/login?link=/notifications")
@@ -31,6 +35,10 @@ def read_all_notifications() -> Response:
 
 @app.route("/notifications/read/<int:id>", methods=["POST"])
 def read_notification(id: int) -> Response:
+    """
+    Set a specific notification for `user` as archived
+    """
+
     user = getLoggedInUser()
 
     notif = db.session.get(Notification, id)
@@ -38,6 +46,7 @@ def read_notification(id: int) -> Response:
     if user is None:
         return redirect("/login?link=/notifications")
     elif notif is None or notif.fk_username != user.username:
+        # Trying to update the wrong notification
         flash("Notification not found", "error")
     else:
         notif.archived = True
@@ -48,6 +57,10 @@ def read_notification(id: int) -> Response:
 
 @app.route("/notifications/")
 def notifications() -> str | Response:
+    """
+    Display all the notifications for a user, grouped by new and archived
+    """
+
     user = getLoggedInUser()
     if user is None:
         return redirect("/login?link=/notifications")
