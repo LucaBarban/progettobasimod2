@@ -106,7 +106,17 @@ Le funzionalità pricipali che abbiamo implementato sono le seguenti:
 
 ## Sistema di Autenticazione
 (auth.py)
+Il sistema di autenticazione implementato si occupa di gestire le registrazioni, i login, i logout e la validazione dei token di sessione.
 
+I login sono gestiti come segue: l'utente invia tramite l'apposito form utente e password, si recupera l'oggetto corrispondente allo username dato. Se un utente è stato trovato, allora si controlla la password sfruttando la funzione `check_password_hash` fornita da `bcrypt`, e se il controllo passa si genera un nuovo token tramite la funzione `getNewToken()`, la quale invoca `secrets.token_hex(tokenSize)` per ottenere una stringa randomica esadecimale che verrà assegnata ad un cookie (`session["token"]`) usando la libreria session
+
+Le registrazioni sono gestite come segue: si controlla che tutti i parametri siano stati passati e non siano `None`, si procede controllando che il nome utente contenga solo lettere o numeri, che il nome e il cognome contengano solo lettere e che le password passate corrispondano. Una volta fatto questo si interroga il database per trovare un'altro eventuale utente, se non esiste si procede all'inserzione del nuovo utente a cui si assegna anche un token si sessione generato al momento
+
+Il logout funziona andando a trovare l'utente con un dato token si sessione all'interno del database, per poi andarlo a porre a `NULL`. Viene sempre e comunque rimosso il token di sessione, ma solo se il token è stato cancellato anche a lato database viene mostrato il messaggio di successo.
+
+Nel caso in avvenga un errore con il token csrf, ovvero un valore randomico univoco per la richiesta fatta in fase di registrazione, allora viene mostrata una pagina d'errore (cosa che non dovrebbe mai accadere se non, ad esempio, in caso di attacchi MITM)
+
+Le funzioni `checkLoggedIn` e `getLoggedInUser` funzionano essenzialmente alla stessa maniera: entrambe prendono il token di sessione e lo cercano sul database per recuperare l'utente corrispondente, controllano che sia ancora valido (durata di 1 giorno) e ritornano di conseguenza `True` o l'oggetto corrispondente di tipo `User` in caso di successo, `False` o `None` altrimenti.
 
 ## Visualizzazione singolo Libro e relative Inserzioni
 (book.py)
@@ -118,6 +128,7 @@ Le funzionalità pricipali che abbiamo implementato sono le seguenti:
 
 ## Visualizzazione degli Acquisti
 (history.py)
+Lo storico, una volta controllato che l'utente sia loggato e ricevuti l'id dell'acquisto fatto (id nello storico), una recensione e una valutazione, procedono a controllare che i dati passati siano validi (quindi non `None` e con una recensione almeno lunga 2 caratteri), procedono a modificare l'oggetto `History` corrispondente al prodotto nello storico andando ad aggiungere la recensione e la valutazione. In caso di errori viene eseguito un rollback esplicitamente e viene mostrato un messaggio d'errore. Infine vengono ricaricati gli oggetti aggiornati presenti nello storico con lo scopo di visualizzarli
 
 
 ## Struttura delle Pagine
@@ -126,6 +137,30 @@ Le funzionalità pricipali che abbiamo implementato sono le seguenti:
 
 ## Gestione delle Inserzioni
 (inserionmanager.py)
+Il sistema di gestione delle inserzioni di occupa di ricevere alcune informazioni come l'id del libro, il suo stato ecc... e di apportare le modifiche rischieste dall'utente tramite i form ad esso forniti.
+
+Le operazioni che un utente può svolgere sono:
+- creazione di un'inserzione
+- aggiornamento di un'inserzione
+- eliminazione di un'inserzione
+Ognuna di queste operazioni ha una funzione che si occupa di controllare che una serie di dati necessari (es. per creare un'inserzione è necessario conoscere l'id e lo stato del libro che si vuole cendere), per poi ritornare il form in cui vengono richieste le informazioni mancanti (es. sempre per l'inserzione, la quantità di libri da vendere e il relativo prezzo)
+
+Le singole operazioni effettive gestite tramite richieste `POST` sono poi elaborate da funzioni differenti:
+- Aggiornamento Inserzione
+
+    l'operazione di aggiornamento di un'inserzione inzia controllando che l'utente sia un venditore abilitato, per poi appoggiarsi alla funzione `retriveExistingBooks` al fine di recuperare i libri con lo stesso id che sono in vendita o meno. Una volta controllato che ci siano sufficienti libri a cui apportare la modifica, la si applica al record esistente, oppure se ne crea uno nuovo. In caso di errori avviene un rollback. Questa operazione, quindi, permette solamente di aggiornare i prezzi e non di rimuovere libri dalla vendita
+- Creazione Inserzione
+
+    una volta controllato che l'utente sia un venditore, si recuperano i libri sia in vendita che quelli che non lo sono tramite la funzione `retriveBooks`, e se la quantità di libri è sufficiente viene chiamata la funzione `manageInsertion` abilitando l'aggiunta tramite l'ultimo parametro impostato a `true`
+- Eliminazione Inserzione
+
+    l'operazione di eliminazione controlla che l'utente sia un venditore, recupera i libri tramite l'operazione `retriveBooks`, controlla che ci sia quantità sufficiente di libri da rimuovere, in caso affermativo viene chiamata la funzione `manageInsertion` abilitando la rimozione tramite l'ultimo parametro impostato a `False`
+
+La funzione `retriveBooks` si occupa di recuperare i libri in vendita e quelli che non sono in vendita, sopo aver opportunamente controlalto che l'utente abbia passato tutti i parametri corretti tramite il form
+
+La funzione `retriveExistingBooks` compie un'operazione simile a `retriveBooks`, se non per il fatto che opera con libri che sono esclusivamente in vendita
+
+La funzione `manageInsertion` si occupa di gestire tutti i casi in cui l'aggiunta e la rimozione di libri comportino il dover creare, eliminare o aggiornare dei record all'interno della tabella [`owns`](#tabella-owns). In caso di errori, si occupa autonomamente di effettuare un rollback esplicitamente, emtre se va tutto a buon fine effettua un commit
 
 
 ## Visualizzazione della propria Libreria
@@ -142,6 +177,9 @@ Le funzionalità pricipali che abbiamo implementato sono le seguenti:
 
 ## Gestione del Profilo
 (profile.py)
+La visualizzazione del profilo permette all'utente di modificare alcuni attributi che esso ha, tra cui il nome e il cognome, la password, il proprio saldo (scleta fatta in quanto non abbiamo un vero e proprio modo di aggiungere effettivamente della valuta all'account o gestire delle carte). Viene anche data la possibilità all'utente di effettuare un upgrade al suo account e diventare un venditore.
+
+Le operazioni di aggiornamento avvengono controllando se sono avvenuti dei cambiamenti ai dati pasati al form rispetto a quelli che sono presenti all'interno del database. Una volta che un cambiamento avviene, le modifica vengono validate (es. il nome e il cognome devono contenere solamente lettere, la password deve avere una certa lunghezza, il balance deve essere un numero...) e vengono applicate sull'oggeto `usr`, il quale aggiornerà automaticamente anche il database a seguito del commit presente alla riga successiva. In caso siano presenti degli errori, essi vengono mostrati tutti in una volta sola, senza andare ad applicare modifiche alla base di dati
 
 
 ## Gestione della Ricerca
