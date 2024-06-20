@@ -238,7 +238,7 @@ Collega la notifica specifica notifica di un aggiornamento riguardante un ordine
 ### Tabella `genres`
 $$
 \begin{aligned}
-&genres(\underline{name}:string) \\
+&genres\;(\underline{name}:string) \\
 & \qquad PK(name)
 \end{aligned}
 $$
@@ -249,7 +249,7 @@ Rispecchia la sua corrispettiva [entità](#entità-genres), mantenendo come camp
 ### Tabella `authors`
 $$
 \begin{aligned}
-&authors(\underline{id}:int,\; first\_name:string,\; last\_name:string) \\
+&authors\;(\underline{id}:int,\; first\_name:string,\; last\_name:string) \\
 & \qquad PK(id)
 \end{aligned}
 $$
@@ -262,7 +262,7 @@ Rispecchia la sua corrispettiva [entità](#entità-authors), mantenendo come cam
 ### Tabella `publishers`
 $$
 \begin{aligned}
-&publishers(\underline{name}:string) \\
+&publishers\;(\underline{name}:string) \\
 & \qquad PK(name)
 \end{aligned}
 $$
@@ -273,7 +273,7 @@ Rispecchia la sua corrispettiva [entità](#entità-publishers), mantenendo come 
 ### Tabella `books`
 $$
 \begin{aligned}
-&books(\underline{id}:int,\; title:string,\; published:date,\; pages:int,\; isbn:string,\; fk\_author:int,\; fk\_publisher:string) \\
+&books\;(\underline{id}:int,\; title:string,\; published:date,\; pages:int,\; isbn:string,\; fk\_author:int,\; fk\_publisher:string) \\
 & \qquad PK(id) \\
 & \qquad fk\_author \;FK\; author(id) \\
 & \qquad fk\_publisher \;FK\; publishers(name) 
@@ -292,7 +292,7 @@ Per quanto rispecchi in parte la sua [entità](#entità-books), questa tabella v
 ### Tabella `booksgenres`
 $$
 \begin{aligned}
-&booksgenres(\underline{fk\_idB}:int,\; \underline{fk\_genre}:string) \\
+&booksgenres\;(\underline{fk\_idB}:int,\; \underline{fk\_genre}:string) \\
 & \qquad PK(fk\_idB,\; fk\_genre) \\
 & \qquad fk\_idB \;FK\; books(id) \\
 & \qquad fk\_genre \;FK\; genres(name) 
@@ -306,7 +306,7 @@ Questa tabella rappresenta la relazione [`appartiene`](#relazione-appartiene), c
 ### Tabella `users`
 $$
 \begin{aligned}
-&users(\underline{username}: int,\; first\_name: string,\; last\_name: string,\; password: string,\; created\_at: timestamp,\; balance: int,\; seller: bool,\; last\_logged\_in\_at: timestamp,\; token: string) \\
+&users\;(\underline{username}: int,\; first\_name: string,\; last\_name: string,\; password: string,\; created\_at: timestamp,\; balance: int,\; seller: bool,\; last\_logged\_in\_at: timestamp,\; token: string) \\
 &\qquad PK(username)
 \end{aligned}
 $$
@@ -325,7 +325,7 @@ La seguente tabella rispecchia fedelmente la struttura di [`Users`](#entità-use
 ### Tabella `owns`
 $$
 \begin{aligned}
-&owns(\underline{id}: int,\; fk\_username: string,\; fk\_book: int,\; quantity: int,\; state: state,\; price: int) \\
+&owns\;(\underline{id}: int,\; fk\_username: string,\; fk\_book: int,\; quantity: int,\; state: state,\; price: int) \\
 & \qquad PK(id) \\
 & \qquad fk\_username \;FK\; users(username) \\
 & \qquad fk\_book \;FK\; books(id) 
@@ -345,7 +345,7 @@ La tabella segue la struttura della realzione [`own`](#relazione-own), collegand
 ### Tabella `carts`
 $$
 \begin{aligned}
-&carts(\underline{fk\_buyer}: string,\; \underline{fk\_own}: int,\; quantity: int) \\
+&carts\;(\underline{fk\_buyer}: string,\; \underline{fk\_own}: int,\; quantity: int) \\
 & \qquad PK(fk\_buyer,\; fk\_own) \\
 & \qquad fk\_buyer \;FK\; users(username) \\
 & \qquad fk\_own \;FK\; owns(id) 
@@ -360,9 +360,7 @@ La tabella `carts` ricalca l'entità [`Carts`](#entità-carts), aggiungendo le r
 ### Tabella `history`
 $$
 \begin{aligned}
-&history(
-    \underline{id}:int ,\; date: timestamp,\; quantity: int,\; status: status,\; price: int,\; review: string,\; stars: int,\; fk\_buyer: string,\; fk\_seller: string,\; fk\_book: int,\; state: state
-) \\
+&history\;(\underline{id}:int ,\; date: timestamp,\; quantity: int,\; status: status,\; price: int,\; review: string,\; stars: int,\; fk\_buyer: string,\; fk\_seller: string,\; fk\_book: int,\; state: state) \\
 & \qquad PK(id) \\
 & \qquad fk\_buyer \;FK\; users(username) \\
 & \qquad fk\_seller \;FK\; users(username) \\
@@ -386,7 +384,7 @@ La tabella `history` segue la struttura dell'entità [`History`](#entità-histor
 ### Tabella `notifications`
 $$
 \begin{aligned}
-&notifications(\underline{id}:int ,\; context:disc_notif ,\; fk\_username:string ,\; message:string ,\; archived:bool ,\; fk\_history:int ,\; order\_status\_old:status ,\; order\_status\_new:status ,\; ) \\
+&notifications\;(\underline{id}:int ,\; context:disc_notif ,\; fk\_username:string ,\; message:string ,\; archived:bool ,\; fk\_history:int ,\; order\_status\_old:status ,\; order\_status\_new:status ,\; ) \\
 & \qquad PK(id) \\
 & \qquad fk\_username \;FK\; users(username) \\
 & \qquad fk\_history \;FK\; history(id) 
