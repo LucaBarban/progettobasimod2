@@ -236,20 +236,50 @@ Collega la notifica specifica notifica di un aggiornamento riguardante un ordine
 ## Rappresentazione Logica
 
 ### Tabella `genres`
+$$
+\begin{aligned}
+&genres(\underline{name}:string) \\
+& \qquad PK(name)
+\end{aligned}
+$$
+
 Rispecchia la sua corrispettiva [entità](#entità-genres), mantenendo come campi:
 - `nome` che ha tipo `TEXT` ed è `PRIMARY KEY`
 
 ### Tabella `authors`
+$$
+\begin{aligned}
+&authors(\underline{id}:int,\; first\_name:string,\; last\_name:string) \\
+& \qquad PK(id)
+\end{aligned}
+$$
+
 Rispecchia la sua corrispettiva [entità](#entità-authors), mantenendo come campi:
 - `id` che ha tipo `SERIAL` ed è `PRIMARY KEY`, in modo da evere un modo comodo di gestire le omonimie tramite un contatore autoincrementale
 - `first_name` che ha tipo `CHARACTER VARYING(255)`, quindi una stringa di caratteri di dimensione variabile che non può essere `NULL`
 - `last_name` che ha le stesse caratteristiche di `first_name` per eguali motivi
 
 ### Tabella `publishers`
+$$
+\begin{aligned}
+&publishers(\underline{name}:string) \\
+& \qquad PK(name)
+\end{aligned}
+$$
+
 Rispecchia la sua corrispettiva [entità](#entità-publishers), mantenendo come campi:
 - `name` che ha tipo `TEXT` ed è `PRIMARY KEY`
 
 ### Tabella `books`
+$$
+\begin{aligned}
+&books(\underline{id}:int,\; title:string,\; published:date,\; pages:int,\; isbn:string,\; fk\_author:int,\; fk\_publisher:string) \\
+& \qquad PK(id) \\
+& \qquad fk\_author \;FK\; author(id) \\
+& \qquad fk\_publisher \;FK\; publishers(name) 
+\end{aligned}
+$$
+
 Per quanto rispecchi in parte la sua [entità](#entità-books), questa tabella va anche ad aggiungere agli attributi anche le relazioni qui riportate:
 - `id`: identificativo artificiale del libro, motivo per cui è `SERIAL PRIMARY KEY`
 - `title`: titolo del libro, quindi è `TEXT NOT NULL`
@@ -260,11 +290,27 @@ Per quanto rispecchi in parte la sua [entità](#entità-books), questa tabella v
 - `fk_publisher`: chiave esterna, come richiesto dalla relazione [`pubblicato da`](#relazione-pubblicato-da), quindi diventa `REFERENCES publishers(name)` e ne mantiene il tipo `TEXT`
 
 ### Tabella `booksgenres`
+$$
+\begin{aligned}
+&booksgenres(\underline{fk\_idB}:int,\; \underline{fk\_genre}:string) \\
+& \qquad PK(fk\_idB,\; fk\_genre) \\
+& \qquad fk\_idB \;FK\; books(id) \\
+& \qquad fk\_genre \;FK\; genres(name) 
+\end{aligned}
+$$
+
 Questa tabella rappresenta la relazione [`appartiene`](#relazione-appartiene), che è una `n-n`. Ne consegue che abbia come attributi:
 - `fk_idB`: chiave esterna di `books(id)` con tipo `INTEGER` e anche parte della chiave primaria
 - `fk_genre`: chiave esterna di `genres(name)` con tipo `TEXT` e anche parte della chiave primaria
 
 ### Tabella `users`
+$$
+\begin{aligned}
+&users(\underline{username}: int,\; first\_name: string,\; last\_name: string,\; password: string,\; created\_at: timestamp,\; balance: int,\; seller: bool,\; last\_logged\_in\_at: timestamp,\; token: string) \\
+&\qquad PK(username)
+\end{aligned}
+$$
+
 La seguente tabella rispecchia fedelmente la struttura di [`Users`](#entità-users), per cui ha i seguenti attributi:
 - `username`: nome utente identificativo, ha quindi tipo `VARCHAR(100)` ed è `PRIMARY KEY`
 - `first_name`: nome dell'utente, ha tipo `VARCHAR(255)` e non può essere vuoto (`NOT NULL`)
@@ -277,6 +323,15 @@ La seguente tabella rispecchia fedelmente la struttura di [`Users`](#entità-use
 - `token`: token di autenticazione generato a tempo di login, ha tipo `CHARACTER(64)[]` e può essere `NULL` (in tal caso non esite un token valido)
 
 ### Tabella `owns`
+$$
+\begin{aligned}
+&owns(\underline{id}: int,\; fk\_username: string,\; fk\_book: int,\; quantity: int,\; state: state,\; price: int) \\
+& \qquad PK(id) \\
+& \qquad fk\_username \;FK\; users(username) \\
+& \qquad fk\_book \;FK\; books(id) 
+\end{aligned}
+$$
+
 La tabella segue la struttura della realzione [`own`](#relazione-own), collegandosi a [`Users`](#entità-users) e a [`Books`](#entità-books). Per questo ha i seguenti attributi:
 - `id`: identificativo dell'oggetto posseduto (rappresenta il libro/i fisico, non il "modello" astratto presente in [`Books`](#entità-books)). Per questo è `SERIAL` ed è anche `PRIMARY KEY`
 - `fk_username`: chiave esterna che si riferisce al possessore del libro/i, per questo è un `VARCHAR(100)`, è `NOT NULL` e si riferisce a `users(username)`
@@ -288,12 +343,33 @@ La tabella segue la struttura della realzione [`own`](#relazione-own), collegand
 È presente anche un ulteriore vincolo `UNIQUE(fk_username, fk_book, state, price)`, in modo da prevenire la presenza di più record di libri posseduti dallo stesso utente con lo stesso stato e prezzo
 
 ### Tabella `carts`
+$$
+\begin{aligned}
+&carts(\underline{fk\_buyer}: string,\; \underline{fk\_own}: int,\; quantity: int) \\
+& \qquad PK(fk\_buyer,\; fk\_own) \\
+& \qquad fk\_buyer \;FK\; users(username) \\
+& \qquad fk\_own \;FK\; owns(id) 
+\end{aligned}
+$$
+
 La tabella `carts` ricalca l'entità [`Carts`](#entità-carts), aggiungendo le relazioni [`possiede`](#relazione-possiede) e [`ha prodotti in`](#relazione-ha-prodotti-in). Per cui ha i seguenti attributi:
 - `fk_buyer`: chiave esterna che si riferisce all'utente compratore, ha quindi tipo `VARCHAR(100)` e fa parte della chiave primaria e referenzia `users(username)`
 - `fk_own`: chiave esterna del libro posseduto che l'utente è intenzionato a comprare, ha quindi tipo `INTEGER` e fa parte della chiave primaria e referenzia `owns(id)` andando a specificare `ON DELETE CASCADE`, in modo da rimuovere autoamticamente dal carrello un oggetto che viene esaurito
 - `quantity`: quantità di prodotto che l'utente è interessato a comprare, ha tipo `INTEGER`, è `NOT NULL` e ha il constraint `quantity_gt_carts CHECK (quantity > 0)`
 
 ### Tabella `history`
+$$
+\begin{aligned}
+&history(
+    \underline{id}:int ,\; date: timestamp,\; quantity: int,\; status: status,\; price: int,\; review: string,\; stars: int,\; fk\_buyer: string,\; fk\_seller: string,\; fk\_book: int,\; state: state
+) \\
+& \qquad PK(id) \\
+& \qquad fk\_buyer \;FK\; users(username) \\
+& \qquad fk\_seller \;FK\; users(username) \\
+& \qquad fk\_book \;FK\; books(id) 
+\end{aligned}
+$$
+
 La tabella `history` segue la struttura dell'entità [`History`](#entità-history), aggiungendo le 
 - `id`: identificativo artificiale autoincrement, pre cui è `SERIAL` e `PRIMARY KEY` 
 - `date`: data di acquisto, quindi è `TIMESTAMP` ed anche `NOT NULL`
@@ -308,6 +384,15 @@ La tabella `history` segue la struttura dell'entità [`History`](#entità-histor
 - `state`: stato di usura del prodotto comprato, ha tipo custom `state`
 
 ### Tabella `notifications`
+$$
+\begin{aligned}
+&notifications(\underline{id}:int ,\; context:disc_notif ,\; fk\_username:string ,\; message:string ,\; archived:bool ,\; fk\_history:int ,\; order\_status\_old:status ,\; order\_status\_new:status ,\; ) \\
+& \qquad PK(id) \\
+& \qquad fk\_username \;FK\; users(username) \\
+& \qquad fk\_history \;FK\; history(id) 
+\end{aligned}
+$$
+
 Questa tabella è frutto dell'unione di due entità: [`Notifications`](#entità-notifications) e [`Orders`](#entità-orders). Ha i seguenti attributi:
 - `id`: identificativo della notifica autoincrement, ha tipo `SERIAL` ed è `PRIMARY KEY`
 - `context`: tipo di notifica, ha tipo custom `disc_notif` ed è `NOT NULL`
