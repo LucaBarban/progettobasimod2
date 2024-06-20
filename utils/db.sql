@@ -108,6 +108,7 @@ CREATE TABLE notifications(
     fk_username VARCHAR(100) NOT NULL,
     message TEXT,
     archived BOOLEAN NOT NULL,
+    FOREIGN KEY (fk_username) REFERENCES users(username)
 
     -- Order
     fk_history INTEGER,

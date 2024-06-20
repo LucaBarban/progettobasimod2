@@ -1,5 +1,5 @@
 from datetime import date
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -21,7 +21,7 @@ class Book(Base):
     title: Mapped[str]
     published: Mapped[date]
     pages: Mapped[int]
-    isbn: Mapped[str]
+    isbn: Mapped[Optional[str]]
     fk_author: Mapped[int] = mapped_column(ForeignKey(Author.id))
     fk_publisher: Mapped[str] = mapped_column(ForeignKey(Publisher.name))
 
@@ -36,7 +36,7 @@ class Book(Base):
         title: str,
         published: date,
         pages: int,
-        isbn: str,
+        isbn: str | None,
         author: Author,
         publisher: Publisher,
         genres: List[Genre],
