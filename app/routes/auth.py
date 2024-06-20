@@ -52,7 +52,6 @@ def login() -> str | Response:
     dbUsers = db.session.scalars(sq.select(User).where(User.username == usr)).fetchall()
 
     if len(dbUsers) == 0:
-        # TODO: merge this check with the following one (security risk, debug only)
         flash("Specified user doesn't exist", "error")
         return render_template("login.html")
 
