@@ -103,18 +103,54 @@ La variante del progetto da noi scelta è quella dell'"e-commerce", che abbiamo 
 
 # Funzionalità principali
 Le funzionalità pricipali che abbiamo implementato sono le seguenti:
+
 ## Sistema di Autenticazione
+(auth.py)
+
+
 ## Visualizzazione singolo Libro e relative Inserzioni
+(book.py)
+
+
 ## Gestione del Carrello
+(cart.py)
+
+
 ## Visualizzazione degli Acquisti
+(history.py)
+
+
 ## Struttura delle Pagine
+(index.py)
+
+
 ## Gestione delle Inserzioni
+(inserionmanager.py)
+
+
 ## Visualizzazione della propria Libreria
+(library.py)
+
+
 ## Visualizzazione delle Notifiche
+(notifications.py)
+
+
 ## Gestione degli Ordini
+(orders.py)
+
+
 ## Gestione del Profilo
+(profile.py)
+
+
 ## Gestione della Ricerca
+(search.py)
+
+
 ## Visualizzazione Venditore
+(seller.py)
+
 
 # Progettazione Concettuale e Logica
 A seguito della progettazione concettuale abbiamo individuato le seguenti entità:
