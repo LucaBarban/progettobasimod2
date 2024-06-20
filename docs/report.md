@@ -56,6 +56,18 @@
     4. [Query 4](#query-4)
     5. [Query 5](#query-5)
 5. [Scelte Progettuali](#scelte-progettuali)
+    1. [Trigger](#trigger)
+        1. [Trigger `check_quantity_zero_trigger`](#trigger-check_quantity_zero_trigger)
+        1. [Trigger `trigger_status_change`](#trigger-trigger_status_change)
+        1. [Trigger `trigger_notifications`](#trigger-trigger_notifications)
+        1. [Trigger `trigger_user_rating`](#trigger-trigger_user_rating)
+        1. [Trigger `trigger_carts_owner`](#trigger-trigger_carts_owner)
+        1. [Trigger `trigger_history_notifications`](#trigger-trigger_notifications)
+    2. [View Materializzate](#view-materializzate)
+        1. [Vista `notifications_count`](#vista-notifications_count)
+        2. [Vista `star_count`](#vista-star_count)
+    3. [Indici](#indici)
+    4. [Controlli Ulteriori](#controlli-ulteriori)
 6. [Ulteriori informazioni](#ulteriori-informazioni)
 7. [Contributo al Progetto](#contributo-al-progetto)
 
@@ -303,7 +315,7 @@ db.session.scalars(
 ```
 e può essere tradotta come segue (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 ```postgresql
-SELECT owns.id, owns.fk_username, owns.fk_book, owns.state, owns.price, owns.quantity 
+SELECT *
 FROM owns 
 WHERE owns.fk_username = _user.username_
 LIMIT _limit_ OFFSET _(page-1)*limit_
@@ -319,7 +331,7 @@ db.session.query(Own)
 ```
 In SQL la query sarebbe stata (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 ```postgresql
-SELECT owns.id, owns.fk_username, owns.fk_book, owns.state, owns.price, owns.quantity 
+SELECT *
 FROM owns 
 WHERE owns.fk_book = _book.id_ AND owns.price IS NOT NULL AND owns.fk_username != _username_ ORDER BY owns.fk_username
 ```
@@ -334,7 +346,7 @@ db.session.scalars(
 ```
 La query in linguaggio SQL sarebbe stata (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 ```postgresql
-SELECT history.id, history.date, history.quantity, history.status, history.price, history.review, history.stars, history.fk_buyer, history.fk_seller, history.fk_book, history.state 
+SELECT *
 FROM history 
 WHERE history.fk_buyer = _user.username_ ORDER BY _History.id_ DESC
 ```
@@ -376,7 +388,7 @@ query = db.session.query(Book).filter(
 ```
 La query in linguaggio SQL sarebbe stata indicativamente (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 ```postgresql
-SELECT books.id, books.title, books.published, books.pages, books.isbn, books.fk_author, books.fk_publisher 
+SELECT *
 FROM books 
 JOIN owns ON books.id = owns.fk_book 
 WHERE ((books.title ILIKE '%%' || _title_ || '%%') 
@@ -389,9 +401,162 @@ AND owns.price IS NOT NULL
 AND owns.price <= _price_
 ```
 
-
 # Scelte Progettuali
-politiche di integrità e come sono state garantite in pratica (es. trigger), definizione di ruoli e politiche di autorizzazione, uso di indici, view, ecc. Tutte le principali scelte progettuali devono essere opportunamente commentate e motivate.
+## Trigger 
+Al fine di garantire l'integrità della base di dati ed implementare alcune features, sono stati usati i seguenti trigger:
+
+### Trigger `check_quantity_zero_trigger`
+Questo è il trigger che, come anticipato, potrebbe essere stato sostituito da un `CHECK`. La scelta di utilizzare un trigger è stata fatta al fine di poter sollevare una specifica eccezzione all'interno della funzione, che viene poi catturata python come se fosse una sorta di "segnale" di un determinato problema avvenuto nell'inserimento. Ovviamente, il rollback avviene automaticamente, in quanto a lato SQL l'eccezione non viene mai esplicitamente catturata
+```postgresql
+CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.quantity < 0 THEN --se la quantità è invalida
+        RAISE EXCEPTION 'Quantity must be positive';
+    ELSIF NEW.quantity = 0 THEN --se il libro è stato "esaurito"...
+        DELETE FROM owns WHERE id = NEW.id; -- ...cancellalo di conseguenza
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_quantity_zero_trigger
+AFTER INSERT OR UPDATE OF quantity ON owns
+FOR EACH ROW
+EXECUTE FUNCTION remove_if_quantity_zero();
+```
+
+### Trigger `trigger_status_change`
+Il seguente trigger fa si che a seguito di un cambiamento di stato di un ordine (es. quando questo viene spedito), venga generata automaticamente una notifica lo informi dell'avvenimento
+```postgresql
+CREATE OR REPLACE FUNCTION notify_status_change()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO notifications (fk_username, context, archived, fk_history, order_status_old, order_status_new) -- inserici la notifica
+    VALUES (NEW.fk_buyer, 'order updated', FALSE, NEW.id, OLD.status, NEW.status); -- ne dati inserisci lo stato vecchio e quello aggiornato
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_status_change
+AFTER UPDATE ON history
+FOR EACH ROW
+WHEN (OLD.status IS DISTINCT FROM NEW.status) -- previene la creazione automatica di notifiche se 
+                                              -- non in caso di cambiamenti di stato
+EXECUTE FUNCTION notify_status_change();
+```
+
+### Trigger `trigger_notifications`
+Il seguente trigger viene utilizzato per aggiornare la vista materializzata [`notifications_count`](#vista-notifications_count) a seguito dell'aggiunta di una nuova notifica. Per questo motivo il trigger che chiama la funzione `notifications_count_refresh` è un `AFTER TRIGGER`
+```postgresql
+CREATE OR REPLACE FUNCTION notifications_count_refresh()
+RETURNS TRIGGER AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW notifications_count; -- aggiorna la view materializzata
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_notifications
+AFTER INSERT OR UPDATE OR DELETE ON notifications -- a seguito di qualsiasi cambiamento
+EXECUTE FUNCTION notifications_count_refresh();
+```
+
+### Trigger `trigger_user_rating`
+Il seguente trigger ha lo scopo di mantenere aggiornata la view [`star_count`](#vista-star_count) a seguito di un'aggiunta di un ordine nella history o nel caso venga scritta una recensione con relativa valutazione
+```postgresql
+CREATE OR REPLACE FUNCTION refresh_star_count()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW star_count; -- aggiorna la vista
+    RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER trigger_user_rating
+AFTER INSERT OR UPDATE ON history -- a seguito di un'aggiunta o di un'aggiornamento
+FOR EACH STATEMENT
+EXECUTE PROCEDURE refresh_star_count();
+```
+
+### Trigger `trigger_carts_owner`
+Questo trigger serve a mantenere la consistenza della base di dati, in quanto va a controllare che l'oggetto che si sta per inserrire nel carrello appartenga ad un utente che è abilitato alla vendita
+```postgres
+CREATE OR REPLACE FUNCTION if_seller_is_seller()
+RETURNS TRIGGER
+AS $$
+BEGIN
+    IF EXISTS(SELECT 1 FROM users -- controlla che il venditore sia abilitato
+                WHERE users.username = NEW.fk_own
+                    AND users.seller) THEN
+        RETURN NEW;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_carts_owner
+BEFORE INSERT OR UPDATE ON carts -- in caso di inserimento/aggiornamento del carrello
+FOR EACH ROW
+EXECUTE PROCEDURE if_seller_is_seller();
+```
+
+### Trigger `trigger_history_notifications`
+Il seguente trigger controlla che se una notifica si riferisce ad un ordine, colui che ha comprato il prodotto deve essere anche colui a cui è diretta la notifica
+```postgres
+CREATE OR REPLACE FUNCTION check_notification()
+RETURNS TRIGGER
+AS $$
+BEGIN
+    IF NEW.fk_history IS NOT NULL AND NOT EXISTS( -- se non c'è l'utente a cui è diretta la notifica 
+        SELECT 1 FROM history AS h                -- con il dato id della history
+            WHERE h.id = NEW.fk_history AND
+            NEW.fk_username = h.fk_buyer
+            ) THEN
+        RETURN NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_history_notifications
+BEFORE INSERT OR UPDATE ON notifications -- in caso di inserzione/aggiornamento nelle notifiche
+FOR EACH ROW
+EXECUTE FUNCTION check_notification();
+```
+
+## View Materializzate
+Al fine di migliorare le performance, sono state introdotte le seguenti view materializzate
+
+### Vista `notifications_count`
+```postgresql
+CREATE MATERIALIZED VIEW notifications_count (username, count)
+AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
+
+CREATE INDEX idx_username_notifications_count ON notifications_count(fk_username);
+```
+
+### Vista `star_count`
+```postgresql
+CREATE MATERIALIZED VIEW star_count
+AS
+SELECT fk_seller, CAST(SUM(stars) AS DECIMAL)/COUNT(*) AS vote, COUNT(*) AS total FROM history
+WHERE review IS NOT NULL
+GROUP BY fk_seller
+WITH NO DATA;
+```
+
+CREATE INDEX idx_seller_star_count ON star_count(fk_seller);
+
+## Indici
+Al fine di migliorare le performance, sono stati creati i seguenti indici
+
+## Controlli Ulteriori
+dire anche dei controlli fatti su python (la maggior parte actually)
 
 
 # Ulteriori informazioni
