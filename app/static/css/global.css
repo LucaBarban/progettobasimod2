@@ -53,16 +53,21 @@ body {
 }
 
 .button {
+    position: relative;
     font-size: var(--font-size);
     font-weight: 500;
     background: var(--accent-color);
-    color: #000;
+    color: var(--main-foreground);
     text-decoration: none;
     overflow: hidden;
-    border-radius: 5px;
-    border: solid var(--accent-color);
-    border-style: solid;
+    border-radius: var(--border-radius);
+    border: none;
     padding: 8px 10px;
     margin: 5px;
+    background: #dddbd9;
     cursor: pointer;
+}
+
+.page-title {
+    text-align: center;
 }

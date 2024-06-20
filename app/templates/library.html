@@ -3,42 +3,70 @@
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/library.css') }}">
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/book.css') }}">
+          href="{{ url_for('static', filename='css/components/books.css') }}">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 {% endblock pagestyles %}
 {% block content %}
-    {% from 'components/book.html' import display_book %}
+    {% from 'components/book.html' import display_book_image, display_book_metadata %}
+    <h1 class="page-title">{{ user.username }}'s library</h1>
+    <br>
+    <div class="centered-div">
+        <a href="/book/add" class="button--add">+</a>
+    </div>
     <div class="lib__container">
-        <div class="lib__item">
-            <h1 class="lib__title">{{ user.username }}'s library</h1>
-            <div class="lib__library">
-                {% for own in owns %}
-                    <div class="own__item">
-                        {{ display_book(own.book, publisher=False, generes=False) }}
-                        <div class="own__details">
-                            <div class="detail__box">
-                                <span>{{ own.state }}</span>
-                                <br />
-                                <span>x{{ own.quantity }}</span>
-                            </div>
-                        </div>
+        <div class="lib__library">
+            {% for own in owns %}
+                <div class="library__item">
+                    <div class="centered-div">
                         {% if own.price %}
-                            <a class="lib__btn"
-                               href="/insertion/update/?book={{ own.fk_book }}&bookstate={{ own.state }}&quantity={{ own.quantity }}&oldprice={{ own.price }}"> edit </a>
-                            <a class="lib__btn"
-                               href="/insertion/unlist/?book={{ own.fk_book }}&bookstate={{ own.state }}&quantity={{ own.quantity }}&price={{ own.price }}">remove</a>
+                            <span class="icon material-symbols-outlined">
+                                <a class="icon"
+                                   href="/insertion/update/?book={{ own.fk_book }}&bookstate={{ own.state }}&quantity={{ own.quantity }}&oldprice={{ own.price }}"> edit </a>
+                            </span>
+                            <span class="icon material-symbols-outlined">
+                                <a class="icon"
+                                   href="/insertion/unlist/?book={{ own.fk_book }}&bookstate={{ own.state }}&quantity={{ own.quantity }}&price={{ own.price }}">delete</a>
+                            </span>
                         {% elif own.user.seller %}
-                            <a class="lib__btn"
-                               href="/insertion/list/?book={{ own.fk_book }}&bookstate={{ own.state }}">create</a>
+                            <span class="material-symbols-outlined">
+                                <a class="icon"
+                                   href="/insertion/list/?book={{ own.fk_book }}&bookstate={{ own.state }}">storefront</a>
+                            </span>
                         {% endif %}
                     </div>
-                {% endfor %}
-                {% if page == last_page %}
-                    <div class="lib__add">
-                        <a href="/book/add" class="add__btn">+</a>
+                    {{ display_book_image(own.book, link=False) }}
+                    <table class="book__meta">
+                        {{ display_book_metadata(own.book, label=False) }}
+                    </table>
+                    <div class="centered-div">
+                        <span>{{ own.quantity }} {{ own.state }}</span>
                     </div>
-                {% endif %}
-            </div>
-            {% include "components/pagination.html" %}
+                </div>
+            {% endfor %}
         </div>
+        <br>
+        {% if pages|length != 1 %}
+            <div class="lib__pagination">
+                {% if pages[0] != 1 %}<a href="1" class="button">1</a>{% endif %}
+                {% if pages[0] > 2 %}<span>...</span>{% endif %}
+                {% for p in pages %}
+                    {% if page == p %}
+                        <a href="{{ p }}" class="button button--current">{{ p }}</a>
+                    {% else %}
+                        <a href="{{ p }}" class="button button--noncurrent">{{ p }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if pages[-1] < last_page - 1 %}<span>...</span>{% endif %}
+                {% if pages[-1] != last_page %}<a href="{{ last_page }}" class="button">{{ last_page }}</a>{% endif %}
+            </div>
+        {% endif %}
     </div>
+    <br>
 {% endblock content %}

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/stars.css') }}">
+          href="{{ url_for('static', filename='css/components/stars.css') }}">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/book.css') }}">
 {% endblock pagestyles %}
@@ -46,7 +46,7 @@
                             {% if user %}
                                 <form action="/cart/add/{{ own.id }}" method="POST">
                                     <input type="number" class="insertion__quantity" name="quantity" min="1" value="1" />
-                                    <input type="submit" class="button" value="Add to cart" />
+                                    <input type="submit" class="button button--current" value="Add to cart" />
                                 </form>
                             {% else %}
                                 <div>Login before buying</div>
