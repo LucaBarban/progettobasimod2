@@ -866,13 +866,14 @@ Dopo questa fase iniziale ci siamo divisi i compiti in task da svolgenere settim
 - Luca Saccarola:
     - **homepage:** creazione della pagina con libri consigliati scelti randomicamente
     - **searchbar:** barra di ricerca per nome del libro, autore, casa pubblicatrice...
+    - **libro:** visualizzazione dei dettagli di un singolo libro
     - **css e design grafico:** buona parte di scelte principali di design, nonché gli scheletri base delle pagine utilizzate per tutta la piattaforma
     - **componentizzazione delle pagine:** rimozione di codice duplicato e conseguente creazione di componenti singole per le pagine scritte da Paolo Mozzoni e luca
     - **logo:** perché anche l'occhio vuole la sua parte
 - Paolo Mozzoni:
     - **libreria:** visualizzazione di libri posseduti e in vendita dell'utente
     - **carrello:** gestione degli acquisti che l'utente vuole fare
-    - **libro:** visualizzazione dei dettagli di un singolo libro con relative inserzioni disponibili
+    - **libro:** visualizzazione delle relative inserzioni disponibili
     - **notifiche:** visualizzazione delle notifiche
     - **venditore:** visualizzazione delle recensioni e delle inserzioni di un venditore
     - **visualizzazione ordini:** pagina di gestione degli ordini
