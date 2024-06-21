@@ -64,8 +64,8 @@ INSERT INTO books (title, published, pages, isbn, fk_author, fk_publisher) VALUE
     ('Murder on the Orient Express', '1934-01-01', 274, '9780062073495', 14, 'HarperCollins'),
     ('The Shining', '1977-01-28', 447, '9780307743658', 15, 'Random House'),
     ('Half of a Yellow Sun', '2006-08-11', 433, '9781400044161', 16, 'Random House'),
-    ('Emma', '1815-12-23', 474, '9780143105428', 1, 'Penguin Books'),
-    ('David Copperfield', '1850-05-01', 882, '9780140439442', 2, 'Penguin Books'),
+    ('Emma', '1815-12-23', 474, '9780143105429', 1, 'Penguin Books'),
+    ('David Copperfield', '1850-05-01', 882, '9780140439443', 2, 'Penguin Books'),
     ('One Flew Over the Cuckoo''s Nest', '1962-02-01', 320, '9780451163968', 8, 'Simon & Schuster'),
     ('The Catcher in the Rye', '1951-07-16', 234, '9780316769499', 8, 'Penguin Books'),
     ('The Picture of Dorian Gray', '1890-07-20', 254, '9780486278080', 5, 'Penguin Books'),
@@ -75,9 +75,9 @@ INSERT INTO books (title, published, pages, isbn, fk_author, fk_publisher) VALUE
     ('Moby-Dick', '1851-10-18', 585, '9780142000084', 2, 'Penguin Books'),
     ('The Road', '2006-09-26', 287, '9780307387890', 15, 'Simon & Schuster'),
     ('Americanah', '2013-05-14', 588, '9780307455936', 16, 'HarperCollins'),
-    ('Sense and Sensibility', '1811-10-30', 352, '9780143105429', 1, 'Penguin Books'),
-    ('Les Misérables', '1862-03-15', 1232, '9780140444309', 6, 'Penguin Books'),
-    ('The Sun Also Rises', '1926-10-22', 251, '9780684800715', 3, 'Simon & Schuster');
+    ('Sense and Sensibility', '1811-10-30', 352, '9780143105430', 1, 'Penguin Books'),
+    ('Les Misérables', '1862-03-15', 1232, '9780140444310', 6, 'Penguin Books'),
+    ('The Sun Also Rises', '1926-10-22', 251, '9780684800716', 3, 'Simon & Schuster');
 
 
 INSERT INTO booksgenres (fk_idB, fk_genre) VALUES

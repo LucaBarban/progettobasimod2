@@ -116,7 +116,7 @@ CREATE TABLE notifications(
     fk_username VARCHAR(100) NOT NULL,
     message TEXT,
     archived BOOLEAN NOT NULL,
-    FOREIGN KEY (fk_username) REFERENCES users(username)
+    FOREIGN KEY (fk_username) REFERENCES users(username),
 
     -- Order
     fk_history INTEGER,
@@ -130,7 +130,7 @@ CREATE INDEX idx_username_notifications ON notifications(fk_username);
 CREATE MATERIALIZED VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
 
-CREATE INDEX idx_username_notifications_count ON notifications_count(fk_username);
+CREATE INDEX idx_username_notifications_count ON notifications_count(username);
 
 
 CREATE MATERIALIZED VIEW star_count
@@ -217,9 +217,11 @@ CREATE OR REPLACE FUNCTION if_seller_is_seller()
 RETURNS TRIGGER
 AS $$
 BEGIN
-    IF EXISTS(SELECT 1 FROM users
-                WHERE users.username = NEW.fk_own
-                    AND users.seller) THEN
+    IF EXISTS(
+            SELECT 1
+            FROM owns o join users u on o.fk_username = u.username
+            WHERE o.id = NEW.fk_own AND u.seller
+        ) THEN
         RETURN NEW;
     END IF;
     RETURN NULL;
