@@ -458,7 +458,7 @@ La tabella `history` segue la struttura dell'entità [`History`](#entità-histor
 ### Tabella `notifications`
 $$
 \begin{aligned}
-&notifications\;(\underline{id}:int ,\; context:disc_notif ,\; fk\_username:string ,\; message:string ,\; archived:bool ,\; fk\_history:int ,\; order\_status\_old:status ,\; order\_status\_new:status ,\; ) \\
+&notifications\;(\underline{id}:int ,\; context:disc\_notif ,\; fk\_username:string ,\; message:string ,\; archived:bool ,\; fk\_history:int ,\; order\_status\_old:status ,\; order\_status\_new:status \; ) \\
 & \qquad PK(id) \\
 & \qquad fk\_username \;FK\; users(username) \\
 & \qquad fk\_history \;FK\; history(id) 
@@ -862,7 +862,7 @@ La libreria session ci ha permesso di salvare in maniera cifrata in un cookie il
 # Contributo al progetto
 Lo sviluppo ddel progetto è iniziato scrivendo lo schema ER collaborativamente, in modo da evitare di non accorgersi di parti salienti da implementare nel progetto, successivamente Luca Saccarola ha implementato il tooling che abbiamo usato per l'interezza del progetto come, ad esempio, mypy o il file `compose.yml` usato per il database e Paolo Mozzoni ha implementato la struttura base delle pagine (quindi la suddivisione in `routes`, `model`, `templates`, file `__init__`...) 
 
-Dopo questa fase iniziale ci siamo divisi i compiti in task da svolgenere settimanalmente, escludendo quale ritardo dovuto alla presenza della sessione d'esame nell'ultima fase del progetto. Se non consideriamo i contributi minori a parti non assegnate direttamente ad altri interessati, possiamo suddividere le assegnazioni come segue:
+Dopo questa fase iniziale ci siamo divisi i compiti in task da svolgenere settimanalmente, escludendo quale ritardo dovuto alla presenza della sessione d'esame nell'ultima fase del progetto. La suddivisione è stata facilitata dal fatto che abbiamo usato git, per poi lavorare su singoli branch mergiandoli dopo aver creato e approvato le relative pr. Se non consideriamo i contributi minori a parti non assegnate direttamente ad altri interessati, possiamo suddividere le assegnazioni come segue:
 - Luca Saccarola:
     - **homepage:** creazione della pagina con libri consigliati scelti randomicamente
     - **searchbar:** barra di ricerca per nome del libro, autore, casa pubblicatrice...
