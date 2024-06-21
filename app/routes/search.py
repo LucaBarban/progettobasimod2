@@ -12,6 +12,7 @@ from app.models.book import Book
 from app.models.genre import Genre
 from app.models.own import Own
 from app.models.publisher import Publisher
+from app.routes.auth import getLoggedInUser
 
 
 @dataclass
@@ -70,6 +71,8 @@ def search() -> str | Response:
     Parse search form and returns all the matching books
     """
 
+    user = getLoggedInUser()
+
     user_input = request.form.get("user_input") or ""
     available = request.form.get("available") == "on"
     genres_input = request.form.getlist("genre")
@@ -95,7 +98,7 @@ def search() -> str | Response:
 
     return render_template(
         "search.html",
-        user=None,
+        user=user,
         books=books,
         input=input,
         genres=genres,
