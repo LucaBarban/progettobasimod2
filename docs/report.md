@@ -860,4 +860,23 @@ La libreria session ci ha permesso di salvare in maniera cifrata in un cookie il
 
 
 # Contributo al progetto
-una spiegazione di come i diversi membri del gruppo hanno contribuito al design ed allo sviluppo.
+Lo sviluppo ddel progetto è iniziato scrivendo lo schema ER collaborativamente, in modo da evitare di non accorgersi di parti salienti da implementare nel progetto, successivamente Luca Saccarola ha implementato il tooling che abbiamo usato per l'interezza del progetto come, ad esempio, mypy o il file `compose.yml` usato per il database e Paolo Mozzoni ha implementato la struttura base delle pagine (quindi la suddivisione in `routes`, `model`, `templates`, file `__init__`...) 
+
+Dopo questa fase iniziale ci siamo divisi i compiti in task da svolgenere settimanalmente, escludendo quale ritardo dovuto alla presenza della sessione d'esame nell'ultima fase del progetto. Se non consideriamo i contributi minori a parti non assegnate direttamente ad altri interessati, possiamo suddividere le assegnazioni come segue:
+- Luca Saccarola:
+    - **homepage:** creazione della pagina con libri consigliati scelti randomicamente
+    - **searchbar:** barra di ricerca per nome del libro, autore, casa pubblicatrice...
+    - **css e design grafico:** buona parte di scelte principali di design, nonché gli scheletri base delle pagine utilizzate per tutta la piattaforma
+    - **componentizzazione delle pagine:** rimozione di codice duplicato e conseguente creazione di componenti singole per le pagine scritte da Paolo Mozzoni e luca
+- Paolo Mozzoni:
+    - **libreria:** visualizzazione di libri posseduti e in vendita dell'utente
+    - **carrello:** gestione degli acquisti che l'utente vuole fare
+    - **libro:** visualizzazione dei dettagli di un singolo libro con relative inserzioni disponibili
+    - **notifiche:** visualizzazione delle notifiche
+    - **venditore:** visualizzazione delle recensioni e delle inserzioni di un venditore
+    - **visualizzazione ordini:** pagina di gestione degli ordini
+- Luca Barban:
+    - **sistema autenticazione:** gestioni dei login, registrazioni, autenticazione 
+    - **storico:** visualizzazione degli ordini effettuati per recensirli
+    - **gestione inserzioni:** creazione, aggiornamento e rimozione di inserzioni
+    - **profilo:** visualizzazione dei dati del prorpio profilo
