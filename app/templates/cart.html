@@ -4,6 +4,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
 {% endblock pagestyles %}
 {% block content %}
+    <h1> Cart </h1>
+    <hr>
+    <br><br>
     {% if items|length == 0 %}
         <h2>Your cart is empty</h2>
         You can <a href="/">find new books here</a>

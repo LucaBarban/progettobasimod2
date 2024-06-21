@@ -6,9 +6,7 @@
                 name="rating{{ id }}"
                 id="rate-{{ id }}-{{ star }}"
 
-                {% if value %}
-                    value="{{ star }}"
-                {% endif %}
+                value="{{ star }}"
 
                 {% if not input %}
                     {% if value - 0.5 <= star and value + 0.5 >= star  %}
