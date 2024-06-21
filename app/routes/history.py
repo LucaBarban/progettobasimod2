@@ -16,7 +16,6 @@ def history() -> str | Response:
     Print the books the user has purchased provide a way to post a review
     with relative stars to accompany it
     """
-    print(request.form)
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/?link=/history")
@@ -47,8 +46,7 @@ def history() -> str | Response:
                     "An unexpected error occured while interacting with the database",
                     "error",
                 )
-            except Exception as e:
-                print(e)
+            except Exception:
                 db.session.rollback()
                 flash("An unexpected error occured", "error")
         else:
