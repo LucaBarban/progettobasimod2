@@ -1,37 +1,48 @@
-:root {
-    --library-border: #8B4513;
-    --library-separator: #6F4E37;
+.history__list {
+    margin: 20px;
 }
 
-hr {
-    display: block;
+.history__empty {
+    color: #000;
+}
+
+.history__list table {
     width: 100%;
-    border: 4px solid var(--library-border)
 }
 
-.history__border {
-    border: 10px solid var(--library-border);
+.history__image {
+    width: 250px;
+}
+
+.history__info {
+    width: 50%;
     padding: 20px;
-    border-radius: 30px;
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    flex-wrap: wrap;
 }
 
-.history__book {
-    display: inline-block;
-    width: 100%;
+.history__info span {
+    font-size: 24px;
+    font-weight: 500;
 }
 
-.history__left {
-    float: left;
-}
-.history__right {
-    float: right;
+.history__info a {
+    color: #000;
 }
 
-.history__right textarea {
+.history__info div {
+    margin: 20px;
+}
+
+.history__rating {
+    width: 40%;
+}
+
+.history__rating textarea {
     width: 500px;
     height: 120px;
+    background: var(--background-color);
+    color: #000;
+    border: 2px solid black;
+    resize: none;
+    margin: 10px;
+    padding: 5px;
 }

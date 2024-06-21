@@ -23,22 +23,27 @@
         {% for genre in genres %}
             <option value="{{ genre.name }}">{{ genre.name }}</option>
         {% endfor %}
-
-    </select><br><br>
+    </select>
+    <a href="/book/add/genre" class="button" style="text-align: center;"> Add a missing genre </a>
+    <br><br>
 
     <label for="author">Author:</label>
     <select id="author" name="author" required>
         {% for author in authors %}
             <option value="{{ author.id }}">{{ author.first_name }} {{ author.last_name }}</option>
         {% endfor %}
-    </select><br><br>
+    </select>
+    <a href="/book/add/author" class="button" style="text-align: center;"> Add a missing author </a>
+    <br><br>
 
     <label for="publisher">Publisher:</label>
     <select id="publisher" name="publisher" required>
         {% for publisher in publishers %}
             <option value="{{ publisher.name }}">{{ publisher.name }}</option>
         {% endfor %}
-    </select><br><br>
+    </select>
+    <a href="/book/add/publisher" class="button" style="text-align: center;"> Add a missing publisher </a>
+    <br><br>
 
     <label for="file">Book's Cover:</label>
     <input type="file" name="file" id="file"><br><br>
