@@ -6,6 +6,7 @@ from flask import current_app as app
 from flask import flash, redirect, render_template, request
 from werkzeug.wrappers.response import Response
 
+from sqlalchemy import select
 from app.database import db
 from app.models.history import History, Statuses
 from app.routes.auth import getLoggedInUser
@@ -73,7 +74,9 @@ def orders() -> str | Response:
         # Mabye custom page?
         abort(404)
 
-    orders = db.session.query(History).filter(History.fk_seller == user.username).all()
+    orders = db.session.scalars(
+        select(History).filter(History.fk_seller == user.username)
+    ).all()
 
     # Split orders into [ not shipped, shipped, delivered ]
     (processing, orders) = partition(

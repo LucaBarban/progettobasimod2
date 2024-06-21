@@ -1,5 +1,6 @@
 from flask import current_app as app
 from flask import flash, redirect, render_template
+from sqlalchemy import select
 from werkzeug.wrappers.response import Response
 
 from app.database import db
@@ -17,13 +18,11 @@ def read_all_notifications() -> Response:
     if user is None:
         return redirect("/login?link=/notifications")
 
-    unreads = (
-        db.session.query(Notification)
-        .filter(
+    unreads = db.session.scalars(
+        select(Notification).filter(
             Notification.fk_username == user.username, Notification.archived == False
         )
-        .all()
-    )
+    ).all()
 
     for notif in unreads:
         notif.archived = True
@@ -65,21 +64,17 @@ def notifications() -> str | Response:
     if user is None:
         return redirect("/login?link=/notifications")
 
-    unreads = (
-        db.session.query(Notification)
-        .filter(
+    unreads = db.session.scalars(
+        select(Notification).filter(
             Notification.fk_username == user.username, Notification.archived == False
         )
-        .all()
-    )
+    ).all()
 
-    archived = (
-        db.session.query(Notification)
-        .filter(
+    archived = db.session.scalars(
+        select(Notification).filter(
             Notification.fk_username == user.username, Notification.archived == True
         )
-        .all()
-    )
+    ).all()
 
     return render_template(
         "notifications.html", user=user, unreads=unreads, archived=archived

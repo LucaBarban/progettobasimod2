@@ -4,6 +4,8 @@ from typing import List, Tuple
 from flask import current_app as app
 from flask import render_template
 
+from sqlalchemy import select
+
 from app.database import db
 from app.models.book import Book
 from app.models.genre import Genre
@@ -14,8 +16,9 @@ def generate_book_list(n_books: int = 5) -> List[Tuple[str, List[Book]]]:
     """
     Returns a list of random books by genre limited by ``n_books``
     """
-    query = [x for x in db.session.query(Genre).all() if len(x.books) >= n_books]
-    return [(genre.name, sample(genre.books, n_books)) for genre in query]
+    query = db.session.scalars(select(Genre)).all()
+    books = [x for x in query if len(x.books) >= n_books]
+    return [(genre.name, sample(genre.books, n_books)) for genre in books]
 
 
 @app.route("/")
