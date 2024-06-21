@@ -22,18 +22,6 @@
     display: flex;
 }
 
-.button--primary {
-    background: var(--accent-color);
-    color: var(--main-foreground);
-}
-
-.button--secondary {
-    background: none;
-    color: var(--accent-color);
-    border-style: solid;
-    border-color: var(--accent-color);
-}
-
 .display__category__books {
     display: flex;
     justify-content: center;

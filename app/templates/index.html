@@ -14,10 +14,10 @@
         {% else %}
             <h1>Welcome Back {{ user.username }}</h1>
             <div class="shortcuts">
-                <a href="/library" class="button button--primary">Library</a>
-                <a href="/history" class="button button--secondary">History</a>
+                <a href="/library" class="button">Library</a>
+                <a href="/history" class="button">History</a>
                 {% if user.seller %}
-                    <a href="/orders" class="button button--secondary">Orders</a>
+                    <a href="/orders" class="button">Orders</a>
                 {% endif %}
             </div>
         {% endif %}
