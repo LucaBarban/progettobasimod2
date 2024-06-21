@@ -5,7 +5,7 @@
     2. [Visualizzazione singolo Libro e relative Inserzioni](#visualizzazione-singolo-libro-e-relative-inserzioni)
     3. [Gestione del Carrello](#gestione-del-carrello)
     4. [Visualizzazione degli Acquisti](#visualizzazione-degli-acquisti)
-    5. [Struttura delle Pagine](#struttura-delle-pagine)
+    5. [Homepage](#homepage)
     6. [Gestione delle Inserzioni](#gestione-delle-inserzioni)
     7. [Visualizzazione della propria Libreria](#visualizzazione-della-propria-libreria)
     8. [Visualizzazione delle Notifiche](#visualizzazione-delle-notifiche)
@@ -120,19 +120,46 @@ Le funzioni `checkLoggedIn` e `getLoggedInUser` funzionano essenzialmente alla s
 
 ## Visualizzazione singolo Libro e relative Inserzioni
 (book.py)
+La pagina prima cerca il libro con l'`id` passato come parametro e, se non è presente, ritorna `404`.
 
+Se il libro esiste, invece, viene visualizzata la copertina e tutte le relative informazioni (come autore e generi) tramite la macro `display_book`.
+
+Inoltre il sistema cerca tutte le inserzioni relative al libro, rimuove quelle dell'utente attualmente loggato, le raggruppa per venditore e le ordina.
+
+L'ordinamento si basa sulle stelle totali o medie dei venditori tramite il parametro `sort` e l'ordine è crescente o decrescente a seconda del paramentro `order`. Tutti i venditori che non hanno ancora stelle verranno sempre mostrati alla fine
+
+Altre operazioni che offre `/book/` sono:
+ - `add` che visualizza un form per aggiungere un libro mancante, da riempire con tutti i paramentri del libro (come titolo, data di pubblicazione, ISBN, etc.) e supporta il caricamento di una foto della copertina
+ - `add/genre` per aggiungere un genere non già presente nel database
+ - `add/author` per aggiungere un autore non già presente nel database
+ - `add/publisher` per aggiungere una casa editrice non già presente nel database
 
 ## Gestione del Carrello
 (cart.py)
+Il carrello raccoglie tutte le inserzioni che l'utente ha aggiunto e la rispettiva quantità, calcola il prezzo totale e offre la possibilità di rimuovere un'inserzione o modificarne la quantità.
 
+Prima di confermare la transazione controlla:
+ - che il libro sia in vendita e la rispettiva inserzione sia presente
+ - che la quantità di ogni inserzione sia minore o uguale a quella disponibile e che sia positiva
+ - che il compratore abbia abbastanza soldi per comprare tutti i libri
+Se anche solo una di queste non e' valida, esegue il rollback
+
+Inoltre supporta l'aggiunta e la rimozione di un'inserzione:
+ - `/cart/add` dove controlla che l'inserzione esista, che la quantità non superi quella presente e che l'utente sia loggato
+ - `/cart/remove` dove evita di cancellare inserzioni non presenti nel carrello
 
 ## Visualizzazione degli Acquisti
 (history.py)
 Lo storico, una volta controllato che l'utente sia loggato e ricevuti l'id dell'acquisto fatto (id nello storico), una recensione e una valutazione, procedono a controllare che i dati passati siano validi (quindi non `None` e con una recensione almeno lunga 2 caratteri), procedono a modificare l'oggetto `History` corrispondente al prodotto nello storico andando ad aggiungere la recensione e la valutazione. In caso di errori viene eseguito un rollback esplicitamente e viene mostrato un messaggio d'errore. Infine vengono ricaricati gli oggetti aggiornati presenti nello storico con lo scopo di visualizzarli
 
 
-## Struttura delle Pagine
+## Homepage
 (index.py)
+La homepage (o root `/`) visualizza multiple liste di libri suddivise per genere e ordinati randomicamente tramite la funzione `generate_book_list`.
+
+Se c'è un utente loggato visualizza anche due pulsanti, rispettivamente per accedere alla libreria personale e per visualizzare lo storico degli ordini.
+
+Inoltre, se l'utente è un venditore, mostra un pulsante extra per accedere alla lista degli ordini.
 
 
 ## Gestione delle Inserzioni
@@ -165,14 +192,36 @@ La funzione `manageInsertion` si occupa di gestire tutti i casi in cui l'aggiunt
 
 ## Visualizzazione della propria Libreria
 (library.py)
+La libreria raccoglie tutti i libri posseduti dall'utente corrente. Rimanda alla pagina di login se l'utente non è ancora loggato.
+
+Le funzioni offerte dalla libreria sono:
+ - Aggiunta di un nuovo libro non presente nel database
+ - Paginazione per suddividerla in sezioni e non sovraccaricare il database per ogni richiesta
+ - Informazioni sul libro posseduto, quantità e stato
+
+Inoltre, solo se l'utente corrente è un venditore, offre anche la possiblità di aggiungere, modificare e rimuovere un'inserzione.
 
 
 ## Visualizzazione delle Notifiche
 (notifications.py)
+Le notifiche sono divise in "Unread" and "Archived" e divise per utente, dove ogni utente può visualizzare solo le proprie.
+
+Offre anche due funzioni `/notifications/read` e `/notifications/read/:id` rispettivamente per segnare tutte le notifiche come lette, quindi archiviarle, e per leggerne una sola specificatamente.
+
+Entrambe le funzioni rimandano a `/notifications` per aggiornare la pagina in seguito
+
+E' anche presente un badge visualizzato sulla navbar che riporta il numero di notifiche non lette, tramite il metodo `user.unread_count()`
+
+Questo metodo esegue una query sulla view `NotificationCount` dato l'utente `self` e ritorna un numero che, se maggiore di 0, viene mostrato sopra il badge
 
 
 ## Gestione degli Ordini
 (orders.py)
+Per il venditore loggato visualizza tutti gli ordini suddivisi in "Da spedire", "Spediti" e "Consegnati". Solo i venditori hanno accesso a questa pagina.
+
+Per gli ordini in "Da spedire" e "Spediti" è possibile aggiornare lo stato dell'ordine. Viene automaticamente aggiornato e viene mandata una notifica all'utente interessato se il nuovo stato è tra quelli accettati.
+
+Per gli ordini già consegnati viene visualizzata anche la review ricevuta dall'utente oppure, se non presente, un messaggio di attesa.
 
 
 ## Gestione del Profilo
@@ -184,10 +233,30 @@ Le operazioni di aggiornamento avvengono controllando se sono avvenuti dei cambi
 
 ## Gestione della Ricerca
 (search.py)
+Normalmente visibile solamente come input testuale nella navbar, si arricchisce di ulteriori filtri una volta visitata la pagina `/search`.
+
+I filtri sono raccolti nella classe interna `UserInput` e sono:
+ - `search` per l'input testuale, 
+ - `genres` per i libri che hanno almeno uno dei generi selezionati
+ - `publishers` per i libri pubblicati da una delle case editoriali selezionate
+ - `available` per mostrare solo i libri acquistabili
+ - `min` per ritornare tutti i libri con un prezzo superiore
+ - `max` per ritornare tutti i libri con un prezzo inferiore 
+
+ Dati i filtri, che possono anche essere `None` o liste vuote, la funzione `generate_book_list` crea una query utilizzando solo i filtri abilitati, per evitare controlli extra.
+
+Inoltre le checkboxes `genres` e `publishers` vengono automaticamente create in base al contenuto delle rispettive tabelle nel database.
+
+Inoltre le checkboxes `genres` e `publishers` vengono automaticamente create in base al contenuto delle rispettive tabelle nel database.
 
 
 ## Visualizzazione Venditore
 (seller.py)
+La pagina del venditore, visibile solo se l'utente cercato è un venditore, visualizza le stelle medie, una lista dei libri attualmente in vendita e le recensioni ricevute. 
+
+Le stelle di un venditore vengono calcolate dalla view `star_count` come media delle stelle di tutte le recensioni ricevute da coloro che hanno effettuato un ordine da quel venditore. Questo avviene tramite il metodo `user.stars()`.
+
+Tutti i libri nella lista hanno anche un link che rimanda alla pagine del libro per poterlo comprare o valutare altre inserzioni.
 
 
 # Progettazione Concettuale e Logica
