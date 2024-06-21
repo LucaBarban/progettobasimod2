@@ -4,7 +4,7 @@ import sqlalchemy as sq
 from flask import current_app as app
 from flask import flash, redirect, render_template, request
 from psycopg2.errors import CheckViolation, RaiseException
-from sqlalchemy import exc
+from sqlalchemy import exc, select, delete
 from werkzeug.wrappers.response import Response
 
 from app.database import db
@@ -62,16 +62,14 @@ def add_library(own: Own, user: User, quantity: int) -> None:
     Add or append the bought books to a user collection
     """
 
-    insertion = (
-        db.session.query(Own)
-        .filter(
+    insertion = db.session.scalars(
+        select(Own).filter(
             Own.fk_username == user.username,
             Own.fk_book == own.fk_book,
             Own.state == own.state,
             Own.price == -1,
         )
-        .one_or_none()
-    )
+    ).one_or_none()
 
     if insertion is not None:
         insertion.quantity += quantity
@@ -121,8 +119,8 @@ def cart_post(user: User) -> str | Response:
             user.balance -= own.price * quantity  #  move balance from buyer
             own.user.balance += own.price * quantity  # to seller
 
-        # Empty cart
-        db.session.query(Cart).filter(Cart.fk_buyer == user.username).delete()
+        # Empty the cart
+        db.session.execute(delete(Cart).filter(Cart.fk_buyer == user.username))
         db.session.commit()
 
     except exc.NoResultFound:
@@ -200,11 +198,9 @@ def cart_add(id: int) -> Response:
         flash("User not logged in", "error")
         return redirect(f"/book/{insertion.book.id}")
 
-    cart = (
-        db.session.query(Cart)
-        .filter(Cart.fk_buyer == user.username, Cart.fk_own == id)
-        .one_or_none()
-    )
+    cart = db.session.scalars(
+        select(Cart).filter(Cart.fk_buyer == user.username, Cart.fk_own == id)
+    ).one_or_none()
 
     if cart is None:
         # Add row if not already present
@@ -234,17 +230,16 @@ def cart_remove(id: int) -> Response:
 
     try:
         # Find insertion with `id`
-        item = (
-            db.session.query(Cart)
+        item = db.session.scalars(
+            select(Cart)
             .join(Cart.own)
             .filter(Cart.fk_buyer == user.username, Own.id == id)
-            .one()
-        )
+        ).one()
 
         # Remove insertion from user's cart
-        db.session.query(Cart).filter(
-            Cart.own == item.own, Cart.fk_buyer == item.fk_buyer
-        ).delete()
+        db.session.execute(
+            delete(Cart).filter(Cart.own == item.own, Cart.fk_buyer == item.fk_buyer)
+        )
 
         db.session.commit()
     except:

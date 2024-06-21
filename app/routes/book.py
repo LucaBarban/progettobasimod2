@@ -7,7 +7,7 @@ from typing import List, Optional, Tuple
 import sqlalchemy as sq
 from flask import current_app as app
 from flask import flash, redirect, render_template, request
-from sqlalchemy import and_, exc
+from sqlalchemy import and_, exc, select
 from stdnum import isbn as isbnval  # type: ignore
 from werkzeug.wrappers.response import Response
 
@@ -58,12 +58,11 @@ def get_insertions(
     sort = sort or ""
     order = order or "asc"
 
-    insertions = (
-        db.session.query(Own)
+    insertions = db.session.scalars(
+        select(Own)
         .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
         .order_by(Own.fk_username)  # Needed for `itertools.groupby`
-        .all()
-    )
+    ).all()
 
     # Groups insertions by seller
     insertions_grouped = itertools.groupby(insertions, lambda ins: ins.user)
@@ -75,7 +74,7 @@ def get_insertions(
     # Sort insertion by seller stars
     insertions_sorted = sorted(
         insertions_list,
-        key=lambda item: star_sort(item[1], sort, order), # type: ignore
+        key=lambda item: star_sort(item[1], sort, order),  # type: ignore
     )
 
     return insertions_sorted
@@ -221,21 +220,33 @@ def add() -> str | Response:
         )
 
     try:
-        selectedBook = db.session.scalars(sq.select(Book).where(
-            (Book.title == title) &
-            (Book.published == published) &
-            (Book.pages == pages) &
-            (Book.fk_author == authorid) &
-            (Book.fk_publisher == publishername)
-        )).fetchall()
+        selectedBook = db.session.scalars(
+            sq.select(Book).where(
+                (Book.title == title)
+                & (Book.published == published)
+                & (Book.pages == pages)
+                & (Book.fk_author == authorid)
+                & (Book.fk_publisher == publishername)
+            )
+        ).fetchall()
         if len(selectedBook) == 0:
-            book = Book(title, published, pages, str(isbnval.validate(isbn)) if isbn is not None else None, author, publisher, bookgenres)
+            book = Book(
+                title,
+                published,
+                pages,
+                str(isbnval.validate(isbn)) if isbn is not None else None,
+                author,
+                publisher,
+                bookgenres,
+            )
             db.session.add(book)
             bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
         else:
             book = selectedBook[0]
 
-        ownedBook = db.session.scalars(sq.select(Own).where(Own.book == book.id)).fetchall()
+        ownedBook = db.session.scalars(
+            sq.select(Own).where(Own.book == book.id)
+        ).fetchall()
         if len(ownedBook) != 0:
             ownedBook[0].quantity += quantity
         else:

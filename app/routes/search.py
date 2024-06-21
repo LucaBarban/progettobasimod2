@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from flask import current_app as app
 from flask import redirect, render_template, request
-from sqlalchemy import or_
+from sqlalchemy import or_, select
 from werkzeug.wrappers.response import Response
 
 from app.database import db
@@ -30,7 +30,7 @@ def generate_book_list(input: UserInput) -> List[Book]:
     """
 
     # Filter for searchbar, match in title, author first and last name and publisher
-    query = db.session.query(Book).filter(
+    query = select(Book).filter(
         or_(
             Book.title.icontains(input.search),
             Book.author.has(Author.first_name.icontains(input.search)),
@@ -60,7 +60,8 @@ def generate_book_list(input: UserInput) -> List[Book]:
             # Keep only the books with price <= max price
             query = query.filter(Own.price <= input.max * 100.0)
 
-    return query.all()
+    # to prevent mypy to complain
+    return list(db.session.scalars(query).all())
 
 
 @app.route("/search/", methods=["POST"])
@@ -89,8 +90,8 @@ def search() -> str | Response:
     books = generate_book_list(input)
 
     # Needed to fill the checkboxes automatically
-    genres = db.session.query(Genre).all()
-    publishers = db.session.query(Publisher).all()
+    genres = db.session.scalars(select(Genre)).all()
+    publishers = db.session.scalars(select(Publisher)).all()
 
     return render_template(
         "search.html",

@@ -1,10 +1,10 @@
 services:
   db:
     image: postgres:14.1-alpine
-    restart: always
+    restart: no
     environment:
-      - POSTGRES_USER=user-name
-      - POSTGRES_PASSWORD=a
+      - POSTGRES_USER=librarian
+      - POSTGRES_PASSWORD=test
     ports:
       - '5432:5432'
     volumes:
