@@ -11,14 +11,21 @@ from app.routes.auth import getLoggedInUser
 
 @app.route("/seller/<string:username>")
 def seller(username: str) -> str:
+    """
+    Display all the insertions on sale and the reviews for a specific seller
+    404 if the searched user is not a seller
+    """
+
     user = getLoggedInUser()
 
     seller = db.first_or_404(
         sq.select(User).filter(User.username == username, User.seller == True)
     )
 
-    reviews = db.session.query(History).filter(
-        History.fk_seller == username, History.review != None
+    reviews = (
+        db.session.query(History)
+        .filter(History.fk_seller == username, History.review != None)
+        .all()
     )
 
     insertions = (

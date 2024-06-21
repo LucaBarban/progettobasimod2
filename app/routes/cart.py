@@ -16,22 +16,33 @@ from app.routes.auth import getLoggedInUser
 
 
 def cart_get(user: User, err: str | None = None) -> str:
+    """
+    Display the cart's items for a specific user and the total price
+    Optionally flash an error
+    """
+
     items = db.session.scalars(
         sq.select(Cart).filter(Cart.fk_buyer == user.username)
     ).all()
 
     total = sum([item.own.price * item.quantity for item in items])  # type: ignore
 
+    if err:
+        flash(err, "error")
+
     return render_template(
         "cart.html",
         items=items,
         user=user,
         total=total,
-        error=err,
     )
 
 
 def add_history(own: Own, user: User, quantity: int) -> None:
+    """
+    Save the transaction to `History`
+    """
+
     db.session.add(
         History(
             date=datetime.now(),
@@ -47,6 +58,10 @@ def add_history(own: Own, user: User, quantity: int) -> None:
 
 
 def add_library(own: Own, user: User, quantity: int) -> None:
+    """
+    Add or append the bought books to a user collection
+    """
+
     insertion = (
         db.session.query(Own)
         .filter(
@@ -74,7 +89,11 @@ def add_library(own: Own, user: User, quantity: int) -> None:
     db.session.commit()
 
 
-def cart_post(user: User) -> str:
+def cart_post(user: User) -> str | Response:
+    """
+    Validate cart's form, add book to `user` (buyer), flash and rollback if error
+    """
+
     own_ids = request.form.getlist("own")
 
     price_total = 0
@@ -83,6 +102,7 @@ def cart_post(user: User) -> str:
         for own_id in own_ids:
             own = db.session.get_one(Own, own_id)
 
+            # Validate form inputs
             if own.price is None:
                 raise ValueError("Cannot buy a book not on sale")
 
@@ -94,20 +114,21 @@ def cart_post(user: User) -> str:
             if quantity <= 0:
                 raise ValueError("Quantity must be positive")
 
-            add_history(own, user, quantity)
-            add_library(own, user, quantity)
+            add_history(own, user, quantity)  # track transaction
+            add_library(own, user, quantity)  # add books to buyer
 
-            own.quantity -= quantity
-            own.user.balance += own.price * quantity
-            price_total += own.price * quantity
+            own.quantity -= quantity  # remove book from seller
+            user.balance -= own.price * quantity  #  move balance from buyer
+            own.user.balance += own.price * quantity  # to seller
 
-        user.balance -= price_total
-
+        # Empty cart
         db.session.query(Cart).filter(Cart.fk_buyer == user.username).delete()
         db.session.commit()
 
     except exc.NoResultFound:
         db.session.rollback()
+
+        # Error: trying to buy a book already bought
         return cart_get(
             user,
             "The status of some insertion has changed, the page has been refreshed",
@@ -118,10 +139,12 @@ def cart_post(user: User) -> str:
         err = e.__dict__["orig"]
 
         if type(err) == RaiseException:
+            # Error: trying to buy extra copies
             return cart_get(
                 user, "Some insertions have been removed or their quantity decreased"
             )
         elif type(err) == CheckViolation:
+            # Error: trigger raise error on balance check
             return cart_get(user, "Not enough money on account")
         else:
             return cart_get(user, "An error occoured")
@@ -130,11 +153,16 @@ def cart_post(user: User) -> str:
         db.session.rollback()
         return cart_get(user, "An error occoured")
 
-    return "<h1>All Good</h1>"
+    flash("Your order has been confirmed", "success")
+    return redirect("/history")
 
 
 @app.route("/cart/", methods=["GET", "POST"])
 def cart() -> str | Response:
+    """
+    Show user's cart on 'GET', execute transaction on 'POST'
+    """
+
     user = getLoggedInUser()
     if user is None:
         return redirect("/login")
@@ -147,12 +175,18 @@ def cart() -> str | Response:
 
 @app.route("/cart/add/<int:id>", methods=["POST"])
 def cart_add(id: int) -> Response:
+    """
+    Add insertion to user's cart
+    Require a logged user
+    """
+
     user = getLoggedInUser()
 
     quantity = request.form.get("quantity")
 
     insertion = db.session.get(Own, id)
 
+    # Validate form
     if insertion is None:
         flash("An error occoured", "error")
         return redirect("/")
@@ -173,8 +207,10 @@ def cart_add(id: int) -> Response:
     )
 
     if cart is None:
+        # Add row if not already present
         db.session.add(Cart(fk_buyer=user.username, fk_own=id, quantity=quantity))
     else:
+        # Increment quantity if already present
         cart.quantity += int(quantity)
 
     try:
@@ -188,11 +224,16 @@ def cart_add(id: int) -> Response:
 
 @app.route("/cart/remove/<int:id>")
 def cart_remove(id: int) -> Response:
+    """
+    Remove an insertion from the user's cart
+    """
+
     user = getLoggedInUser()
     if user is None:
         return redirect("/login")
 
     try:
+        # Find insertion with `id`
         item = (
             db.session.query(Cart)
             .join(Cart.own)
@@ -200,6 +241,7 @@ def cart_remove(id: int) -> Response:
             .one()
         )
 
+        # Remove insertion from user's cart
         db.session.query(Cart).filter(
             Cart.own == item.own, Cart.fk_buyer == item.fk_buyer
         ).delete()

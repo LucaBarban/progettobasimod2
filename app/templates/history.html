@@ -2,55 +2,58 @@
 
 {% block pagestyles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/stars.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/stars.css') }}">
 {% endblock pagestyles %}
 
 {% block content %}
+    {% from 'components/stars.html' import stars %}
+
     <h1>History</h1>
-    <div class="history__border">
+    <hr>
+    <div class="history__list">
         {% if hsts|length == 0 %}
-            You havent bought any books, you can find them here :D
+            You havent bought any books, you can
+            <a href="/" class="history__empty">find them here</a> :D
         {% endif %}
 
+        <table>
         {% for hst in hsts %}
-            <div class="history__book">
-                <div class="history__left">
-                    <b>{{ hst.book.title }}</b> (isbn: {{ hst.book.isbn }}) <br>
-                    Status: {{ hst.status }} <br>
-                    Payed Price: {{ '%0.2f'|format(hst.price / 100) }} <br>
+            <tr>
+                <td class="history__image">
                     <img width=200 src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
                          onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
-                </div>
-                <div class="history__right">
+                </td>
+                <td class="history__info">
+                    <span>{{ hst.book.title }}</span> ({{ hst.book.isbn }}) <br>
+                    <div>
+                        From: <a href="/seller/{{ hst.seller.username }}">{{ hst.seller.username }}</a> <br>
+                        Status: {{ hst.status }} <br>
+                        State: {{ hst.state }} <br>
+                        Payed Price: {{ '%0.2f'|format(hst.price / 100) }} <br>
+                    </div>
+                </td>
+                <td class="history__rating">
                     {% if not hst.review %}
                         <form action="/history" method="POST">
                             <input type="hidden" id="hid" name="hid" value="{{ hst.id }}"><br>
 
-                            <p>Rating: <span class="star-rating">
-                                {% for star in range(5, 0, -1) %}
-                                    <input type="radio" name="rating" id="rate-{{ star }}" value="{{ star }}">
-                                    <label for="rate-{{ star }}">&#9734;</label>
-                                {% endfor %}
-                            </span></p>
+                            <p>Rating:
+                                {{ stars("", "", True) }}
+                            </p>
 
                             <label for="review">Review:</label><br>
                             <textarea id="review" name="review"></textarea><br>
-                            <input type="submit" class="history__button" value="Send Review">
+                            <input type="submit" class="button button--current" value="Send Review">
                         </form>
                     {% else %}
-                        <p>Rating: <span class="star-rating">
-                            {% for star in range(5, 0, -1) %}
-                                <input type="radio" name="rating{{ hst.id }}" id="rate-{{ hst.id }}-{{ star }}" value="{{ star }}"
-                                    {% if hst.stars == star %} checked {% endif %}
-                                disabled>
-                                <label for="rate-{{ hst.id }}-{{ star }}">&#9734;</label>
-                            {% endfor %}
-                        </span></p>
+                        <p>Rating:
+                            {{ stars(hst.id, hst.stars) }}
+                        </p>
                         <textarea disabled>{{ hst.review }}</textarea>
                     {% endif %}
-                </div>
-            </div>
-            <hr>
+                </td>
+            </tr>
         {% endfor %}
+        </table>
     </div>
 {% endblock content %}

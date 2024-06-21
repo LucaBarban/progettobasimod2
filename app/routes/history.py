@@ -27,7 +27,7 @@ def history() -> str | Response:
 
         if hid is not None and rew is not None and rating is not None and len(rew) >= 2:
             try:
-                hsToUpd = db.session.scalars(# get the book/s ordered by the user to write his experience
+                hsToUpd = db.session.scalars(  # get the book/s ordered by the user to write his experience
                     sq.select(History).where(History.id == hid)
                 ).one()
 
@@ -36,22 +36,25 @@ def history() -> str | Response:
                 elif hsToUpd.review is not None:
                     flash("You have already reviewed this book", "error")
                 else:
-                    hsToUpd.review = rew # apply the provided review and stars
+                    hsToUpd.review = rew  # apply the provided review and stars
                     hsToUpd.stars = max(1, min(5, int(rating)))
                     db.session.commit()
             except exc.SQLAlchemyError:
-                db.session.rollback() # explicit rollback (users reviews are one of the most delicate
-                                      # parts of the project)
-                flash("An unexpected error occured while interacting with the database", "error")
-            except:
+                db.session.rollback()
+                # explicit rollback (users reviews are one of the most delicate parts of the project)
+                flash(
+                    "An unexpected error occured while interacting with the database",
+                    "error",
+                )
+            except Exception:
                 db.session.rollback()
                 flash("An unexpected error occured", "error")
         else:
-            flash("Be sure to give a rating and a review", "success")
+            flash("Be sure to give a rating and a review", "error")
 
     hsts = db.session.scalars(
         sq.select(History)
         .where(History.fk_buyer == usr.username)
         .order_by(History.id.desc())
-    ).fetchall() # load all purchases (including any updated ones)
+    ).fetchall()  # load all purchases (including any updated ones)
     return render_template("history.html", user=usr, hsts=hsts)

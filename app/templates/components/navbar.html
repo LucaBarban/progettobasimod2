@@ -1,18 +1,19 @@
 <header class="navbar">
     <div class="navbar__box">
         <a class="navbar__logo" href="/">
-            <h3>LOGO</h3>
+            <img src="{{ url_for('static', filename='images/logo.svg') }}">
         </a>
     </div>
     <div class="navbar__searchbar">{% include 'components/searchbar.html' %}</div>
     <div class="navbar__box">
         {% if user %}
+            {% include 'components/cart_badge.html' %}
             {% include 'components/notifications_badge.html' %}
-            <span class="navbar__user">hi {{ user.username }}</span>
-            <a href="/logout" class="navbar__button">Logout</a>
+            <a class="navbar__user" href="/profile">{{ user.username }}</a>
+            <a href="/logout" class="button button--current">Logout</a>
         {% else %}
-            <a href="/login" class="navbar__button">SignIn</a>
-            <a href="/register" class="navbar__button">SignUp</a>
+            <a href="/login" class="button button--current">SignIn</a>
+            <a href="/register" class="button button--current">SignUp</a>
         {% endif %}
     </div>
 </header>

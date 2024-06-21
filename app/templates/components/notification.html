@@ -1,7 +1,28 @@
-Notification: {{ notification.id }}
-Context: {{ notification.context }}
-{% if notification.archived == false %}
-<form action="/notifications/read/{{ notification.id }}" method="POST">
-    <input type="submit" value="Read"/>
-</form>
-{% endif %}
+<table class="notification">
+    <tr>
+        <th class="notification__title">
+            {{ notification.context }}
+            {% if notification.archived == false %}
+                <form action="/notifications/read/{{ notification.id }}" method="POST">
+                    <input type="image" src="{{ url_for('static', filename='images/read.svg') }}" alt="Submit Form" />
+                </form>
+            {% endif %}
+        </th>
+    </tr>
+    <tr>
+        <td>
+            {% if notification.context == "order updated" %}
+            Your order for
+            <span>
+                <a href="/book/{{ notification.order.book.id }}">
+                    "{{ notification.order.book.title }}"
+                </a>
+            </span>
+            has been updated from
+            <span>{{ notification.order_status_old }}</span>
+            to
+            <span>{{ notification.order_status_new }}</span>
+            {% endif %}
+        </td>
+    </tr>
+</table>

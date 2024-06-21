@@ -49,15 +49,16 @@ class User(Base):
     def __repr__(self) -> str:
         return f"User: {{{self.username}, {self.first_name}, {self.last_name}, {self.last_logged_in_at}, {self.seller}, {self.balance}, {self.password}, {self.token}}}"
 
-    def unread_count(self) -> Optional[int]:
+    def unread_count(self) -> int:
+        """
+        Returns the number of unread notifications for the user
+        """
+
         from app.models.notification import NotificationCount
 
         nc = db.session.get(NotificationCount, self.username)
 
-        if nc is None:
-            return None
-
-        return nc.count
+        return nc.count if nc is not None else 0
 
     def stars(self) -> Optional[Star]:
         from app.models.star import Star

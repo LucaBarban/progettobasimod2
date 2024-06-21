@@ -28,6 +28,11 @@ def products() -> Response:
 
 
 def star_sort(star: Optional[Star], sort: str, order: str) -> float:
+    """
+    Returns `star.total` or `star.average` ordered
+    Keeps sellers without a rating at the end
+    """
+
     if star is None:
         value = math.inf
     elif sort == "total":
@@ -45,25 +50,32 @@ def star_sort(star: Optional[Star], sort: str, order: str) -> float:
 def get_insertions(
     id: int, username: Optional[str], sort: Optional[str], order: Optional[str]
 ) -> List[Tuple[User, Optional[Star], List[Own]]]:
+    """
+    Returns all the insertions on sale for a specific book.
+    Removes the ones from the current user
+    """
+
     sort = sort or ""
     order = order or "asc"
 
     insertions = (
         db.session.query(Own)
         .filter(Own.fk_book == id, Own.price != None, Own.fk_username != username)
-        .order_by(Own.fk_username)
+        .order_by(Own.fk_username)  # Needed for `itertools.groupby`
         .all()
     )
 
+    # Groups insertions by seller
     insertions_grouped = itertools.groupby(insertions, lambda ins: ins.user)
 
     insertions_list = (
         (user, user.stars(), list(owns)) for user, owns in insertions_grouped
     )
 
+    # Sort insertion by seller stars
     insertions_sorted = sorted(
         insertions_list,
-        key=lambda item: star_sort(item[1], sort, order),
+        key=lambda item: star_sort(item[1], sort, order), # type: ignore
     )
 
     return insertions_sorted
@@ -71,6 +83,10 @@ def get_insertions(
 
 @app.route("/book/<int:id>/", methods=["GET"])
 def get(id: int) -> str:
+    """
+    Display the book's image and info and all the available insertions
+    """
+
     user = getLoggedInUser()
 
     if user is None:
@@ -120,6 +136,8 @@ def add() -> str | Response:
     authorid: int | None = int(request.form.get("author") or -1)
     publishername: str | None = request.form.get("publisher") or None
     selectedGenres: list[str] = request.form.getlist("genres")
+    quantity: int = int(request.form.get("quantity") or -1)
+    state: str | None = request.form.get("state") or None
 
     if title is None:
         flash("The title has been found to be empty", "error")
@@ -127,6 +145,11 @@ def add() -> str | Response:
         flash("The date of pubblication is invalid", "error")
     if pages <= 0:
         flash("The number of pages is invalid", "error")
+    if quantity < 1:
+        flash("The number of books to add to your library is invalid", "error")
+    if state is None or not (state in ["new", "as new", "used"]):
+        state = ""
+        flash("The state of the book is invalid", "error")
     isbres: bool = False
     if isbn is not None:
         try:
@@ -148,7 +171,8 @@ def add() -> str | Response:
         flash("Select a file to upload as the book's cover", "error")
     else:
         tmpfilename = str(request.files["file"].filename)
-        if "." in tmpfilename or tmpfilename.rsplit(".", 1)[-1].lower() != "png":
+        if "." not in tmpfilename or tmpfilename.rsplit(".", 1)[-1].lower() != "png":
+            print(tmpfilename)
             flash("Invalid file extension (it must be a png file)", "error")
             tmpfilename = ""
     if (
@@ -160,6 +184,8 @@ def add() -> str | Response:
         or publishername is None
         or len(selectedGenres) == 0
         or tmpfilename == ""
+        or quantity < 1
+        or state == ""
     ):
         return render_template(
             "addbook.html",
@@ -169,7 +195,7 @@ def add() -> str | Response:
             publishers=publishers,
         )
 
-    isbn = str(isbnval.validate(isbn))
+    state = str(state)
     book: Book
     author: Author | None = next(
         (a for a in authors if a.id == authorid), None
@@ -195,12 +221,28 @@ def add() -> str | Response:
         )
 
     try:
-        book = Book(title, published, pages, isbn, author, publisher, bookgenres)
-        db.session.add(book)
-        db.session.flush()
-        bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
+        selectedBook = db.session.scalars(sq.select(Book).where(
+            (Book.title == title) &
+            (Book.published == published) &
+            (Book.pages == pages) &
+            (Book.fk_author == authorid) &
+            (Book.fk_publisher == publishername)
+        )).fetchall()
+        if len(selectedBook) == 0:
+            book = Book(title, published, pages, str(isbnval.validate(isbn)) if isbn is not None else None, author, publisher, bookgenres)
+            db.session.add(book)
+            bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
+        else:
+            book = selectedBook[0]
+
+        ownedBook = db.session.scalars(sq.select(Own).where(Own.book == book.id)).fetchall()
+        if len(ownedBook) != 0:
+            ownedBook[0].quantity += quantity
+        else:
+            own = Own(usr.username, book.id, state, None, quantity)
+            db.session.add(own)
         db.session.commit()
-        flash("Book added correctly", "error")
+        flash("Book added correctly", "success")
     except exc.SQLAlchemyError:
         db.session.rollback()
         flash("An error occured while adding the new book", "error")

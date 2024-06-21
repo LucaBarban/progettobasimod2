@@ -1,3 +1,11 @@
+CREATE DATABASE library;
+
+CREATE USER librarian WITH PASSWORD 'test';
+
+GRANT CONNECT ON DATABASE library TO librarian;
+
+\c library
+
 CREATE TABLE genres (
     name TEXT PRIMARY KEY
 );
@@ -21,7 +29,8 @@ CREATE TABLE books (
     fk_author INTEGER,
     fk_publisher TEXT,
     FOREIGN KEY (fk_author) REFERENCES authors(id),
-    FOREIGN KEY (fk_publisher) REFERENCES publishers(name)
+    FOREIGN KEY (fk_publisher) REFERENCES publishers(name),
+    UNIQUE(isbn)
 );
 
 CREATE INDEX idx_title_books ON books(title);
@@ -107,6 +116,7 @@ CREATE TABLE notifications(
     fk_username VARCHAR(100) NOT NULL,
     message TEXT,
     archived BOOLEAN NOT NULL,
+    FOREIGN KEY (fk_username) REFERENCES users(username),
 
     -- Order
     fk_history INTEGER,
@@ -120,7 +130,7 @@ CREATE INDEX idx_username_notifications ON notifications(fk_username);
 CREATE MATERIALIZED VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
 
-CREATE INDEX idx_username_notifications_count ON notifications_count(fk_username);
+CREATE INDEX idx_username_notifications_count ON notifications_count(username);
 
 
 CREATE MATERIALIZED VIEW star_count
@@ -207,9 +217,11 @@ CREATE OR REPLACE FUNCTION if_seller_is_seller()
 RETURNS TRIGGER
 AS $$
 BEGIN
-    IF EXISTS(SELECT 1 FROM users
-                WHERE users.username = NEW.fk_own
-                    AND users.seller) THEN
+    IF EXISTS(
+            SELECT 1
+            FROM owns o join users u on o.fk_username = u.username
+            WHERE o.id = NEW.fk_own AND u.seller
+        ) THEN
         RETURN NEW;
     END IF;
     RETURN NULL;
@@ -263,3 +275,17 @@ CREATE TRIGGER trigger_history_notifications
 BEFORE INSERT OR UPDATE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION check_notification();
+
+
+-- Revoke unwanted privileges
+REVOKE CREATE ON SCHEMA public FROM librarian;
+REVOKE ALL PRIVILEGES ON DATABASE library FROM librarian;
+
+-- Explicitly grant required privileges
+GRANT CONNECT ON DATABASE library TO librarian;
+GRANT USAGE ON SCHEMA public TO librarian;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO librarian;
+GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO librarian;
+
+ALTER TABLE notifications_count OWNER TO librarian;
+ALTER TABLE star_count OWNER TO librarian;

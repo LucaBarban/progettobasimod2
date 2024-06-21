@@ -1,12 +1,14 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/stars.css') }}">
+          href="{{ url_for('static', filename='css/components/stars.css') }}">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/book.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     {% from 'components/book.html' import display_book %}
+    {% from 'components/stars.html' import stars %}
+
     <h1>{{ book.title }}</h1>
     <br>
     {{ display_book(book, link=False, label=True, title=False) }}
@@ -27,32 +29,29 @@
         <div class="insertions">
             {% for (seller, star, owns) in insertions %}
                 <div class="insertion">
-                    seller: <a href="/seller/{{ seller.username }}">{{ seller.username }}</a>
-                    {% if star %}
-                        <span class="star-rating">
-                            {% for value in range(5, 0, -1) %}
-                                <input type="radio"
-                                       id="rate-{{ seller.username }}-{{ value }}"
-                                       value="{{ value }}"
-                                       {% if star.vote >= value %}checked{% endif %}
-                                       disabled>
-                                <label for="rate-{{ seller.username }}-{{ value }}">&#9734;</label>
-                            {% endfor %}
-                        </span>
-                        ( {{ star.total }} )
-                    {% endif %}
-                    {% for own in owns %}
-                        <div>Price: {{ own.price }}</div>
-                        <div>Avaiable: {{ own.quantity }}</div>
-                        <div>State: {{ own.state }}</div>
-                        {% if user %}
-                            <form action="/cart/add/{{ own.id }}" method="POST">
-                                <input type="number" name="quantity" min="1" value="1" />
-                                <input type="submit" value="Add to cart" />
-                            </form>
-                        {% else %}
-                            <div>Login before buying</div>
+                    <div class="insertion__header">
+                        <div>
+                            seller: <a href="/seller/{{ seller.username }}">{{ seller.username }}</a>
+                        </div>
+                        {% if star %}
+                            {{ stars(seller.username, star.vote) }}
+                            ( {{ star.total }} )
                         {% endif %}
+                    </div>
+                    {% for own in owns %}
+                        <div class="book__insertion">
+                            <div>Price: {{ '%0.2f'|format(own.price / 100) }}</div>
+                            <div>Available: {{ own.quantity }}</div>
+                            <div>State: {{ own.state }}</div>
+                            {% if user %}
+                                <form action="/cart/add/{{ own.id }}" method="POST">
+                                    <input type="number" class="insertion__quantity" name="quantity" min="1" value="1" />
+                                    <input type="submit" class="button button--current" value="Add to cart" />
+                                </form>
+                            {% else %}
+                                <div>Login before buying</div>
+                            {% endif %}
+                        </div>
                     {% endfor %}
                 </div>
             {% endfor %}

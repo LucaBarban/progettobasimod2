@@ -40,25 +40,24 @@ def login() -> str | Response:
     if request.method != "POST":
         link: str | None = request.args.get("link")
         link = "" if link is None else link
-        return render_template("login.html", error="", link=link)
+        return render_template("login.html", link=link)
 
     usr = request.form.get("usr") or None
     pwd = request.form.get("pwd") or None
 
     if usr is None or pwd is None:
-        return render_template(
-            "login.html",
-            error="You haven't compiled the username or the password fields",
-        )
+        flash("You haven't compiled the username or the password fields", "error")
+        return render_template("login.html")
 
     dbUsers = db.session.scalars(sq.select(User).where(User.username == usr)).fetchall()
 
     if len(dbUsers) == 0:
-        # TODO: merge this check with the following one (security risk, debug only)
-        return render_template("login.html", error="Specified user doesn't exist")
+        flash("Specified user doesn't exist", "error")
+        return render_template("login.html")
 
     if not bcrypt.check_password_hash(dbUsers[0].password, pwd):
-        return render_template("login.html", error="The password is wrong")
+        flash("The password is wrong", "error")
+        return render_template("login.html")
 
     dbUsers[0].token = (
         getNewToken()
@@ -104,7 +103,7 @@ def register() -> str | Response:
     to validate his registration requests
     """
     if request.method != "POST":  # provide the normal registration page
-        return render_template("register.html", regform=RegForm(), error="")
+        return render_template("register.html", regform=RegForm())
 
     regform = RegForm(request.form)  # load the form from its template
     regform.validate_on_submit()
@@ -117,10 +116,10 @@ def register() -> str | Response:
     seller = request.form.get("seller") or ""
 
     if None in [usr, frname, lsname, pwd, checkpwd]:
+        flash("You have to compile all the fields", "error")
         return render_template(
             "register.html",
             regform=regform,
-            error="You have to compile all the fields",
         )
 
     usr = str(usr)  # prevent mypy from complaining abount None values
@@ -131,36 +130,42 @@ def register() -> str | Response:
 
     # checking the username
     if not whitelistnum.match(usr) and len(usr) > 0:
+        flash("Username can only contain letters and numbers", "error")
         return render_template(
             "register.html",
             regform=regform,
-            error="Username can only contain letters and numbers",
         )
     # checking the name and surname
     for field in [frname, lsname]:
         if not whitelist.match(field) and len(field) > 0:
+            flash("The Name and the Surname must contain only letter", "error")
             return render_template(
                 "register.html",
                 regform=regform,
-                error="The Name and the Surname must contain only letter",
             )
     # checking password length and equality
     if len(pwd) < 8 or len(checkpwd) < 8:
+        flash(
+            f"Password/s fields must be at least {minPwdLen} characters long", "error"
+        )
         return render_template(
             "register.html",
             regform=regform,
-            error=f"Password/s fields must be at least {minPwdLen} characters long",
         )
     if pwd != checkpwd:
+        flash("Passwords must be the same", "error")
         return render_template(
-            "register.html", regform=regform, error="Passwords must be the same"
+            "register.html",
+            regform=regform,
         )
 
     # check wether the username already exists
     dbUsers = db.session.scalars(sq.select(User).where(User.username == usr)).fetchall()
     if len(dbUsers) != 0:
+        flash("Username already taken", "error")
         return render_template(
-            "register.html", regform=regform, error="Username already taken"
+            "register.html",
+            regform=regform,
         )
 
     newUsersToken: str = getNewToken()  # generate a new session token

@@ -22,29 +22,12 @@
     display: flex;
 }
 
-.button {
-    position: relative;
-    font-size: var(--font-size);
-    text-decoration: none;
-    overflow: hidden;
-    border-radius: 5px;
-    border: none;
-    padding: 8px 10px;
-    margin: 5px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .button--primary {
-    position: relative;
     background: var(--accent-color);
     color: var(--main-foreground);
 }
 
 .button--secondary {
-    position: relative;
     background: none;
     color: var(--accent-color);
     border-style: solid;
@@ -56,35 +39,4 @@
     justify-content: center;
     grid-column-start: 1;
     grid-column-end: 5;
-}
-
-.book__container {
-    width: var(--cover-width);
-    margin: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.book__cover {
-    width: var(--cover-width);
-}
-
-.book__meta {
-    width: var(--cover-width);
-    padding-left: 10px;
-}
-
-.book__meta--author,
-.book__meta--title {
-    word-wrap: break-word;
-    overflow: hidden;
-}
-
-.book__meta--title {
-    font-weight: 500;
-}
-
-.book__meta--author {
-    color: rgba(0, 0, 0, 0.50);
 }

@@ -1,0 +1,49 @@
+.seller__title {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.seller__books {
+    margin: 20px;
+}
+
+.seller__insertions {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.seller__insertions h3 {
+    word-wrap: normal;
+    width: 300px;
+    height: 50px;
+    margin-top: 20px;
+}
+
+.seller__info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.seller__review {
+    width: 100%;
+    margin: 20px;
+}
+
+.seller__review__left {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.seller__review textarea {
+    width: 100%;
+    height: 50px;
+    background: var(--background-color);
+    color: #000;
+    border: 2px solid black;
+    resize: none;
+    margin: 10px;
+}
+
