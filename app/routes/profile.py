@@ -74,9 +74,9 @@ def profile() -> str | Response:
         err = True
         flash("The balance must be a number", "error")
 
-    if (seller is not None and seller != "on"):
+    if seller is not None and seller != "on":
         flash("You cannot downgrade your account's status")
-        seller = "off" # prevent the user from removing his seller's status
+        seller = "off"  # prevent the user from removing his seller's status
     elif seller is None:
         seller = "off"
 
@@ -84,7 +84,7 @@ def profile() -> str | Response:
         usr.first_name = frname
         usr.last_name = lsname
         usr.password = pwd  # type:ignore
-        usr.balance = int(float(balance)*100) if balance is not None else usr.balance
+        usr.balance = int(float(balance) * 100) if balance is not None else usr.balance
         usr.seller = usr.seller or seller == "on"
         db.session.commit()
 

@@ -66,7 +66,7 @@ def getInsertionUpdateForm() -> str | Response:
         book=book,
         bookstate=bookstate,
         quantity=quantity,
-        oldprice=int(oldprice)/100,
+        oldprice=int(oldprice) / 100,
     )
 
 
@@ -109,9 +109,14 @@ def getInsertionUnListForm() -> str | Response:
         return redirect(
             "/insertion"
         )  # if some parameters are missing return the insertion page
-    price = str(price) # prevent mypy from complaining
+    price = str(price)  # prevent mypy from complaining
     return render_template(
-        "unlistinsertion.html", user=usr, book=book, bookstate=bookstate, price=int(price)/100, quantity=quantity
+        "unlistinsertion.html",
+        user=usr,
+        book=book,
+        bookstate=bookstate,
+        price=int(price) / 100,
+        quantity=quantity,
     )
 
 
@@ -153,7 +158,10 @@ def updatebook() -> str | Response:
             usr, newPriceBooks, oldPriceBooks, quantity, oldprice, False
         )
         if not insState[1]:
-            flash("An error occured during insertion's deletion/update: " + insState[0], "error")
+            flash(
+                "An error occured during insertion's deletion/update: " + insState[0],
+                "error",
+            )
             return redirect("/insertion")
     else:
         try:
@@ -173,7 +181,10 @@ def updatebook() -> str | Response:
             db.session.delete(oldPriceBooks)
         except exc.SQLAlchemyError:
             db.session.rollback()
-            flash("An unexpected error occured while interacting with the database", "error")
+            flash(
+                "An unexpected error occured while interacting with the database",
+                "error",
+            )
             return redirect("/insertion")
 
     db.session.commit()
@@ -214,7 +225,10 @@ def listbook() -> str | Response:
         usr, ownedBook, ownedBookOnSale, quantity, price, True
     )  # try to add the insertion
     if not insState[1]:
-        flash("An error occured during insertion's creation/update: " + insState[0], "error")
+        flash(
+            "An error occured during insertion's creation/update: " + insState[0],
+            "error",
+        )
         return redirect("/insertion")
 
     return redirect("/insertion")
@@ -253,7 +267,10 @@ def unlistbook() -> str | Response:
         usr, ownedBook, ownedBookOnSale, quantity, price, False
     )  # try to remove the insertion
     if not insState[1]:
-        flash(f"An error occured during insertion's deletion/update: {insState[0]}", "error")
+        flash(
+            f"An error occured during insertion's deletion/update: {insState[0]}",
+            "error",
+        )
         return redirect("/insertion")
 
     return redirect("/insertion")
@@ -267,8 +284,8 @@ def retriveBooks(usr: User) -> tuple[Own | None, Own | None, int | None, int | N
     book: str | None = request.form.get("book") or None
     bookstate: str | None = request.form.get("bookstate") or None
     quantity: int | None = request.form.get("quantity", type=int) or None
-    fprice: float | None  = request.form.get("price", type=float)
-    price: int | None = int(fprice*100) if fprice else None
+    fprice: float | None = request.form.get("price", type=float)
+    price: int | None = int(fprice * 100) if fprice else None
 
     if book is None or bookstate is None or quantity is None or price is None:
         return (None, None, None, None)  # if not all the parameters are populated
@@ -301,9 +318,9 @@ def retriveExistingBooks(
     bookstate: str | None = request.form.get("bookstate") or None
     quantity: int | None = request.form.get("quantity", type=int) or None
     foldprice: float | None = request.form.get("oldprice", type=float)
-    oldprice: int | None = int(foldprice*100) if foldprice else None
+    oldprice: int | None = int(foldprice * 100) if foldprice else None
     fnewprice: float | None = request.form.get("newprice", type=float) or None
-    newprice: int | None = int(fnewprice*100) if fnewprice else None
+    newprice: int | None = int(fnewprice * 100) if fnewprice else None
 
     if book is None or bookstate is None or quantity is None or oldprice is None:
         return (None, None, None, None, None)

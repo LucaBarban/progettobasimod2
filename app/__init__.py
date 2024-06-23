@@ -12,7 +12,7 @@ def create_app() -> Flask:
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["SQLALCHEMY_DATABASE_URI"]
     app.secret_key = os.environ["SECRET_KEY"].encode()
     app.config["WTF_CSRF_CHECK_DEFAULT"] = False
-    app.config['UPLOAD_FOLDER'] = "app/static/covers/"
+    app.config["UPLOAD_FOLDER"] = "app/static/covers/"
 
     bcrypt.init_app(app)
     csrf.init_app(app)
