@@ -104,7 +104,7 @@ CREATE TABLE history(
     FOREIGN KEY (fk_book) REFERENCES books(id)
 );
 
-CREATE INDEX idx_history ON owns(fk_username, fk_book, state, price);
+CREATE INDEX idx_history ON history(fk_buyer, fk_book, state, price);
 CREATE INDEX idx_seller_history ON history(fk_seller);
 CREATE INDEX idx_buyer_history ON history(fk_buyer);
 
@@ -233,6 +233,26 @@ BEFORE INSERT OR UPDATE ON carts
 FOR EACH ROW
 EXECUTE PROCEDURE if_seller_is_seller();
 
+-- Trigger per carts
+
+CREATE OR REPLACE FUNCTION check_selling()
+RETURNS TRIGGER
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM owns
+                WHERE id = NEW.fk_own AND price IS NOT NONE) THEN
+        RETURN NEW;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trigger_carts_selling
+BEFORE INSERT OR UPDATE ON carts
+FOR EACH ROW
+EXECUTE FUNCTION check_selling();
+
 -- Trigger for history notifications
 
 CREATE OR REPLACE FUNCTION check_notification()
@@ -255,6 +275,7 @@ CREATE TRIGGER trigger_history_notifications
 BEFORE INSERT OR UPDATE ON notifications
 FOR EACH ROW
 EXECUTE FUNCTION check_notification();
+
 
 -- Revoke unwanted privileges
 REVOKE CREATE ON SCHEMA public FROM librarian;
