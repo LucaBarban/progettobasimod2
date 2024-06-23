@@ -107,6 +107,11 @@ def get(id: int) -> str:
 
 @app.route("/book/add/", methods=["GET", "POST"])
 def add() -> str | Response:
+    """
+    POST: Read and validate all the fields and adds a new book in the system
+    GET:  Display the form
+    """
+
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/?link=/book/add")
@@ -124,6 +129,7 @@ def add() -> str | Response:
             publishers=publishers,
         )
 
+    # Read all the fields
     title: str | None = request.form.get("title") or None
     published: date | None
     try:
@@ -138,6 +144,7 @@ def add() -> str | Response:
     quantity: int = int(request.form.get("quantity") or -1)
     state: str | None = request.form.get("state") or None
 
+    # Validate them
     if title is None:
         flash("The title has been found to be empty", "error")
     if published is None:
@@ -149,12 +156,14 @@ def add() -> str | Response:
     if state is None or not (state in ["new", "as new", "used"]):
         state = ""
         flash("The state of the book is invalid", "error")
-    isbres: bool = False
+    isbres: bool | None = False
     if isbn is not None:
         try:
             isbres = isbnval.is_valid(isbn)
         except:
-            pass
+            isbres = None
+
+    # Display an error if something is missing
     if not isbres:
         flash("Provide a valid ISBN code (" + str(isbn) + ")", "error")
     if authorid is None:
@@ -174,6 +183,8 @@ def add() -> str | Response:
             print(tmpfilename)
             flash("Invalid file extension (it must be a png file)", "error")
             tmpfilename = ""
+
+    # Stop and display an error if all the fields are not filled in
     if (
         title is None
         or published is None
@@ -196,12 +207,18 @@ def add() -> str | Response:
 
     state = str(state)
     book: Book
+
+    # Find the right author
     author: Author | None = next(
         (a for a in authors if a.id == authorid), None
     )  # next iterates untill the iterator provided by the foor loop iterates afer the whole list
+
+    # Find the right publisher
     publisher: Publisher | None = next(
         (p for p in publishers if p.name == publishername), None
     )
+
+    # Find all the right genres
     bookgenres: List[Genre] = []
     for sgen in selectedGenres:
         for g in genres:
@@ -209,6 +226,7 @@ def add() -> str | Response:
                 bookgenres.append(g)
     bookcover = request.files["file"]
 
+    # If didn't find the right author or publisher display an error
     if author is None or publisher is None:
         flash("An unforeseen error occurred", "error")
         return render_template(
@@ -220,6 +238,7 @@ def add() -> str | Response:
         )
 
     try:
+        # Check if the book already exists
         selectedBook = db.session.scalars(
             sq.select(Book).where(
                 (Book.title == title)
@@ -229,7 +248,9 @@ def add() -> str | Response:
                 & (Book.fk_publisher == publishername)
             )
         ).fetchall()
+
         if len(selectedBook) == 0:
+            # If not, add a new book
             book = Book(
                 title,
                 published,
@@ -242,14 +263,19 @@ def add() -> str | Response:
             db.session.add(book)
             bookcover.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{book.id}.png"))
         else:
+            # If yes, update it
             book = selectedBook[0]
 
+        # Find if the user already has the book
         ownedBook = db.session.scalars(
             sq.select(Own).where(Own.book == book.id)
         ).fetchall()
+
         if len(ownedBook) != 0:
+            # If yes, update the quantity
             ownedBook[0].quantity += quantity
         else:
+            # If not, add a new row
             own = Own(usr.username, book.id, state, None, quantity)
             db.session.add(own)
         db.session.commit()
@@ -268,16 +294,23 @@ def add() -> str | Response:
 
 @app.route("/book/add/genre/", methods=["GET", "POST"])
 def addgenre() -> str | Response:
+    """
+    POST: Read and validate the field and adds a new genre in the system
+    GET:  Display the form
+    """
+
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/?link=/book/add/genre")
 
     if request.method == "POST":
+        # Read and validate the field
         genrename: str | None = request.form.get("name") or None
         if genrename is None:
             flash("You must compile the genre field", "error")
         else:
             try:
+                # Add the new genre to the database
                 genre = Genre(genrename)
                 db.session.add(genre)
                 db.session.commit()
@@ -293,16 +326,23 @@ def addgenre() -> str | Response:
 
 @app.route("/book/add/publisher/", methods=["GET", "POST"])
 def addpublisher() -> str | Response:
+    """
+    POST: Read and validate the field and adds a new publisher in the system
+    GET:  Display the form
+    """
+
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/?link=/book/add/publisher")
 
     if request.method == "POST":
+        # Read and validate the field
         publishername: str | None = request.form.get("name") or None
         if publishername is None:
             flash("You must compile the publisher field", "error")
         else:
             try:
+                # Add the new publisher to the database
                 publisher = Publisher(publishername)
                 db.session.add(publisher)
                 db.session.commit()
@@ -318,18 +358,26 @@ def addpublisher() -> str | Response:
 
 @app.route("/book/add/author/", methods=["GET", "POST"])
 def addauthor() -> str | Response:
+    """
+    POST: Read and validate all the fields and adds a new author in the system
+    GET:  Display the form
+    """
+
     usr: User | None = getLoggedInUser()
     if usr is None:
         return redirect("/login/?link=/book/add/author")
 
     if request.method == "POST":
+        # Read the fields
         first_name: str | None = request.form.get("first_name") or None
         last_name: str | None = request.form.get("last_name") or None
 
+        # Validate them
         if first_name is None or last_name is None:
             flash("You must compile all the fields", "error")
         else:
             try:
+                # Check if the author already exists
                 if (
                     db.session.scalars(
                         sq.select(Author).filter(
@@ -344,6 +392,7 @@ def addauthor() -> str | Response:
                     flash("Author already exists", "error")
                     return redirect("/book/add/author/")
 
+                # Add a new author to the database
                 author = Author(first_name, last_name)
                 db.session.add(author)
                 db.session.commit()
