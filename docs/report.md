@@ -1,6 +1,6 @@
 # Introduzione
 
-La variante del progetto da noi scelta è quella dell'"e-commerce", che abbiamo personalizzato come una piattaforma specializzata nella vendita di libri. Questa piattaforma supporta la ricerca delle singole opere, affinabile tramite filtri, e la conseguente acquisto da parte degli utenti registrati. Ogni utente può successivamente decidere di vendere i propri libri al prezzo desiderato e, se l'opera non è ancora presente nel database, può aggiungerla fornendo i relativi metadata, come il genere, l'autore, la copertina, ecc.
+La variante del progetto da noi scelta è quella dell'"e-commerce", che abbiamo personalizzato come una piattaforma specializzata nella vendita di libri. Questa piattaforma supporta la ricerca delle singole opere, affinabile tramite filtri, e il conseguente acquisto delle stesse da parte degli utenti registrati. Ogni utente può successivamente decidere di vendere i propri libri al prezzo desiderato e, se l'opera non è ancora presente nel database, può aggiungerla fornendo i relativi metadata, come il genere, l'autore, la copertina, ecc.
 
 # Funzionalità principali
 
@@ -14,11 +14,11 @@ Il sistema di autenticazione implementato si occupa di gestire le registrazioni,
 
 I login sono gestiti come segue: l'utente invia tramite l'apposito form utente e password, si recupera l'oggetto corrispondente allo username dato. Se un utente è stato trovato, allora si controlla la password sfruttando la funzione `check_password_hash` fornita da `bcrypt`, e se il controllo passa si genera un nuovo token tramite la funzione `getNewToken()`, la quale invoca `secrets.token_hex(tokenSize)` per ottenere una stringa randomica esadecimale che verrà assegnata ad un cookie (`session["token"]`) usando la libreria session
 
-Le registrazioni sono gestite come segue: si controlla che tutti i parametri siano stati passati e non siano `None`, si procede controllando che il nome utente contenga solo lettere o numeri, che il nome e il cognome contengano solo lettere e che le password passate corrispondano. Una volta fatto questo si interroga il database per trovare un'altro eventuale utente, se non esiste si procede all'inserzione del nuovo utente a cui si assegna anche un token si sessione generato al momento
+Le registrazioni sono gestite come segue: si controlla che tutti i parametri siano stati passati e non siano `None`, si procede controllando che il nome utente contenga solo lettere o numeri, che il nome e il cognome contengano solo lettere e che le password passate corrispondano. Una volta fatto questo si interroga il database per trovare un'altro eventuale utente, se non esiste si procede all'inserzione del nuovo utente a cui si assegna anche un token di sessione generato al momento, altrimenti si blocca l'inserione.
 
-Il logout funziona andando a trovare l'utente con un dato token si sessione all'interno del database, per poi andarlo a porre a `NULL`. Viene sempre e comunque rimosso il token di sessione, ma solo se il token è stato cancellato anche a lato database viene mostrato il messaggio di successo.
+Il logout funziona andando a trovare l'utente con un dato token si sessione all'interno del database, per poi andarlo a porre a `NULL`. Viene sempre e comunque rimosso il token di sessione, ma solamente se viene cancellato il token a lato database viene mostrato il messaggio di logout eseguiro con successo.
 
-Nel caso in avvenga un errore con il token csrf, ovvero un valore randomico univoco per la richiesta fatta in fase di registrazione, allora viene mostrata una pagina d'errore (cosa che non dovrebbe mai accadere se non, ad esempio, in caso di attacchi MITM)
+Nel caso in cui avvenga un errore con il token csrf, ovvero un valore randomico univoco per la richiesta fatta in fase di registrazione, allora viene mostrata una pagina d'errore (cosa che non dovrebbe mai accadere se non, ad esempio, in caso di attacchi MITM)
 
 Le funzioni `checkLoggedIn` e `getLoggedInUser` funzionano essenzialmente alla stessa maniera: entrambe prendono il token di sessione e lo cercano sul database per recuperare l'utente corrispondente, controllano che sia ancora valido (durata di 1 giorno) e ritornano di conseguenza `True` o l'oggetto corrispondente di tipo `User` in caso di successo, `False` o `None` altrimenti.
 
@@ -30,7 +30,7 @@ La pagina prima cerca il libro con l'`id` passato come parametro e, se non è pr
 
 Se il libro esiste, invece, viene visualizzata la copertina e tutte le relative informazioni (come autore e generi) tramite la macro `display_book`.
 
-Inoltre il sistema cerca tutte le inserzioni relative al libro, rimuove quelle dell'utente attualmente loggato, le raggruppa per venditore e le ordina.
+Inoltre il sistema cerca tutte le inserzioni relative al libro, rimuove quelle appartenenti all'utente attualmente loggato per far si che non vengano visualizzate, le raggruppa per venditore e le ordina con il criterio specificato dall'utente.
 
 L'ordinamento si basa sulle stelle totali o medie dei venditori tramite il parametro `sort` e l'ordine è crescente o decrescente a seconda del parametro `order`. Tutti i venditori che non hanno ancora stelle verranno sempre mostrati alla fine
 
@@ -60,7 +60,7 @@ Inoltre supporta l'aggiunta e la rimozione di un'inserzione:
 
 `history.py`
 
-Lo storico, una volta controllato che l'utente sia loggato e ricevuti l'id dell'acquisto fatto (id nello storico), una recensione e una valutazione, procedono a controllare che i dati passati siano validi (quindi non `None` e con una recensione almeno lunga 2 caratteri), procedono a modificare l'oggetto `History` corrispondente al prodotto nello storico andando ad aggiungere la recensione e la valutazione. In caso di errori viene eseguito un rollback esplicitamente e viene mostrato un messaggio d'errore. Infine vengono ricaricati gli oggetti aggiornati presenti nello storico con lo scopo di visualizzarli
+Lo storico, una volta controllato che l'utente sia loggato e che abbia ricevuto l'id dell'acquisto fatto (id nello storico), una recensione e una valutazione, procede a controllare che i dati passati siano validi (quindi non `None` e con una recensione almeno lunga 2 caratteri), per poi modificare l'oggetto `History` corrispondente al prodotto nello storico, andando ad aggiungere la recensione e la valutazione. In caso di errori viene eseguito un rollback esplicitamente e viene mostrato un messaggio d'errore. Infine vengono ricaricati gli oggetti aggiornati presenti nello storico con lo scopo di visualizzarli
 
 ## Homepage
 
@@ -90,7 +90,7 @@ Le singole operazioni effettive gestite tramite richieste `POST` sono poi elabor
 
 - Aggiornamento Inserzione
 
-    l'operazione di aggiornamento di un'inserzione inizia controllando che l'utente sia un venditore abilitato, per poi appoggiarsi alla funzione `retriveExistingBooks` al fine di recuperare i libri con lo stesso id che sono in vendita o meno. Una volta controllato che ci siano sufficienti libri a cui apportare la modifica, la si applica al record esistente, oppure se ne crea uno nuovo. In caso di errori avviene un rollback. Questa operazione, quindi, permette solamente di aggiornare i prezzi e non di rimuovere libri dalla vendita
+    l'operazione di aggiornamento di un'inserzione inizia controllando che l'utente sia un venditore abilitato, per poi appoggiarsi alla funzione `retriveExistingBooks` al fine di recuperare i libri con lo stesso id che sono in vendita o meno. Una volta controllato che ci siano sufficienti libri a cui apportare la modifica, la si applica al record esistente, oppure se ne crea uno nuovo con quest'ultima già applicata. In caso di errori avviene un rollback. Questa operazione, quindi, permette solamente di aggiornare i prezzi e non di rimuovere libri dalla vendita
 - Creazione Inserzione
 
     una volta controllato che l'utente sia un venditore, si recuperano i libri sia in vendita che quelli che non lo sono tramite la funzione `retriveBooks`, e se la quantità di libri è sufficiente viene chiamata la funzione `manageInsertion` abilitando l'aggiunta tramite l'ultimo parametro impostato a `true`
@@ -178,7 +178,7 @@ La pagina del venditore, visibile solo se l'utente cercato è un venditore, visu
 
 Le stelle di un venditore vengono calcolate dalla view `star_count` come media delle stelle di tutte le recensioni ricevute da coloro che hanno effettuato un ordine da quel venditore. Questo avviene tramite il metodo `user.stars()`.
 
-Tutti i libri nella lista hanno anche un link che rimanda alla pagine del libro per poterlo comprare o valutare altre inserzioni.
+Tutti i libri nella lista hanno anche un link che rimanda alla corrispondenti pagine del libro, dove sarà possibile poterli comprare e/o valutare inserzioni di altri venditori più vantaggiose.
 
 # Progettazione Concettuale e Logica
 
@@ -210,7 +210,7 @@ Questa entità rappresenta un a serie di libri uguali che l'utente vuole comprar
 
 - `quantità`: rappresenta la quantità di uno specifico libro che è stato aggiunto al carrello
 
-Vengono specificate tre invarianti: una che controlla che la quantità sia positiva, una che controlla che il libro/i che si vuole comprare faccia parte dei libri appartenenti al venditore e un'ultima che controlla che il libro che si intende acquistare sia effettivamente in vendita
+Vengono specificate tre invarianti: una che controlla che la quantità sia positiva, una che controlla che il libro che si vuole comprare faccia parte dei libri appartenenti al venditore e un'ultima che controlla che il libro che si intende acquistare sia effettivamente in vendita
 
 ### Entità `History`
 
