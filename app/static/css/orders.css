@@ -17,8 +17,8 @@
     width: 200px;
 }
 
-.order__extra > *  {
-   margin: 10px 20px;
+.order__extra > * {
+    margin: 10px 20px;
 }
 
 .order__review {

@@ -25,7 +25,7 @@
 .search-bar__input::placeholder,
 .search-bar__icon {
     color: var(--input-foreground);
-    color: rgba(0, 0, 0, 0.50);
+    color: rgba(0, 0, 0, 0.5);
 }
 
 .search-bar__box {

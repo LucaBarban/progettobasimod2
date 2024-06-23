@@ -11,7 +11,7 @@
 }
 
 .greeter h1 {
-    font-family: var(--font-serif)
+    font-family: var(--font-serif);
 }
 
 .greeter h2 {

@@ -12,7 +12,7 @@
 }
 
 .form .form__title h1 {
-    font-family: var(--font-serif)
+    font-family: var(--font-serif);
 }
 
 .form br {
@@ -20,11 +20,11 @@
 }
 
 .form input[type="text"],
-        input[type="number"],
-        input[type="password"],
-        input[type="date"],
-        select,
-        input[type="file"] {
+input[type="number"],
+input[type="password"],
+input[type="date"],
+select,
+input[type="file"] {
     width: 100%;
     padding: 10px;
     border: 1px solid var(--main-foreground);
@@ -52,4 +52,3 @@
     padding: 8px 10px;
     cursor: pointer;
 }
-
