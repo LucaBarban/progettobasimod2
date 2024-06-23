@@ -72,7 +72,7 @@ def add_library(own: Own, user: User, quantity: int) -> None:
             Own.fk_username == user.username,
             Own.fk_book == own.fk_book,
             Own.state == own.state,
-            Own.price == -1,
+            Own.price == None,
         )
     ).one_or_none()
 
@@ -89,7 +89,7 @@ def add_library(own: Own, user: User, quantity: int) -> None:
             )
         )
 
-    db.session.commit()
+    # db.session.commit()
 
 
 def cart_post(user: User) -> str | Response:
