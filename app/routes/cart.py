@@ -25,10 +25,15 @@ def cart_get(user: User, err: str | None = None) -> str:
         sq.select(Cart).filter(Cart.fk_buyer == user.username)
     ).all()
 
-    total = sum([item.own.price * item.quantity for item in items])  # type: ignore
+    total = None
 
-    if err:
-        flash(err, "error")
+    if None in [item.own.price for item in items]:
+        flash("Unexpected error", "error")
+    else:
+        total = sum([item.own.price * item.quantity for item in items])  # type: ignore
+
+        if err:
+            flash(err, "error")
 
     return render_template(
         "cart.html",
@@ -215,6 +220,7 @@ def cart_add(id: int) -> Response:
         flash("An error occoured", "error")
         db.session.rollback()
 
+    flash("added item to the cart", "success")
     return redirect(f"/book/{insertion.book.id}")
 
 

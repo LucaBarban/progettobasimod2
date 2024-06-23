@@ -35,7 +35,8 @@ INSERT INTO authors (first_name, last_name) VALUES
     ('George', 'Orwell'),
     ('Agatha', 'Christie'),
     ('Stephen', 'King'),
-    ('Chimamanda Ngozi', 'Adichie');
+    ('Chimamanda Ngozi', 'Adichie'),
+    ('J.R.R.', 'Tolkien');
 
 INSERT INTO publishers (name) VALUES
     ('Penguin Books'),
@@ -71,7 +72,7 @@ INSERT INTO books (title, published, pages, isbn, fk_author, fk_publisher) VALUE
     ('The Picture of Dorian Gray', '1890-07-20', 254, '9780486278080', 5, 'Penguin Books'),
     ('Crime and Punishment', '1866-11-14', 430, '9780679734506', 6, 'Penguin Books'),
     ('Gone with the Wind', '1936-06-30', 1037, '9780446675547', 10, 'HarperCollins'),
-    ('The Hobbit', '1937-09-21', 310, '9780345339693', 9, 'Random House'),
+    ('The Hobbit', '1937-09-21', 310, '9780345339693', 17, 'Random House'),
     ('Moby-Dick', '1851-10-18', 585, '9780142000084', 2, 'Penguin Books'),
     ('The Road', '2006-09-26', 287, '9780307387890', 15, 'Simon & Schuster'),
     ('Americanah', '2013-05-14', 588, '9780307455936', 16, 'HarperCollins'),
