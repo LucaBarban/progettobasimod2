@@ -329,7 +329,7 @@ Collega la notifica specifica notifica di un aggiornamento riguardante un ordine
 
 ## Schema ER Risultante
 
-![Schema ER](database_ER.png)
+![](./docs/database_ER.png)
 
 ## Rappresentazione Logica
 
