@@ -4,7 +4,7 @@ La variante del progetto da noi scelta è quella dell'"e-commerce", che abbiamo 
 
 # Funzionalità principali
 
-Le funzionalità pricipali che abbiamo implementato sono le seguenti:
+Le funzionalità principali che abbiamo implementato sono le seguenti:
 
 ## Sistema di Autenticazione
 
@@ -32,10 +32,10 @@ Se il libro esiste, invece, viene visualizzata la copertina e tutte le relative 
 
 Inoltre il sistema cerca tutte le inserzioni relative al libro, rimuove quelle dell'utente attualmente loggato, le raggruppa per venditore e le ordina.
 
-L'ordinamento si basa sulle stelle totali o medie dei venditori tramite il parametro `sort` e l'ordine è crescente o decrescente a seconda del paramentro `order`. Tutti i venditori che non hanno ancora stelle verranno sempre mostrati alla fine
+L'ordinamento si basa sulle stelle totali o medie dei venditori tramite il parametro `sort` e l'ordine è crescente o decrescente a seconda del parametro `order`. Tutti i venditori che non hanno ancora stelle verranno sempre mostrati alla fine
 
 Altre operazioni che offre `/book/` sono:
- - `add` che visualizza un form per aggiungere un libro mancante, da riempire con tutti i paramentri del libro (come titolo, data di pubblicazione, ISBN, etc.) e supporta il caricamento di una foto della copertina
+ - `add` che visualizza un form per aggiungere un libro mancante, da riempire con tutti i parametri del libro (come titolo, data di pubblicazione, ISBN, etc.) e supporta il caricamento di una foto della copertina
  - `add/genre` per aggiungere un genere non già presente nel database
  - `add/author` per aggiungere un autore non già presente nel database
  - `add/publisher` per aggiungere una casa editrice non già presente nel database
@@ -76,7 +76,7 @@ Inoltre, se l'utente è un venditore, mostra un pulsante extra per accedere alla
 
 `inserionmanager.py`
 
-Il sistema di gestione delle inserzioni di occupa di ricevere alcune informazioni come l'id del libro, il suo stato ecc... e di apportare le modifiche rischieste dall'utente tramite i form ad esso forniti.
+Il sistema di gestione delle inserzioni di occupa di ricevere alcune informazioni come l'id del libro, il suo stato ecc... e di apportare le modifiche richieste dall'utente tramite i form ad esso forniti.
 
 Le operazioni che un utente può svolgere sono:
 
@@ -84,13 +84,13 @@ Le operazioni che un utente può svolgere sono:
 - aggiornamento di un'inserzione
 - eliminazione di un'inserzione
 
-Ognuna di queste operazioni ha una funzione che si occupa di controllare che una serie di dati necessari (es. per creare un'inserzione è necessario conoscere l'id e lo stato del libro che si vuole cendere), per poi ritornare il form in cui vengono richieste le informazioni mancanti (es. sempre per l'inserzione, la quantità di libri da vendere e il relativo prezzo)
+Ognuna di queste operazioni ha una funzione che si occupa di controllare che una serie di dati necessari (es. per creare un'inserzione è necessario conoscere l'id e lo stato del libro che si vuole vendere), per poi ritornare il form in cui vengono richieste le informazioni mancanti (es. sempre per l'inserzione, la quantità di libri da vendere e il relativo prezzo)
 
 Le singole operazioni effettive gestite tramite richieste `POST` sono poi elaborate da funzioni differenti:
 
 - Aggiornamento Inserzione
 
-    l'operazione di aggiornamento di un'inserzione inzia controllando che l'utente sia un venditore abilitato, per poi appoggiarsi alla funzione `retriveExistingBooks` al fine di recuperare i libri con lo stesso id che sono in vendita o meno. Una volta controllato che ci siano sufficienti libri a cui apportare la modifica, la si applica al record esistente, oppure se ne crea uno nuovo. In caso di errori avviene un rollback. Questa operazione, quindi, permette solamente di aggiornare i prezzi e non di rimuovere libri dalla vendita
+    l'operazione di aggiornamento di un'inserzione inizia controllando che l'utente sia un venditore abilitato, per poi appoggiarsi alla funzione `retriveExistingBooks` al fine di recuperare i libri con lo stesso id che sono in vendita o meno. Una volta controllato che ci siano sufficienti libri a cui apportare la modifica, la si applica al record esistente, oppure se ne crea uno nuovo. In caso di errori avviene un rollback. Questa operazione, quindi, permette solamente di aggiornare i prezzi e non di rimuovere libri dalla vendita
 - Creazione Inserzione
 
     una volta controllato che l'utente sia un venditore, si recuperano i libri sia in vendita che quelli che non lo sono tramite la funzione `retriveBooks`, e se la quantità di libri è sufficiente viene chiamata la funzione `manageInsertion` abilitando l'aggiunta tramite l'ultimo parametro impostato a `true`
@@ -98,11 +98,11 @@ Le singole operazioni effettive gestite tramite richieste `POST` sono poi elabor
 
     l'operazione di eliminazione controlla che l'utente sia un venditore, recupera i libri tramite l'operazione `retriveBooks`, controlla che ci sia quantità sufficiente di libri da rimuovere, in caso affermativo viene chiamata la funzione `manageInsertion` abilitando la rimozione tramite l'ultimo parametro impostato a `False`
 
-La funzione `retriveBooks` si occupa di recuperare i libri in vendita e quelli che non sono in vendita, sopo aver opportunamente controlalto che l'utente abbia passato tutti i parametri corretti tramite il form
+La funzione `retriveBooks` si occupa di recuperare i libri in vendita e quelli che non sono in vendita, sopo aver opportunamente controllato che l'utente abbia passato tutti i parametri corretti tramite il form
 
 La funzione `retriveExistingBooks` compie un'operazione simile a `retriveBooks`, se non per il fatto che opera con libri che sono esclusivamente in vendita
 
-La funzione `manageInsertion` si occupa di gestire tutti i casi in cui l'aggiunta e la rimozione di libri comportino il dover creare, eliminare o aggiornare dei record all'interno della tabella [`owns`](#tabella-owns). In caso di errori, si occupa autonomamente di effettuare un rollback esplicitamente, emtre se va tutto a buon fine effettua un commit
+La funzione `manageInsertion` si occupa di gestire tutti i casi in cui l'aggiunta e la rimozione di libri comportino il dover creare, eliminare o aggiornare dei record all'interno della tabella [`owns`](#tabella-owns). In caso di errori, si occupa autonomamente di effettuare un rollback esplicitamente, mentre se va tutto a buon fine effettua un commit
 
 
 ## Visualizzazione della propria Libreria
@@ -116,13 +116,13 @@ Le funzioni offerte dalla libreria sono:
  - Paginazione per suddividerla in sezioni e non sovraccaricare il database per ogni richiesta
  - Informazioni sul libro posseduto, quantità e stato
 
-Inoltre, solo se l'utente corrente è un venditore, offre anche la possiblità di aggiungere, modificare e rimuovere un'inserzione.
+Inoltre, solo se l'utente corrente è un venditore, offre anche la possibilità di aggiungere, modificare e rimuovere un'inserzione.
 
 ## Visualizzazione delle Notifiche
 
 `notifications.py`
 
-Le notifiche sono divise in "Unread" and "Archived" e divise per utente, dove ogni utente può visualizzare solo le proprie.
+Le notifiche sono divise in "Unread" e "Archived" e divise per utente, dove ogni utente può visualizzare solo le proprie.
 
 Offre anche due funzioni `/notifications/read` e `/notifications/read/:id` rispettivamente per segnare tutte le notifiche come lette, quindi archiviarle, e per leggerne una sola specificatamente.
 
@@ -146,9 +146,9 @@ Per gli ordini già consegnati viene visualizzata anche la review ricevuta dall'
 
 `profile.py`
 
-La visualizzazione del profilo permette all'utente di modificare alcuni attributi che esso ha, tra cui il nome e il cognome, la password, il proprio saldo (scleta fatta in quanto non abbiamo un vero e proprio modo di aggiungere effettivamente della valuta all'account o gestire delle carte). Viene anche data la possibilità all'utente di effettuare un upgrade al suo account e diventare un venditore.
+La visualizzazione del profilo permette all'utente di modificare alcuni attributi che esso ha, tra cui il nome e il cognome, la password, il proprio saldo (scelta fatta in quanto non abbiamo un vero e proprio modo di aggiungere effettivamente della valuta all'account o gestire delle carte). Viene anche data la possibilità all'utente di effettuare un upgrade al suo account e diventare un venditore.
 
-Le operazioni di aggiornamento avvengono controllando se sono avvenuti dei cambiamenti ai dati pasati al form rispetto a quelli che sono presenti all'interno del database. Una volta che un cambiamento avviene, le modifica vengono validate (es. il nome e il cognome devono contenere solamente lettere, la password deve avere una certa lunghezza, il balance deve essere un numero...) e vengono applicate sull'oggeto `usr`, il quale aggiornerà automaticamente anche il database a seguito del commit presente alla riga successiva. In caso siano presenti degli errori, essi vengono mostrati tutti in una volta sola, senza andare ad applicare modifiche alla base di dati
+Le operazioni di aggiornamento avvengono controllando se sono avvenuti dei cambiamenti ai dati passati al form rispetto a quelli che sono presenti all'interno del database. Una volta che un cambiamento avviene, le modifica vengono validate (es. il nome e il cognome devono contenere solamente lettere, la password deve avere una certa lunghezza, il balance deve essere un numero...) e vengono applicate sull'oggetto `usr`, il quale aggiornerà automaticamente anche il database a seguito del commit presente alla riga successiva. In caso siano presenti degli errori, essi vengono mostrati tutti in una volta sola, senza andare ad applicare modifiche alla base di dati
 
 ## Gestione della Ricerca
 
@@ -228,7 +228,7 @@ Vengono specificati anche tre invarianti, una che controlla che la quantità acq
 
 ### Entità `Books`
 
-L'entitò rappresenta i libri presenti all'interno del database come "entità" astratta, quindi non il singolo libro posseduto da un certo utente. L'entità ha anche i seguenti campi:
+L'entità rappresenta i libri presenti all'interno del database come "entità" astratta, quindi non il singolo libro posseduto da un certo utente. L'entità ha anche i seguenti campi:
 
 - `id`: identifica il libro univocamente all'interno della base di dati
 - `title`: titolo del libro
@@ -254,9 +254,9 @@ Entità rappresentante gli autori dei libri. I suoi attributi sono:
 
 ### Entità `Publishers`
 
-Entità rappresentante una casa pubblicatrice di libri. Il suo unico attributo è:
+Entità rappresentante una casa editoriale di libri. Il suo unico attributo è:
 
-- `nome`: nome identificativo della casa pubblicatrice
+- `nome`: nome identificativo della casa editoriale
 
 ### Entità `Notifications`
 
@@ -268,7 +268,7 @@ Entità rappresentante le singole notifiche di un certo utente. Essa ha i seguen
 
 ### Entità `Orders`
 
-Enità che specializza `Notifications` al fine di contenere maggiori informazioni per gli ordini andando ad agginge 2 attributi:
+Entità che specializza `Notifications` al fine di contenere maggiori informazioni per gli ordini andando ad aggiunge 2 attributi:
 
 - `status_old`: vecchio stato della spedizione
 - `status_new`: nuovo stato della spedizione
@@ -301,7 +301,7 @@ Collega il libro al suo autore
 
 ### Relazione `pubblicato da`
 
-Collega il libro alla sua casa pubblicatrice
+Collega il libro alla sua casa editoriale
 
 ### Relazione `contiene`
 
@@ -410,7 +410,7 @@ La seguente tabella rispecchia fedelmente la struttura di [`Users`](#entità-use
 - `created_at`: `TIMESTAMP` della creazione, deve essere `NOT NULL`
 - `balance`: centesimi presenti all'interno dell'account, per cui è `INTEGER` ed è `NOT NULL`. Essendo che deve essere rispettata l'invariante, viene aggiunto il seguente controllo: `CONSTRAINT balance_ge CHECK (balance >= 0)`
 - `seller`: flag che sta ad indicare se l'account è abilitato a vendere prodotti, quindi ha tipo `BOOLEAN` ed è `NOT NULL`
-- `last_logged_in_at`: orario in cui è stato fatto l'ultimo login, ha tipo `TIMESTAMP WITHOUT TIME ZONE` in modo da avere un oriario consistente tra tutti gli utenti, per quanto ci sia il server flask di mezzo, ed è `NOT NULL`
+- `last_logged_in_at`: orario in cui è stato fatto l'ultimo login, ha tipo `TIMESTAMP WITHOUT TIME ZONE`, siccome devono essere confrontate indifferentemente dalla time zone e non vengono visualizzate agli utenti, ed è `NOT NULL`
 - `token`: token di autenticazione generato a tempo di login, ha tipo `CHARACTER(64)[]` e può essere `NULL` (in tal caso non esite un token valido)
 
 ### Tabella `owns`
@@ -443,7 +443,7 @@ carts([fk_buyer*]{.underline}: string, [fk_own*]{.underline}: int, quantity: int
 La tabella `carts` ricalca l'entità [`Carts`](#entità-carts), aggiungendo le relazioni [`possiede`](#relazione-possiede) e [`ha prodotti in`](#relazione-ha-prodotti-in). Per cui ha i seguenti attributi:
 
 - `fk_buyer`: chiave esterna che si riferisce all'utente compratore, ha quindi tipo `VARCHAR(100)` e fa parte della chiave primaria e referenzia `users(username)`
-- `fk_own`: chiave esterna del libro posseduto che l'utente è intenzionato a comprare, ha quindi tipo `INTEGER` e fa parte della chiave primaria e referenzia `owns(id)` andando a specificare `ON DELETE CASCADE`, in modo da rimuovere autoamticamente dal carrello un oggetto che viene esaurito
+- `fk_own`: chiave esterna del libro posseduto che l'utente è intenzionato a comprare, ha quindi tipo `INTEGER` e fa parte della chiave primaria e referenzia `owns(id)` andando a specificare `ON DELETE CASCADE`, in modo da rimuovere automaticamente dal carrello un oggetto che viene esaurito
 - `quantity`: quantità di prodotto che l'utente è interessato a comprare, ha tipo `INTEGER`, è `NOT NULL` e ha il constraint `quantity_gt_carts CHECK (quantity > 0)`
 
 ### Tabella `history`
@@ -456,12 +456,12 @@ history([id]{.underline}: int, date: timestamp, quantity: int, status: status, p
 
 La tabella `history` segue la struttura dell'entità [`History`](#entità-history), aggiungendo le
 
-- `id`: identificativo artificiale autoincrement, pre cui è `SERIAL` e `PRIMARY KEY`
+- `id`: identificativo artificiale autoincrement, per cui è `SERIAL` e `PRIMARY KEY`
 - `date`: data di acquisto, quindi è `TIMESTAMP` ed anche `NOT NULL`
 - `quantity`: quantità di prodotti acquistata, quindi è `INTEGER`, `NOT NULL` e possiede il constraint `quantity_gt_history CHECK (quantity > 0)` che fa si che la quantità acquistabile non sia nulla o negativa
 - `status`: stato dell'ordine/spedizione, ha tipo custom `status` ed è `NOT NULL`
 - `price`: prezzo di acquisto in centesimi, è quindi `INTEGER`, `NOT NULL` e ha il constraint `price_ge_history CHECK (price >= 0)` che fa si che il prezzo sia positivo
-- `review`: recensione che l'utente può lasciare (non obligatoriamente e successivamente all'acquisto), ha tipo `TEXT`
+- `review`: recensione che l'utente può lasciare (non obbligatoriamente e successivamente all'acquisto), ha tipo `TEXT`
 - `stars`: valutazione in stelle, ha tipo `INTEGER` e ha `CONSTRAINT stars_btw CHECK (stars IS NULL OR stars BETWEEN 0 AND 5)` che fa si che il numero di stelle sia compreso tra $1$ e $5$
 - `fk_buyer`: chiave esterna dell'utente che ha comprato, ha quindi tipo `VARCHAR(100)` e si riferisce a `users(username)`
 - `fk_seller`: chiave esterna che si riferisce all'utente venditore, ha quindi tipo `VARCHAR(100)` e si riferisce a `users(username)`
@@ -493,7 +493,7 @@ Avendo utilizzato il più possibile le features di SQLALchemy, come l'ORM, non a
 
 ## Query 1
 
-La seguente query l'abbiamo usata per creare un tipo di dato custom, al fine di facilitare la scrittura delle tabelle, oltre ad avere anceh il vantaggio della presenza di un controllo automatico dei dati da noi inseriti
+La seguente query l'abbiamo usata per creare un tipo di dato custom, al fine di facilitare la scrittura delle tabelle, oltre ad avere anche il vantaggio della presenza di un controllo automatico dei dati da noi inseriti
 
 ```postgresql
 CREATE TYPE state AS ENUM ('new', 'as new', 'used');
@@ -566,7 +566,7 @@ La seguente query ha lo scopo di recuperare i libri filtrati secondo diversi cri
 - titolo (`Book.title.icontains(input.search)`)
 - nome dell'autore (`Book.author.has(Author.first_name.icontains(input.search))`)
 - cognome dell'autore (`Book.author.has(Author.last_name.icontains(input.search))`)
-- casa pubblicatrice (`Book.publisher.has(Publisher.name.icontains(input.search))`)
+- casa editoriale (`Book.publisher.has(Publisher.name.icontains(input.search))`)
 
 L'utilizzo dell'`or_` permette il funzionamento simultaneo di tutti i filtri. Il risultato della query verrà, in realtà, successivamente rifinito in base ai filtri ulteriori richiesti dall'utente tramite l'aggiunta di ulteriori `WHERE`. Di seguito un esempio
 
@@ -623,7 +623,7 @@ Al fine di garantire l'integrità della base di dati ed implementare alcune feat
 
 ### Trigger `check_quantity_zero_trigger`
 
-Questo è il trigger che, come anticipato, potrebbe essere stato sostituito da un `CHECK`. La scelta di utilizzare un trigger è stata fatta al fine di poter sollevare una specifica eccezzione all'interno della funzione, che viene poi catturata python come se fosse una sorta di "segnale" di un determinato problema avvenuto nell'inserimento. Ovviamente, il rollback avviene automaticamente, in quanto a lato SQL l'eccezione non viene mai esplicitamente catturata
+Questo è il trigger che, come anticipato, potrebbe essere stato sostituito da un `CHECK`. La scelta di utilizzare un trigger è stata fatta al fine di poter sollevare una specifica eccezione all'interno della funzione, che viene poi catturata python come se fosse una sorta di "segnale" di un determinato problema avvenuto nell'inserimento. Ovviamente, il rollback avviene automaticamente, in quanto a lato SQL l'eccezione non viene mai esplicitamente catturata
 
 ```postgresql
 CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
@@ -708,7 +708,7 @@ EXECUTE PROCEDURE refresh_star_count();
 
 ### Trigger `trigger_carts_owner`
 
-Questo trigger serve a mantenere la consistenza della base di dati, in quanto va a controllare che l'oggetto che si sta per inserrire nel carrello appartenga ad un utente che è abilitato alla vendita
+Questo trigger serve a mantenere la consistenza della base di dati, in quanto va a controllare che l'oggetto che si sta per inserire nel carrello appartenga ad un utente che è abilitato alla vendita
 
 ```postgres
 CREATE OR REPLACE FUNCTION if_seller_is_seller()
@@ -816,8 +816,8 @@ Al fine di migliorare le performance, sono stati creati i seguenti indici:
 - `idx_title_books`: Ottimizzare la ricerca per titolo dei libri, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `title`
 - `idx_isbn_books`: Ottimizza la ricerca dei libri per isbn, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `isbn`
 - `idx_author_books`: Ottimizza la ricerca dei libri tramite la chiave esterna dell'autore salvata per ognuno, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `fk_author`
-- `idx_publisher_books`: Ottimizza la ricerca dei libri tramite la chiave esterna della casa pubblicatrice salvata per ognuno, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `fk_publisher`
-- `idx_token_users`: Ottimizza la ricerca degli utenti tramite il token a loro assegnato una volta fatto il login/registreazione, per cui l'indice viene creato su [`users`](#tabella-users) sulla colonna `token`
+- `idx_publisher_books`: Ottimizza la ricerca dei libri tramite la chiave esterna della casa editoriale salvata per ognuno, per cui l'indice viene creato su [`books`](#tabella-books) sulla colonna `fk_publisher`
+- `idx_token_users`: Ottimizza la ricerca degli utenti tramite il token a loro assegnato una volta fatto il login/registrazione, per cui l'indice viene creato su [`users`](#tabella-users) sulla colonna `token`
 - `idx_own`: Ottimizza la ricerca di un determinato libro posseduto da un certo utente in un dato stato di usura, per cui l'indice è stato creato su [`owns`](#tabella-owns) per gli attributi `fk_book`, `fk_username`, `state`
 - `idx_history`: Ottimizza la ricerca di un libro comprato da un certo utente in un certo stato ad un dato prezzo, per cui l'indice è stato creato su [`history`](#tabella-history) per gli attributi `fk_buyer`, `fk_book`, `state`, `price`
 - `idx_seller_history`: Ottimizza la ricerca degli ordini di un determinato venditore, per cui è stato fatto sulla tabella [`Histroy`](#tabella-history) e sull'attributo `fk_seller`
@@ -836,7 +836,7 @@ Un altro esempio consiste nella validazione degli input, andando a controllare c
 
 ### Utilizzo dell'ORM
 
-Un'altra tecnica che abbiamo usato al fine di limitare errori nell'inseriemnto/aggiornamento dei dati è stato l'utilizzo esclusivo dell'ORM e i relativi costruttori, permettendoci quindi di evitare typo e l'utilizzo di dati con tipo incompatibile (permesso anche da mypy, come vedremo poi). Un ulteriore vantaggio è stato quello di poter accedere comodamente alle relazioni semplicemente usando il `.` (es. `libro.autore.first_name`) evitando ancora "errori di distrazione" che avrebbero potuto intaccare la consistenza del database.
+Un'altra tecnica che abbiamo usato al fine di limitare errori nell'inserimento/aggiornamento dei dati è stato l'utilizzo esclusivo dell'ORM e i relativi costruttori, permettendoci quindi di evitare typo e l'utilizzo di dati con tipo incompatibile (permesso anche da mypy, come vedremo poi). Un ulteriore vantaggio è stato quello di poter accedere comodamente alle relazioni semplicemente usando il `.` (es. `libro.autore.first_name`) evitando ancora "errori di distrazione" che avrebbero potuto intaccare la consistenza del database.
 
 ### Utilizzo di Trigger e Check
 
@@ -848,7 +848,7 @@ Un'ulteriore misura di sicurezza è fornita dal sistema di autenticazione, il qu
 
 ### Utente e Database dedicati
 
-Un'ultimo tasello è permesso dall'utilizzo di un utente e un database dedicato per accedere al DBMS (nel nostro specifico caso Postgres), cosa che permette di limitare le azioni che esso può fare in caso di eventi come la compromissione del server Flask. Un permesso banale quanto importante che è stato revocato è la possibilità di creare/modificare/cancellare tabelle, trigger, viste... Il database specifio usato è stato chiamato `library` e l'utente è stato denominato `librarian`
+Un'ultimo tassello è permesso dall'utilizzo di un utente e un database dedicato per accedere al DBMS (nel nostro specifico caso Postgres), cosa che permette di limitare le azioni che esso può fare in caso di eventi come la compromissione del server Flask. Un permesso banale quanto importante che è stato revocato è la possibilità di creare/modificare/cancellare tabelle, trigger, viste... Il database specifico usato è stato chiamato `library` e l'utente è stato denominato `librarian`
 
 # Ulteriori informazioni
 
@@ -856,7 +856,7 @@ Di seguito alcuni aspetti interessanti del progetto
 
 ## Libreria `MyPy`
 
-MyPy, insieme alle sue relative estensioni, ci ha permesso di effettuare il controllo statico dei tipi, ed individuare di conseguenza prima ancora di eseuire il codice potenziali problemi, come dei cast errati. Il codice risultante risulta quindi essere più facile da leggere e mantenere.
+MyPy, insieme alle sue relative estensioni, ci ha permesso di effettuare il controllo statico dei tipi, ed individuare di conseguenza prima ancora di eseguire il codice potenziali problemi, come dei cast errati. Il codice risultante risulta quindi essere più facile da leggere e mantenere.
 
 Nonostante i vantaggi da esso offerti, abbiamo incontrato alcune problematiche, principalmente causate da errori sui tipi scorretti. L'errore più comune è causato a seguito di un controllo per evitare che una serie di variabili non sia `None`, come il seguente:
 
@@ -892,7 +892,7 @@ Le macro si sono rivelate estremamente comode per inserire, e talvolta anche ela
 
 ## Libreria `wtform`
 
-Questa libreria è stata utilizzata nel form di login, al fine di poter utilizzare la feature del token csrf, ovvero un valore randomico che viene inserito per evitare, in questo caso, che un altra pagina possa far regisreare forzatamente l'utente tramite un iframe o usando una richiesta ajax tramite javascript.
+Questa libreria è stata utilizzata nel form di login, al fine di poter utilizzare la feature del token csrf, ovvero un valore randomico che viene inserito per evitare, in questo caso, che un altra pagina possa far registrare forzatamente l'utente tramite un iframe o usando una richiesta ajax tramite javascript.
 Per il resto dei form si è rivelata leggermente più scomoda rispetto alla creazione diretta in html del form desiderato, quindi non è stata ulteriormente utilizzata.
 
 ## Libreria `bcrypt`
@@ -901,18 +901,18 @@ Questa libreria è stata utilizzata per calcolare l'hash della password e, al te
 
 ## Libreria `session`
 
-La libreria session ci ha permesso di salvare in maniera cifrata in un cookie il token utilizzato nelle varie pagine per autenticvare l'utente e verificare che sia effettivamente lui
+La libreria session ci ha permesso di salvare in maniera cifrata in un cookie il token utilizzato nelle varie pagine per autentificare l'utente e verificare che sia effettivamente lui
 
 
 # Contributo al progetto
 
-Lo sviluppo ddel progetto è iniziato scrivendo lo schema ER collaborativamente, in modo da evitare di non accorgersi di parti salienti da implementare nel progetto, successivamente Luca Saccarola ha implementato il tooling che abbiamo usato per l'interezza del progetto come, ad esempio, mypy o il file `compose.yml` usato per il database e Paolo Mozzoni ha implementato la struttura base delle pagine (quindi la suddivisione in `routes`, `model`, `templates`, file `__init__`...)
+Lo sviluppo del progetto è iniziato scrivendo lo schema ER collaborativamente, in modo da evitare di non accorgersi di parti salienti da implementare nel progetto, successivamente Luca Saccarola ha implementato il tooling che abbiamo usato per l'interezza del progetto come, ad esempio, mypy o il file `compose.yml` usato per il database e Paolo Mozzoni ha implementato la struttura base delle pagine (quindi la suddivisione in `routes`, `model`, `templates`, file `__init__`...)
 
-Dopo questa fase iniziale ci siamo divisi i compiti in task da svolgenere settimanalmente, escludendo quale ritardo dovuto alla presenza della sessione d'esame nell'ultima fase del progetto. La suddivisione è stata facilitata dal fatto che abbiamo usato git, per poi lavorare su singoli branch mergiandoli dopo aver creato e approvato le relative pr. Se non consideriamo i contributi minori a parti non assegnate direttamente ad altri interessati, possiamo suddividere le assegnazioni come segue:
+Dopo questa fase iniziale ci siamo divisi i compiti in task da svolgere settimanalmente, escludendo quale ritardo dovuto alla presenza della sessione d'esame nell'ultima fase del progetto. La suddivisione è stata facilitata dal fatto che abbiamo usato git, per poi lavorare su singoli branch mergiandoli dopo aver creato e approvato le relative pr. Se non consideriamo i contributi minori a parti non assegnate direttamente ad altri interessati, possiamo suddividere le assegnazioni come segue:
 
 - Luca Saccarola:
     - **homepage:** creazione della pagina con libri consigliati scelti randomicamente
-    - **searchbar:** barra di ricerca per nome del libro, autore, casa pubblicatrice...
+    - **searchbar:** barra di ricerca per nome del libro, autore, casa editoriale...
     - **libro:** visualizzazione dei dettagli di un singolo libro
     - **css e design grafico:** buona parte di scelte principali di design, nonché gli scheletri base delle pagine utilizzate per tutta la piattaforma
     - **componentizzazione delle pagine:** rimozione di codice duplicato e conseguente creazione di componenti singole per le pagine scritte da Paolo Mozzoni e luca
@@ -926,6 +926,6 @@ Dopo questa fase iniziale ci siamo divisi i compiti in task da svolgenere settim
     - **visualizzazione ordini:** pagina di gestione degli ordini
 - Luca Barban:
     - **sistema autenticazione:** gestioni dei login, registrazioni, autenticazione
-    - **storico:** visualizzazione degli ordini effettuati per recensirli
+    - **storico:** visualizzazione degli ordini effettuati per recensirli 
     - **gestione inserzioni:** creazione, aggiornamento e rimozione di inserzioni
-    - **profilo:** visualizzazione dei dati del prorpio profilo
+    - **profilo:** visualizzazione dei dati del proprio profilo
