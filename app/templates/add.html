@@ -1,11 +1,8 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/components/form.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/components/form.css') }}">
 {% endblock pagestyles %}
-
 {% block content %}
-
-{% block addform %}{% endblock %}
-
+    {% block addform %}{% endblock %}
 {% endblock content %}

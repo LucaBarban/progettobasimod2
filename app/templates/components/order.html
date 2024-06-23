@@ -1,26 +1,19 @@
 <div>
     {% from 'components/book.html' import display_book_image %}
-
-    <h3 class="order__title"> {{ order.book.title }} </h3>
-
+    <h3 class="order__title">{{ order.book.title }}</h3>
     <div class="order">
-        <div class="order__book">
-            {{ display_book_image(order.book, link=False) }}
-        </div>
-
+        <div class="order__book">{{ display_book_image(order.book, link=False) }}</div>
         <div class="order__extra">
-            <div> To: {{ order.buyer.username }} </div>
-            <div> State: {{ order.state }} </div>
-            <div> Quantity: {{ order.quantity }} </div>
-
-            {% set statuses = ['processing', 'packing', 'shipped', 'on delivery', 'delivered'] %}
-
+            <div>To: {{ order.buyer.username }}</div>
+            <div>State: {{ order.state }}</div>
+            <div>Quantity: {{ order.quantity }}</div>
+            {% set statuses = ["processing", "packing", "shipped", "on delivery", "delivered"] %}
             <div>
                 {% if delivered %}
                     <div class="order__review">
                         {% if order.review %}
                             Review:
-                            <br/>
+                            <br />
                             <textarea disabled>"{{ order.review }}"</textarea>
                         {% else %}
                             Awaiting review...
@@ -30,14 +23,8 @@
                     <form action="/orders/{{ order.id }}" method="POST">
                         <select name="status">
                             {% for status in statuses %}
-                                <option
-                                    value="{{ status }}"
-                                    {% if order.status == status %}
-                                        selected
-                                    {% endif %}
-                                >
-                                    {{ status }}
-                                </option>
+                                <option value="{{ status }}"
+                                        {% if order.status == status %}selected{% endif %}>{{ status }}</option>
                             {% endfor %}
                         </select>
                         <input class="order__submit" type="submit" value="Update" />

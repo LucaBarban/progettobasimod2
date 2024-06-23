@@ -16,9 +16,7 @@
             <div class="shortcuts">
                 <a href="/library" class="button">Library</a>
                 <a href="/history" class="button">History</a>
-                {% if user.seller %}
-                    <a href="/orders" class="button">Orders</a>
-                {% endif %}
+                {% if user.seller %}<a href="/orders" class="button">Orders</a>{% endif %}
             </div>
         {% endif %}
     </div>

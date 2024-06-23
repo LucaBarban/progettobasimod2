@@ -2,7 +2,7 @@
 {% block pagestyles %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/library.css') }}">
-          <link rel="stylesheet"
+    <link rel="stylesheet"
           href="{{ url_for('static', filename='css/components/form.css') }}">
 {% endblock pagestyles %}
 {% block content %}
@@ -17,7 +17,11 @@
         <input type="hidden" id="price" name="price" value="{{ price }}" step=".01">
         <br>
         <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" name="quantity" min="0" value="{{ quantity }}">
+        <input type="number"
+               id="quantity"
+               name="quantity"
+               min="0"
+               value="{{ quantity }}">
         <br>
         <input type="submit" value="Unlist">
     </form>

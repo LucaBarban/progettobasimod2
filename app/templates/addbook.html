@@ -1,63 +1,68 @@
 {% extends "add.html" %}
-
 {% block addform %}
-
-<form action="/book/add/" method="post" enctype=multipart/form-data class="form">
-    <div class="form__title">
-        <h1>Add a new Book to the System</h1>
-    </div>
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required><br><br>
-
-    <label for="published">Published:</label>
-    <input type="date" id="published" name="published" required><br><br>
-
-    <label for="pages">Pages:</label>
-    <input type="number" id="pages" name="pages" min="0" required><br><br>
-
-    <label for="isbn">ISBN:</label>
-    <input type="text" id="isbn" name="isbn"><br><br>
-
-    <label for="genres">Genre:</label>
-    <select id="genres" name="genres" multiple required>
-        {% for genre in genres %}
-            <option value="{{ genre.name }}">{{ genre.name }}</option>
-        {% endfor %}
-    </select>
-    <a href="/book/add/genre" class="button" style="text-align: center;"> Add a missing genre </a>
-    <br><br>
-
-    <label for="author">Author:</label>
-    <select id="author" name="author" required>
-        {% for author in authors %}
-            <option value="{{ author.id }}">{{ author.first_name }} {{ author.last_name }}</option>
-        {% endfor %}
-    </select>
-    <a href="/book/add/author" class="button" style="text-align: center;"> Add a missing author </a>
-    <br><br>
-
-    <label for="publisher">Publisher:</label>
-    <select id="publisher" name="publisher" required>
-        {% for publisher in publishers %}
-            <option value="{{ publisher.name }}">{{ publisher.name }}</option>
-        {% endfor %}
-    </select>
-    <a href="/book/add/publisher" class="button" style="text-align: center;"> Add a missing publisher </a>
-    <br><br>
-
-    <label for="file">Book's Cover:</label>
-    <input type="file" name="file" id="file"><br><br>
-
-    <label for="quantity">Quantity:</label>
-    <input type="number" id="quantity" name="quantity" min="1" value="1" required><br><br>
-
-    <select id="state" name="state" required>
+    <form action="/book/add/" method="post" enctype=multipart/form-data class="form">
+        <div class="form__title">
+            <h1>Add a new Book to the System</h1>
+        </div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+        <br>
+        <br>
+        <label for="published">Published:</label>
+        <input type="date" id="published" name="published" required>
+        <br>
+        <br>
+        <label for="pages">Pages:</label>
+        <input type="number" id="pages" name="pages" min="0" required>
+        <br>
+        <br>
+        <label for="isbn">ISBN:</label>
+        <input type="text" id="isbn" name="isbn">
+        <br>
+        <br>
+        <label for="genres">Genre:</label>
+        <select id="genres" name="genres" multiple required>
+            {% for genre in genres %}<option value="{{ genre.name }}">{{ genre.name }}</option>{% endfor %}
+        </select>
+        <a href="/book/add/genre" class="button" style="text-align: center;">Add a missing genre</a>
+        <br>
+        <br>
+        <label for="author">Author:</label>
+        <select id="author" name="author" required>
+            {% for author in authors %}
+                <option value="{{ author.id }}">{{ author.first_name }} {{ author.last_name }}</option>
+            {% endfor %}
+        </select>
+        <a href="/book/add/author" class="button" style="text-align: center;">Add a missing author</a>
+        <br>
+        <br>
+        <label for="publisher">Publisher:</label>
+        <select id="publisher" name="publisher" required>
+            {% for publisher in publishers %}<option value="{{ publisher.name }}">{{ publisher.name }}</option>{% endfor %}
+        </select>
+        <a href="/book/add/publisher" class="button" style="text-align: center;">Add a missing publisher</a>
+        <br>
+        <br>
+        <label for="file">Book's Cover:</label>
+        <input type="file" name="file" id="file">
+        <br>
+        <br>
+        <label for="quantity">Quantity:</label>
+        <input type="number"
+               id="quantity"
+               name="quantity"
+               min="1"
+               value="1"
+               required>
+        <br>
+        <br>
+        <select id="state" name="state" required>
             <option value="new">new</option>
             <option value="as new">as new</option>
             <option value="used">used</option>
-    </select><br><br>
-
-    <input type="submit" value="Add Book">
-</form>
-
+        </select>
+        <br>
+        <br>
+        <input type="submit" value="Add Book">
+    </form>
 {% endblock %}

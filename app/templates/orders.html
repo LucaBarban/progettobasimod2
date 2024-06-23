@@ -1,45 +1,39 @@
 {% extends "layout.html" %}
-
 {% block pagestyles %}
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/orders.css') }}">
-
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/library.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/orders.css') }}">
 {% endblock pagestyles %}
-
-
 {% block content %}
     <div>
-
-        <h1> Processing </h1>
+        <h1>Processing</h1>
         <hr>
         <div class="orders">
             {% for order in processing %}
                 {% include 'components/order.html' %}
-                <br/>
+                <br />
             {% else %}
                 Nothing here...
             {% endfor %}
         </div>
-
-        <h1> Shipping </h1>
+        <h1>Shipping</h1>
         <hr>
         <div class="orders">
             {% for order in shipping %}
                 {% include 'components/order.html' %}
-                <br/>
+                <br />
             {% else %}
                 Nothing here...
             {% endfor %}
         </div>
-
-        <h1> Delivered </h1>
+        <h1>Delivered</h1>
         <hr>
         <div class="orders">
             {% for order in done %}
                 {% with delivered = true %}
                     {% include 'components/order.html' %}
-                    <br/>
+                    <br />
                 {% endwith %}
             {% else %}
                 Nothing here...

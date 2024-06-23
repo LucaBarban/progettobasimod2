@@ -8,7 +8,6 @@
 {% block content %}
     {% from 'components/book.html' import display_book %}
     {% from 'components/stars.html' import stars %}
-
     <h1>{{ book.title }}</h1>
     <br>
     {{ display_book(book, link=False, label=True, title=False) }}
@@ -45,7 +44,11 @@
                             <div>State: {{ own.state }}</div>
                             {% if user %}
                                 <form action="/cart/add/{{ own.id }}" method="POST">
-                                    <input type="number" class="insertion__quantity" name="quantity" min="1" value="1" />
+                                    <input type="number"
+                                           class="insertion__quantity"
+                                           name="quantity"
+                                           min="1"
+                                           value="1" />
                                     <input type="submit" class="button button--current" value="Add to cart" />
                                 </form>
                             {% else %}

@@ -1,18 +1,17 @@
 {% extends "add.html" %}
-
 {% block addform %}
-
-<form action="/book/add/author/" method="post" class="form">
-    <div class="form__title">
-        <h1>Add a new Author to the System</h1>
-    </div>
-    <label for="first_name">First Name:</label>
-    <input type="text" id="first_name" name="first_name" required><br><br>
-
-    <label for="last_name">Last Name:</label>
-    <input type="text" id="last_name" name="last_name" required><br><br>
-
-    <input type="submit" value="Add Author"/>
-</form>
-
+    <form action="/book/add/author/" method="post" class="form">
+        <div class="form__title">
+            <h1>Add a new Author to the System</h1>
+        </div>
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" required>
+        <br>
+        <br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" required>
+        <br>
+        <br>
+        <input type="submit" value="Add Author" />
+    </form>
 {% endblock %}

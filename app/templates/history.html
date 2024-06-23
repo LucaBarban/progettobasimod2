@@ -1,13 +1,12 @@
 {% extends "layout.html" %}
-
 {% block pagestyles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/stars.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/history.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/components/stars.css') }}">
 {% endblock pagestyles %}
-
 {% block content %}
     {% from 'components/stars.html' import stars %}
-
     <h1>History</h1>
     <hr>
     <div class="history__list">
@@ -15,45 +14,53 @@
             You havent bought any books, you can
             <a href="/" class="history__empty">find them here</a> :D
         {% endif %}
-
         <table>
-        {% for hst in hsts %}
-            <tr>
-                <td class="history__image">
-                    <img width=200 src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
-                         onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
-                </td>
-                <td class="history__info">
-                    <span>{{ hst.book.title }}</span> ({{ hst.book.isbn }}) <br>
-                    <div>
-                        From: <a href="/seller/{{ hst.seller.username }}">{{ hst.seller.username }}</a> <br>
-                        Status: {{ hst.status }} <br>
-                        State: {{ hst.state }} <br>
-                        Payed Price: {{ '%0.2f'|format(hst.price / 100) }} <br>
-                    </div>
-                </td>
-                <td class="history__rating">
-                    {% if not hst.review %}
-                        <form action="/history" method="POST">
-                            <input type="hidden" id="hid" name="hid" value="{{ hst.id }}"><br>
-
-                            <p>Rating:
-                                {{ stars(hst.id, "", True) }}
+            {% for hst in hsts %}
+                <tr>
+                    <td class="history__image">
+                        <img width="200"
+                             src="{{ url_for('static', filename='covers/' ~ hst.book.id ~ ".png") }}"
+                             onerror="this.src='{{ url_for('static', filename='images/404.png') }}'" />
+                    </td>
+                    <td class="history__info">
+                        <span>{{ hst.book.title }}</span> ({{ hst.book.isbn }})
+                        <br>
+                        <div>
+                            From: <a href="/seller/{{ hst.seller.username }}">{{ hst.seller.username }}</a>
+                            <br>
+                            Status: {{ hst.status }}
+                            <br>
+                            State: {{ hst.state }}
+                            <br>
+                            Payed Price: {{ '%0.2f'|format(hst.price / 100) }}
+                            <br>
+                        </div>
+                    </td>
+                    <td class="history__rating">
+                        {% if not hst.review %}
+                            <form action="/history" method="POST">
+                                <input type="hidden" id="hid" name="hid" value="{{ hst.id }}">
+                                <br>
+                                <p>
+                                    Rating:
+                                    {{ stars(hst.id, "", True) }}
+                                </p>
+                                <label for="review">Review:</label>
+                                <br>
+                                <textarea id="review" name="review{{ hst.id }}"></textarea>
+                                <br>
+                                <input type="submit" class="button button--current" value="Send Review">
+                            </form>
+                        {% else %}
+                            <p>
+                                Rating:
+                                {{ stars(hst.id, hst.stars) }}
                             </p>
-
-                            <label for="review">Review:</label><br>
-                            <textarea id="review" name="review{{ hst.id }}"></textarea><br>
-                            <input type="submit" class="button button--current" value="Send Review">
-                        </form>
-                    {% else %}
-                        <p>Rating:
-                            {{ stars(hst.id, hst.stars) }}
-                        </p>
-                        <textarea disabled>{{ hst.review }}</textarea>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
+                            <textarea disabled>{{ hst.review }}</textarea>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
         </table>
     </div>
 {% endblock content %}

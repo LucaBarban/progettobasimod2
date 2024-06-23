@@ -1,14 +1,18 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/library.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/library.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/notifications.css') }}">
 {% endblock pagestyles %}
 {% block content %}
     <div>
         <div class="notification__title">
             <h1>Unread</h1>
             <form action="/notifications/read" method="POST">
-                <input type="image" src="{{ url_for('static', filename='images/read_all.svg') }}" alt="Submit Form" />
+                <input type="image"
+                       src="{{ url_for('static', filename='images/read_all.svg') }}"
+                       alt="Submit Form" />
             </form>
         </div>
         <hr>
@@ -20,7 +24,6 @@
                 Nothing here...
             {% endfor %}
         </div>
-
         <h1>Archived</h1>
         <hr>
         <div class="notifications__list">

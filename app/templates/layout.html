@@ -23,7 +23,9 @@
             {% include 'components/navbar.html' %}
             {% block filters %}{% endblock %}
         </form>
-        <div class="content">{% block content %}{% endblock %}</div>
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
     </body>
     {% block scripts %}{% endblock %}
 </html>

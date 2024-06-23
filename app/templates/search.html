@@ -1,17 +1,13 @@
 {% extends "layout.html" %}
-
 {% block pagestyles %}
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/search.css') }}" />
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/components/books.css') }}" />
 {% endblock pagestyles %}
-
 {% block content %}
     {% from 'components/book.html' import display_book %}
-
     <hr />
-
     <div class="search__books">
         {% for book in books %}
             {{ display_book(book, generes=False) }}
@@ -20,66 +16,59 @@
         {% endfor %}
     </div>
 {% endblock content %}
-
 {% block filters %}
     <input type="submit" hidden />
-
     <div class="search__filters">
         <div class="search__item">
-            <label for="available"> Available </label>
-            <input
-                type="checkbox"
-                name="available"
-                {% if input.available %} checked {% endif %}
-            />
+            <label for="available">Available</label>
+            <input type="checkbox"
+                   name="available"
+                   {% if input.available %}checked{% endif %} />
         </div>
-
         <div class="search__item">
-            <input
-                type="number"
-                name="price_min"
-                size="6"
-                min="0"
-                placeholder="min"
-                value="{{ input.min }}"
-            >
+            <input type="number"
+                   name="price_min"
+                   size="6"
+                   min="0"
+                   placeholder="min"
+                   value="{{ input.min }}">
             -
-            <input
-                type="number"
-                name="price_max"
-                size="6"
-                min="0"
-                placeholder="max"
-                value="{{ input.max }}"
-            >
+            <input type="number"
+                   name="price_max"
+                   size="6"
+                   min="0"
+                   placeholder="max"
+                   value="{{ input.max }}">
         </div>
-
         <div class="search__item">
             <div class="dropdown" tabindex=100>
-                <span class="anchor"> Genre </span>
+                <span class="anchor">Genre</span>
                 <ul class="dropdown__items">
                     {% for genre in genres %}
                         <li>
-                            <input type="checkbox" name="genre" value="{{ genre.name }}" id="{{ genre.name }}"
-                                {% if genre.name in input.genres %} checked {% endif %}
-                            >
-                            <label for="{{ genre.name }}"> {{ genre.name }} </label>
+                            <input type="checkbox"
+                                   name="genre"
+                                   value="{{ genre.name }}"
+                                   id="{{ genre.name }}"
+                                   {% if genre.name in input.genres %}checked{% endif %}>
+                            <label for="{{ genre.name }}">{{ genre.name }}</label>
                         </li>
                     {% endfor %}
                 </ul>
             </div>
         </div>
-
         <div class="search__item">
             <div class="dropdown" tabindex=100>
-                <span class="anchor"> Publisher </span>
+                <span class="anchor">Publisher</span>
                 <ul class="dropdown__items">
                     {% for publisher in publishers %}
                         <li>
-                            <input type="checkbox" name="publisher" id="{{ publisher.name }}" value="{{ publisher.name }}"
-                                {% if publisher.name in input.publishers %} checked {% endif %}
-                            >
-                            <label for="{{ publisher.name }}"> {{ publisher.name }} </label>
+                            <input type="checkbox"
+                                   name="publisher"
+                                   id="{{ publisher.name }}"
+                                   value="{{ publisher.name }}"
+                                   {% if publisher.name in input.publishers %}checked{% endif %}>
+                            <label for="{{ publisher.name }}">{{ publisher.name }}</label>
                         </li>
                     {% endfor %}
                 </ul>
@@ -87,9 +76,8 @@
         </div>
     </div>
 {% endblock %}
-
 {% block scripts %}
-<script>
+    <script>
     var dropdowns = document.getElementsByClassName("dropdown");
 
     for(let dropdown of dropdowns) {
@@ -101,5 +89,5 @@
             }
         }
     }
-</script>
+    </script>
 {% endblock %}

@@ -9,7 +9,7 @@
             <td>
                 <table class="cart__info">
                     <tr>
-                        <td colspan="2" >
+                        <td colspan="2">
                             <div class="cart__title">
                                 <h2>{{ item.own.book.title }}</h2>
                                 <a href="/cart/remove/{{ item.own.id }}">&#x2715</a>
@@ -28,10 +28,10 @@
                         <td>Quantity:</td>
                         <td>
                             <input type="number"
-                               name="quantity-{{ item.own.id }}"
-                               value="{{ item.quantity }}"
-                               min="1"
-                               max="10" />
+                                   name="quantity-{{ item.own.id }}"
+                                   value="{{ item.quantity }}"
+                                   min="1"
+                                   max="10" />
                         </td>
                     </tr>
                     <tr>

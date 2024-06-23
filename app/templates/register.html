@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block pagestyles %}
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/components/form.css') }}"/>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/components/form.css') }}" />
 {% endblock pagestyles %}
 {% block content %}
     <form action="/register/" method="POST" class="form">
@@ -19,9 +19,7 @@
         <br>
         {{ regform.checkpwd.label }} {{ regform.checkpwd }}
         <br>
-        <div class="checkbox__container">
-            {{ regform.seller.label }} {{ regform.seller }}
-        </div>
+        <div class="checkbox__container">{{ regform.seller.label }} {{ regform.seller }}</div>
         <br>
         {{ regform.sub }}
     </form>

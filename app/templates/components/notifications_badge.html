@@ -1,14 +1,10 @@
 {% block pagestyles %}
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/components/notification_badge.css') }}">
-
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/components/notification_badge.css') }}">
 {% endblock %}
-
 {% with count = user.unread_count() %}
     <a class="notif__btn" href="/notifications/">
         <img src="{{ url_for('static', filename='images/notification.svg') }}" />
-        {% if count %}
-            <span class="notif__badge">{{ count }}</span>
-        {% endif %}
+        {% if count %}<span class="notif__badge">{{ count }}</span>{% endif %}
     </a>
 {% endwith %}
