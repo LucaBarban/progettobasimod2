@@ -22,8 +22,8 @@ def history() -> str | Response:
 
     if request.method == "POST":
         hid: str | None = request.form.get("hid")
-        rew: str | None = request.form.get("review")
-        rating: str | None = request.form.get("rating")
+        rew: str | None = request.form.get("review" + hid if hid is not None else "-1")
+        rating: str | None = request.form.get("rating"  + hid if hid is not None else "-1")
 
         if hid is not None and rew is not None and rating is not None and len(rew) >= 2:
             try:
