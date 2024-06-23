@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from flask import current_app as app
-from flask import redirect, render_template, request
+from flask import render_template, request
 from sqlalchemy import or_, select
 from werkzeug.wrappers.response import Response
 

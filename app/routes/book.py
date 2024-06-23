@@ -153,7 +153,7 @@ def add() -> str | Response:
         flash("The number of pages is invalid", "error")
     if quantity < 1:
         flash("The number of books to add to your library is invalid", "error")
-    if state is None or not (state in ["new", "as new", "used"]):
+    if state is None or state not in ["new", "as new", "used"]:
         state = ""
         flash("The state of the book is invalid", "error")
     isbres: bool | None = False

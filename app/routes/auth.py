@@ -1,5 +1,4 @@
 import re
-from re import Pattern
 import secrets
 from datetime import datetime
 
@@ -15,7 +14,7 @@ from wtforms.validators import InputRequired, Length
 from app.database import db
 from app.models.user import User
 
-from ..safety import bcrypt, csrf
+from ..safety import bcrypt
 
 minPwdLen: int = 8
 bcryptRounds: int = 10
