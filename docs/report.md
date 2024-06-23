@@ -495,7 +495,7 @@ Avendo utilizzato il più possibile le features di SQLALchemy, come l'ORM, non a
 
 La seguente query l'abbiamo usata per creare un tipo di dato custom, al fine di facilitare la scrittura delle tabelle, oltre ad avere anche il vantaggio della presenza di un controllo automatico dei dati da noi inseriti
 
-```postgresql
+```sql
 CREATE TYPE state AS ENUM ('new', 'as new', 'used');
 ```
 
@@ -514,7 +514,7 @@ db.session.scalars(
 
 e può essere tradotta come segue (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 
-```postgresql
+```sql
 SELECT *
 FROM owns
 WHERE owns.fk_username = _user.username_
@@ -534,7 +534,7 @@ db.session.query(Own)
 
 In SQL la query sarebbe stata (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 
-```postgresql
+```sql
 SELECT *
 FROM owns
 WHERE owns.fk_book = _book.id_ AND owns.price IS NOT NULL AND owns.fk_username != _username_ ORDER BY owns.fk_username
@@ -553,7 +553,7 @@ db.session.scalars(
 
 La query in linguaggio SQL sarebbe stata (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 
-```postgresql
+```sql
 SELECT *
 FROM history
 WHERE history.fk_buyer = _user.username_ ORDER BY _History.id_ DESC
@@ -601,7 +601,7 @@ query = db.session.query(Book).filter(
 
 La query in linguaggio SQL sarebbe stata indicativamente (i valori racchiusi in `_` sono i parametri che verrebbero sostituiti):
 
-```postgresql
+```sql
 SELECT *
 FROM books
 JOIN owns ON books.id = owns.fk_book
@@ -625,7 +625,7 @@ Al fine di garantire l'integrità della base di dati ed implementare alcune feat
 
 Questo è il trigger che, come anticipato, potrebbe essere stato sostituito da un `CHECK`. La scelta di utilizzare un trigger è stata fatta al fine di poter sollevare una specifica eccezione all'interno della funzione, che viene poi catturata python come se fosse una sorta di "segnale" di un determinato problema avvenuto nell'inserimento. Ovviamente, il rollback avviene automaticamente, in quanto a lato SQL l'eccezione non viene mai esplicitamente catturata
 
-```postgresql
+```sql
 CREATE OR REPLACE FUNCTION remove_if_quantity_zero()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -649,7 +649,7 @@ EXECUTE FUNCTION remove_if_quantity_zero();
 
 Il seguente trigger fa si che a seguito di un cambiamento di stato di un ordine (es. quando questo viene spedito), venga generata automaticamente una notifica lo informi dell'avvenimento
 
-```postgresql
+```sql
 CREATE OR REPLACE FUNCTION notify_status_change()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -671,7 +671,7 @@ EXECUTE FUNCTION notify_status_change();
 
 Il seguente trigger viene utilizzato per aggiornare la vista materializzata [`notifications_count`](#vista-notifications_count) a seguito dell'aggiunta di una nuova notifica. Per questo motivo il trigger che chiama la funzione `notifications_count_refresh` è un `AFTER TRIGGER`
 
-```postgresql
+```sql
 CREATE OR REPLACE FUNCTION notifications_count_refresh()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -689,7 +689,7 @@ EXECUTE FUNCTION notifications_count_refresh();
 
 Il seguente trigger ha lo scopo di mantenere aggiornata la view [`star_count`](#vista-star_count) a seguito di un'aggiunta di un ordine nella history o nel caso venga scritta una recensione con relativa valutazione
 
-```postgresql
+```sql
 CREATE OR REPLACE FUNCTION refresh_star_count()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -761,7 +761,7 @@ EXECUTE FUNCTION check_notification();
 
 Questo trigger fa si che un oggetto all'interno del carrello debba obbligatoriamente essere anche un oggetto che è messo in vendita (cotrolla quindi che l'oggetto abbia un prezzo assegnato)
 
-```postgresql
+```sql
 CREATE OR REPLACE FUNCTION check_selling()
 RETURNS TRIGGER
 AS $$
@@ -789,7 +789,7 @@ Al fine di migliorare le performance, sono state introdotte le seguenti view mat
 
 La seguente vista salva per ogni utente il suo numero di notifiche da visualizzare nella barra principale, andando ad escludere quelle già viste
 
-```postgresql
+```sql
 CREATE MATERIALIZED VIEW notifications_count (username, count)
 AS SELECT fk_username, COUNT(*) FROM notifications WHERE archived = false GROUP BY fk_username;
 
@@ -800,7 +800,7 @@ CREATE INDEX idx_username_notifications_count ON notifications_count(fk_username
 
 La seguente vista conteggia la media delle stelle per ogni utente venditore e il numero totale di recensioni che esso ha
 
-```postgresql
+```sql
 CREATE MATERIALIZED VIEW star_count
 AS
 SELECT fk_seller, CAST(SUM(stars) AS DECIMAL)/COUNT(*) AS vote, COUNT(*) AS total FROM history
